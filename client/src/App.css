@@ -1241,7 +1241,7 @@ body {
 
 /* ========== HOME PAGE ========== */
 .home-container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 2rem var(--side-padding);
   display: flex;
@@ -1259,7 +1259,7 @@ body {
   padding: 0.6rem 1.2rem;
   margin-bottom: 2rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   transition: all 0.3s ease;
 }
 
@@ -1360,10 +1360,9 @@ body {
 
 .profile-stats {
   display: flex;
-  gap: 2rem;
+  align-items: center;
+  gap: 1.5rem;
   padding: 1rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-bottom: 1rem;
 }
 
 .stat-item {
@@ -1375,26 +1374,27 @@ body {
 
 .stat-number {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--color-accent);
 }
 
 .stat-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--color-text);
   opacity: 0.5;
 }
 
 .profile-socials {
   display: flex;
-  gap: 0.8rem;
-  justify-content: center;
+  gap: 0.6rem;
+  align-items: center;
+  margin-left: auto;
 }
 
 .social-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
   display: flex;
