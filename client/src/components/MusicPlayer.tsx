@@ -22,12 +22,13 @@ function loadState() {
 
 export default function MusicPlayer() {
   const [songs, setSongs] = useState<Song[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(() => loadState()?.currentIndex ?? 0);
-  const [isPlaying, setIsPlaying] = useState(() => loadState()?.isPlaying ?? false);
-  const [currentTime, setCurrentTime] = useState(() => loadState()?.currentTime ?? 0);
+  const savedState = useRef(loadState());
+  const [currentIndex, setCurrentIndex] = useState(savedState.current?.currentIndex ?? 0);
+  const [isPlaying, setIsPlaying] = useState(savedState.current?.isPlaying ?? false);
+  const [currentTime, setCurrentTime] = useState(savedState.current?.currentTime ?? 0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(new Audio());
-  const savedTimeRef = useRef<number | null>(null);
+  const savedTimeRef = useRef<number | null>(savedState.current?.currentTime ?? null);
 
   const currentSong = songs[currentIndex];
 
@@ -48,8 +49,11 @@ export default function MusicPlayer() {
 
   useEffect(() => {
     if (songs.length === 0) return;
-    const state = { currentIndex, isPlaying, currentTime };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      currentIndex,
+      isPlaying,
+      currentTime,
+    }));
   }, [currentIndex, isPlaying, currentTime, songs.length]);
 
   useEffect(() => {
@@ -67,6 +71,11 @@ export default function MusicPlayer() {
         savedTimeRef.current = null;
       }
     };
+    const onCanPlay = () => {
+      if (isPlaying) {
+        audio.play().catch(() => {});
+      }
+    };
     const onEnded = () => {
       setCurrentIndex((prev) => (prev + 1) % songs.length);
       setIsPlaying(true);
@@ -74,11 +83,13 @@ export default function MusicPlayer() {
 
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('canplay', onCanPlay);
     audio.addEventListener('ended', onEnded);
 
     return () => {
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('canplay', onCanPlay);
       audio.removeEventListener('ended', onEnded);
     };
   }, [currentIndex, songs]);
@@ -107,6 +118,7 @@ export default function MusicPlayer() {
     setCurrentIndex((prev) => (prev - 1 + songs.length) % songs.length);
     setIsPlaying(true);
     setCurrentTime(0);
+    savedTimeRef.current = null;
   }, [songs.length]);
 
   const handleNext = useCallback(() => {
@@ -114,6 +126,7 @@ export default function MusicPlayer() {
     setCurrentIndex((prev) => (prev + 1) % songs.length);
     setIsPlaying(true);
     setCurrentTime(0);
+    savedTimeRef.current = null;
   }, [songs.length]);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
