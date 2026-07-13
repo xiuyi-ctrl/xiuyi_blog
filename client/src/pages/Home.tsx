@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import MusicPlayer from '../components/MusicPlayer';
+import Lyrics from '../components/Lyrics';
 
 interface Stats {
   posts: number;
@@ -12,6 +13,8 @@ interface Stats {
 export default function Home() {
   const [stats, setStats] = useState<Stats>({ posts: 0, views: 0, photos: 0 });
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentSongId, setCurrentSongId] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -27,6 +30,15 @@ export default function Home() {
       }
     };
     fetchStats();
+  }, []);
+
+  const handleSongChange = useCallback((songId: number, time: number) => {
+    setCurrentSongId(songId);
+    setCurrentTime(time);
+  }, []);
+
+  const handleTimeUpdate = useCallback((time: number) => {
+    setCurrentTime(time);
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -106,10 +118,16 @@ export default function Home() {
             <div className="music-header">
               <span className="music-badge">CLOUD MUSIC</span>
             </div>
-            <MusicPlayer />
+            <MusicPlayer onSongChange={handleSongChange} onTimeUpdate={handleTimeUpdate} />
           </div>
         </div>
       </div>
+
+      {currentSongId > 0 && (
+        <div className="home-lyrics-row">
+          <Lyrics songId={currentSongId} currentTime={currentTime} />
+        </div>
+      )}
     </div>
   );
 }

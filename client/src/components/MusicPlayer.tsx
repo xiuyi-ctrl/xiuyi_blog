@@ -20,7 +20,12 @@ function loadState() {
   }
 }
 
-export default function MusicPlayer() {
+interface MusicPlayerProps {
+  onSongChange?: (songId: number, time: number) => void;
+  onTimeUpdate?: (time: number) => void;
+}
+
+export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerProps) {
   const [songs, setSongs] = useState<Song[]>([]);
   const savedState = useRef(loadState());
   const [currentIndex, setCurrentIndex] = useState(savedState.current?.currentIndex ?? 0);
@@ -31,6 +36,16 @@ export default function MusicPlayer() {
   const savedTimeRef = useRef<number | null>(savedState.current?.currentTime ?? null);
 
   const currentSong = songs[currentIndex];
+
+  useEffect(() => {
+    if (currentSong) {
+      onSongChange?.(currentSong.id, currentTime);
+    }
+  }, [currentSong?.id, currentTime, onSongChange]);
+
+  useEffect(() => {
+    onTimeUpdate?.(currentTime);
+  }, [currentTime, onTimeUpdate]);
 
   useEffect(() => {
     const fetchPlaylist = async () => {
@@ -63,7 +78,7 @@ export default function MusicPlayer() {
     audio.src = currentSong.url;
     audio.load();
 
-    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onTimeUpdateHandler = () => setCurrentTime(audio.currentTime);
     const onLoadedMetadata = () => {
       setDuration(audio.duration);
       if (savedTimeRef.current !== null) {
@@ -81,13 +96,13 @@ export default function MusicPlayer() {
       setIsPlaying(true);
     };
 
-    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('timeupdate', onTimeUpdateHandler);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
     audio.addEventListener('canplay', onCanPlay);
     audio.addEventListener('ended', onEnded);
 
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('timeupdate', onTimeUpdateHandler);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
       audio.removeEventListener('canplay', onCanPlay);
       audio.removeEventListener('ended', onEnded);
