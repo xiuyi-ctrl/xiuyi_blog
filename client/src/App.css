@@ -1907,9 +1907,10 @@ body {
   opacity: 0;
   transition: opacity 0.3s;
   position: absolute;
-  top: -40px;
+  bottom: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(-90deg);
+  transform-origin: center center;
 }
 
 .music-volume-btn:hover .music-volume-slider {
