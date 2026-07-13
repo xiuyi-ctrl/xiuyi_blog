@@ -57,8 +57,15 @@ export default function PostDetail() {
 
   return (
     <div className="container">
+      <button className="back-btn" onClick={() => navigate(-1)}>← 返回</button>
+
       <article className="post-detail">
+        {post.cover && (
+          <img src={post.cover} alt={post.title} className="post-detail-cover" />
+        )}
+
         <h1>{post.title}</h1>
+
         <div className="post-meta">
           <span>作者：{post.author_name}</span>
           <span>分类：{post.category_name}</span>
@@ -83,6 +90,10 @@ export default function PostDetail() {
 
         <div className="post-content">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+        </div>
+
+        <div className="post-footer">
+          <p>最后更新：{new Date(post.updated_at).toLocaleString()}</p>
         </div>
       </article>
     </div>

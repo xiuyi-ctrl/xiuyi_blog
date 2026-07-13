@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import api from '../api';
 
 interface Category {
@@ -24,8 +26,17 @@ export default function Write() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await api.get('/posts', { params: { pageSize: 1 } });
-        setCategories(data.categories || []);
+        const { data } = await api.get('/posts', { params: { pageSize: 100 } });
+        const uniqueCategories = new Map<number, Category>();
+        data.posts.forEach((post: any) => {
+          if (post.category_id && post.category_name && !uniqueCategories.has(post.category_id)) {
+            uniqueCategories.set(post.category_id, {
+              id: post.category_id,
+              name: post.category_name
+            });
+          }
+        });
+        setCategories(Array.from(uniqueCategories.values()));
       } catch {
         setCategories([]);
       }
@@ -88,45 +99,69 @@ export default function Write() {
 
       {error && <p className="error">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="write-form">
-        <input
-          type="text"
-          placeholder="文章标题"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+      <form onSubmit={handleSubmit}>
+        <div className="write-top">
+          <input
+            type="text"
+            placeholder="文章标题"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="write-title"
+          />
+        </div>
 
-        <input
-          type="text"
-          placeholder="封面图 URL（可选）"
-          value={cover}
-          onChange={(e) => setCover(e.target.value)}
-        />
+        <div className="write-meta">
+          <input
+            type="text"
+            placeholder="封面图 URL（可选）"
+            value={cover}
+            onChange={(e) => setCover(e.target.value)}
+          />
 
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">选择分类</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
-          ))}
-        </select>
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="">选择分类</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
 
-        <input
-          type="text"
-          placeholder="标签（逗号分隔，如：React, TypeScript）"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-        />
+          <input
+            type="text"
+            placeholder="标签（逗号分隔）"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+          />
+        </div>
 
-        <textarea
-          placeholder="文章内容（支持 Markdown）"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={20}
-        />
+        <div className="markdown-editor">
+          <div className="editor-pane">
+            <div className="pane-header">编辑</div>
+            <textarea
+              placeholder="输入文章内容（支持 Markdown 语法）"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          </div>
+          <div className="preview-pane">
+            <div className="pane-header">预览</div>
+            <div className="preview-content">
+              {content ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+              ) : (
+                <p className="placeholder">在左侧输入内容，这里会实时预览...</p>
+              )}
+            </div>
+          </div>
+        </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? '提交中...' : '发布文章'}
-        </button>
+        <div className="write-actions">
+          <button type="submit" disabled={loading} className="submit-btn">
+            {loading ? '提交中...' : editId ? '更新文章' : '发布文章'}
+          </button>
+          <button type="button" onClick={() => navigate(-1)} className="cancel-btn">
+            取消
+          </button>
+        </div>
       </form>
     </div>
   );
