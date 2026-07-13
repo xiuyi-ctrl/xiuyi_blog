@@ -43,7 +43,7 @@ export default function Home() {
         <span className="home-search-icon">🔍</span>
         <input
           type="text"
-          placeholder="输入暗号探索更多..."
+          placeholder="输入标题、描述..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
