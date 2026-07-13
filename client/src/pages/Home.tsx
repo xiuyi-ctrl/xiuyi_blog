@@ -32,10 +32,11 @@ export default function Home() {
 
   useEffect(() => {
     if (playerReady.current || !musicRef.current) return;
+    let destroyed = false;
 
-    const tryInit = () => {
+    const tryInit = (audioList: any[]) => {
       const AP = (window as any).APlayer;
-      if (!AP || !musicRef.current || playerReady.current) return false;
+      if (!AP || !musicRef.current || playerReady.current || destroyed) return false;
 
       playerReady.current = true;
 
@@ -48,22 +49,35 @@ export default function Home() {
         theme: '#D4A76A',
         loop: 'all',
         lrcType: 3,
-        audio: [
-          { name: '如果呢', artist: '郑润泽', url: 'https://music.163.com/song/media/outer/url?id=2161245025.mp3', cover: '' },
-          { name: '于是', artist: '郑润泽', url: 'https://music.163.com/song/media/outer/url?id=1974443814.mp3', cover: '' },
-          { name: '随风', artist: '郑润泽', url: 'https://music.163.com/song/media/outer/url?id=2058267230.mp3', cover: '' },
-        ]
+        audio: audioList
       });
       return true;
     };
 
-    if (tryInit()) return;
+    const fetchAndPlay = async () => {
+      try {
+        const { data } = await api.get('/music/playlist/13521757209');
+        if (data.success && data.songs.length > 0) {
+          const audioList = data.songs.map((s: any) => ({
+            name: s.name,
+            artist: s.artist,
+            url: s.url,
+            cover: s.cover || '',
+            lrc: s.lrc || ''
+          })).filter((s: any) => s.url);
 
-    const check = setInterval(() => {
-      if (tryInit()) clearInterval(check);
-    }, 300);
+          if (audioList.length > 0) {
+            tryInit(audioList);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch playlist:', err);
+      }
+    };
 
-    return () => clearInterval(check);
+    fetchAndPlay();
+
+    return () => { destroyed = true; };
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
