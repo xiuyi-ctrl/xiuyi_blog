@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 
@@ -11,7 +11,6 @@ interface Stats {
 export default function Home() {
   const [stats, setStats] = useState<Stats>({ posts: 0, views: 0, photos: 0 });
   const [searchQuery, setSearchQuery] = useState('');
-  const musicRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -27,22 +26,6 @@ export default function Home() {
       }
     };
     fetchStats();
-  }, []);
-
-  useEffect(() => {
-    if (musicRef.current && !musicRef.current.querySelector('meting-js')) {
-      const meting = document.createElement('meting-js');
-      meting.setAttribute('server', 'netease');
-      meting.setAttribute('type', 'playlist');
-      meting.setAttribute('id', '13521757209');
-      meting.setAttribute('mini', 'true');
-      meting.setAttribute('autoplay', 'false');
-      meting.setAttribute('mutex', 'true');
-      meting.setAttribute('preload', 'auto');
-      meting.setAttribute('theme', '#D4A76A');
-      meting.setAttribute('loop', 'all');
-      musicRef.current.appendChild(meting);
-    }
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -122,7 +105,12 @@ export default function Home() {
             <div className="music-header">
               <span className="music-badge">CLOUD MUSIC</span>
             </div>
-            <div className="music-player-wrap" ref={musicRef} />
+            <div
+              className="music-player-wrap"
+              dangerouslySetInnerHTML={{
+                __html: '<meting-js server="netease" type="playlist" id="13521757209" mini="true" autoplay="false" mutex="true" preload="auto" theme="#D4A76A" loop="all"></meting-js>'
+              }}
+            />
           </div>
         </div>
       </div>
