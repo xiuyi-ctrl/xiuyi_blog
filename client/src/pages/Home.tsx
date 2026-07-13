@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import MusicPlayer from '../components/MusicPlayer';
-import Lyrics from '../components/Lyrics';
+import CurrentLyric from '../components/CurrentLyric';
 
 interface Stats {
   posts: number;
@@ -125,7 +125,7 @@ export default function Home() {
 
       {currentSongId > 0 && (
         <div className="home-lyrics-row">
-          <Lyrics songId={currentSongId} currentTime={currentTime} />
+          <CurrentLyric songId={currentSongId} currentTime={currentTime} />
         </div>
       )}
     </div>

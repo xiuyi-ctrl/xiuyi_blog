@@ -968,6 +968,43 @@ body {
   padding: 2rem 0;
 }
 
+/* ========== CURRENT LYRIC (Single Line) ========== */
+.current-lyric-card {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.current-lyric-card:hover {
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.current-lyric-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  text-align: center;
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+.current-lyric-empty {
+  opacity: 0.4;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 1200px) {
   .home-lyrics-row {
     width: 100%;
@@ -1726,6 +1763,11 @@ body {
   backdrop-filter: blur(16px);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.music-lyrics-section {
+  max-width: 700px;
+  margin: 1.2rem auto;
 }
 
 /* ========== HOME RESPONSIVE ========== */

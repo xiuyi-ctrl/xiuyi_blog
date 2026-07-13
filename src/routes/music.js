@@ -32,7 +32,29 @@ router.get('/playlist/:id', async (req, res) => {
       duration: track.dt || 0
     }));
 
-    res.json({ success: true, songs, total: songIds.length });
+    const lyricResults = await Promise.all(
+      songs.map(async (song) => {
+        try {
+          const lr = await fetch(
+            `https://music.163.com/api/song/lyric?id=${song.id}&lv=1&tv=1`,
+            { headers: NETEASE_HEADERS }
+          );
+          const ld = await lr.json();
+          const lrc = (ld.lrc && ld.lrc.lyric) || '';
+          const tlyric = (ld.tlyric && ld.tlyric.lyric) || '';
+          return lrc || tlyric;
+        } catch {
+          return '';
+        }
+      })
+    );
+
+    const songsWithLyric = songs.map((song, i) => ({
+      ...song,
+      lrc: lyricResults[i] || ''
+    }));
+
+    res.json({ success: true, songs: songsWithLyric, total: songIds.length });
   } catch (error) {
     console.error('Music API error:', error);
     res.status(500).json({ success: false, error: error.message });
