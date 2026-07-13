@@ -9,12 +9,16 @@ interface Song {
   lrc?: string;
 }
 
+type PlayMode = 'sequential' | 'shuffle' | 'single';
+
 interface MusicState {
   songs: Song[];
   currentIndex: number;
   isPlaying: boolean;
   currentTime: number;
   duration: number;
+  playMode: PlayMode;
+  volume: number;
 }
 
 type Listener = () => void;
@@ -29,6 +33,8 @@ let state: MusicState = {
   isPlaying: false,
   currentTime: 0,
   duration: 0,
+  playMode: 'sequential',
+  volume: 0.7,
 };
 
 let lastNotifyTime = 0;
@@ -41,10 +47,12 @@ function loadSavedState() {
       return {
         currentIndex: saved.currentIndex ?? 0,
         currentTime: saved.currentTime ?? 0,
+        playMode: saved.playMode ?? 'sequential',
+        volume: saved.volume ?? 0.7,
       };
     }
   } catch {}
-  return { currentIndex: 0, currentTime: 0 };
+  return { currentIndex: 0, currentTime: 0, playMode: 'sequential' as PlayMode, volume: 0.7 };
 }
 
 function saveState() {
@@ -53,6 +61,8 @@ function saveState() {
       currentIndex: state.currentIndex,
       isPlaying: state.isPlaying,
       currentTime: state.currentTime,
+      playMode: state.playMode,
+      volume: state.volume,
     }));
   } catch {}
 }
@@ -68,6 +78,7 @@ function notify(throttle = false) {
 export function getAudio(): HTMLAudioElement {
   if (!audio) {
     audio = new Audio();
+    audio.volume = state.volume;
     audio.addEventListener('timeupdate', () => {
       state.currentTime = audio!.currentTime;
       notify(true);
@@ -81,7 +92,13 @@ export function getAudio(): HTMLAudioElement {
       notify();
     });
     audio.addEventListener('ended', () => {
-      next();
+      if (state.playMode === 'single') {
+        const audioEl = getAudio();
+        audioEl.currentTime = 0;
+        audioEl.play().catch(() => {});
+      } else {
+        next();
+      }
     });
   }
   return audio;
@@ -106,6 +123,8 @@ export async function loadPlaylist() {
       if (saved.currentIndex < filtered.length) {
         state.currentIndex = saved.currentIndex;
       }
+      state.playMode = saved.playMode;
+      state.volume = saved.volume;
       notify();
       loadSong(state.currentIndex);
     }
@@ -157,7 +176,17 @@ export function togglePlay() {
 export function next() {
   if (state.songs.length === 0) return;
   const wasPlaying = state.isPlaying;
-  state.currentIndex = (state.currentIndex + 1) % state.songs.length;
+
+  if (state.playMode === 'shuffle') {
+    let nextIdx: number;
+    do {
+      nextIdx = Math.floor(Math.random() * state.songs.length);
+    } while (nextIdx === state.currentIndex && state.songs.length > 1);
+    state.currentIndex = nextIdx;
+  } else {
+    state.currentIndex = (state.currentIndex + 1) % state.songs.length;
+  }
+
   state.currentTime = 0;
   state.duration = 0;
 
@@ -174,7 +203,17 @@ export function next() {
 export function prev() {
   if (state.songs.length === 0) return;
   const wasPlaying = state.isPlaying;
-  state.currentIndex = (state.currentIndex - 1 + state.songs.length) % state.songs.length;
+
+  if (state.playMode === 'shuffle') {
+    let prevIdx: number;
+    do {
+      prevIdx = Math.floor(Math.random() * state.songs.length);
+    } while (prevIdx === state.currentIndex && state.songs.length > 1);
+    state.currentIndex = prevIdx;
+  } else {
+    state.currentIndex = (state.currentIndex - 1 + state.songs.length) % state.songs.length;
+  }
+
   state.currentTime = 0;
   state.duration = 0;
 
@@ -199,6 +238,20 @@ export function setSong(index: number) {
   if (index < 0 || index >= state.songs.length) return;
   state.isPlaying = true;
   loadSong(index);
+}
+
+export function togglePlayMode() {
+  const modes: PlayMode[] = ['sequential', 'shuffle', 'single'];
+  const currentIdx = modes.indexOf(state.playMode);
+  state.playMode = modes[(currentIdx + 1) % modes.length];
+  notify();
+}
+
+export function setVolume(vol: number) {
+  state.volume = Math.max(0, Math.min(1, vol));
+  const audioEl = getAudio();
+  audioEl.volume = state.volume;
+  notify();
 }
 
 export function getCurrentSong(): Song | null {
