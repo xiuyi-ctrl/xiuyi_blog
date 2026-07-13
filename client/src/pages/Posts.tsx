@@ -54,18 +54,10 @@ export default function Posts() {
 
   const fetchCategories = async () => {
     try {
-      const { data } = await api.get('/posts', { params: { pageSize: 100 } });
-      const uniqueCategories = new Map<number, Category>();
-      data.posts.forEach((post: Post) => {
-        if (post.category_id && post.category_name && !uniqueCategories.has(post.category_id)) {
-          uniqueCategories.set(post.category_id, {
-            id: post.category_id,
-            name: post.category_name,
-            description: ''
-          });
-        }
-      });
-      setCategories(Array.from(uniqueCategories.values()));
+      const { data } = await api.get('/categories');
+      if (data.success) {
+        setCategories(data.categories);
+      }
     } catch (error) {
       console.error('Failed to fetch categories:', error);
     }
@@ -97,7 +89,7 @@ export default function Posts() {
 
   return (
     <div className="container">
-      <h1 className="page-title">Xiuyi's Blog</h1>
+      <h1 className="page-title">手记拾遗</h1>
       <p className="page-subtitle">思考、记录、分享</p>
 
       <div className="category-tags">
