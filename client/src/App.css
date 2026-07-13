@@ -1442,11 +1442,6 @@ body {
   min-height: 66px;
 }
 
-.music-player-wrap .aplayer {
-  margin: 0;
-  background: transparent;
-}
-
 .music-header {
   margin-bottom: 0.8rem;
 }
@@ -1462,94 +1457,127 @@ body {
   border-radius: 20px;
 }
 
-.music-info {
-  margin-bottom: 1rem;
+/* ========== CUSTOM MUSIC PLAYER ========== */
+.cmp-player {
+  width: 100%;
 }
 
-.music-title {
-  font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0 0 0.3rem 0;
-  color: var(--color-text);
-}
-
-.music-artist {
+.cmp-loading {
+  text-align: center;
+  opacity: 0.5;
   font-size: 0.85rem;
-  color: var(--color-text);
-  opacity: 0.6;
-  margin: 0 0 0.3rem 0;
+  padding: 1rem 0;
 }
 
-.music-composer {
-  font-size: 0.8rem;
-  color: var(--color-accent);
-  margin: 0;
-}
-
-.music-progress {
+.cmp-top {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   margin-bottom: 1rem;
 }
 
-.music-time {
-  font-size: 0.7rem;
-  color: var(--color-text);
-  opacity: 0.5;
-  min-width: 30px;
+.cmp-cover {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-secondary);
 }
 
-.progress-bar {
+.cmp-info {
   flex: 1;
-  height: 3px;
+  min-width: 0;
+}
+
+.cmp-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cmp-artist {
+  font-size: 0.8rem;
+  color: var(--color-text);
+  opacity: 0.5;
+  margin-top: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cmp-bottom {
+  width: 100%;
+}
+
+.cmp-progress {
+  width: 100%;
+  height: 4px;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 2px;
+  cursor: pointer;
   overflow: hidden;
 }
 
-.progress-fill {
+.cmp-progress:hover {
+  height: 6px;
+}
+
+.cmp-progress-bar {
   height: 100%;
   background: var(--color-accent);
   border-radius: 2px;
-  transition: width 0.3s ease;
+  transition: width 0.1s linear;
 }
 
-.music-controls {
+.cmp-time {
   display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--color-text);
+  opacity: 0.4;
+  margin-top: 0.3rem;
+}
+
+.cmp-controls {
+  display: flex;
+  align-items: center;
   justify-content: center;
   gap: 1rem;
+  margin-top: 0.5rem;
 }
 
-.music-btn {
-  width: 36px;
-  height: 36px;
+.cmp-btn {
+  width: 32px;
+  height: 32px;
   border: none;
   background: rgba(0, 0, 0, 0.05);
   border-radius: 50%;
   cursor: pointer;
-  font-size: 0.9rem;
   color: var(--color-text);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  padding: 0;
 }
 
-.music-btn:hover {
+.cmp-btn:hover {
   background: rgba(0, 0, 0, 0.1);
 }
 
-.music-play {
-  width: 44px;
-  height: 44px;
+.cmp-play {
+  width: 40px;
+  height: 40px;
   background: var(--color-accent);
   color: white;
-  font-size: 1rem;
 }
 
-.music-play:hover {
+.cmp-play:hover {
   background: var(--color-accent);
   opacity: 0.9;
   transform: scale(1.05);

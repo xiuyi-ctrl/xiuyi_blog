@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import MusicPlayer from '../components/MusicPlayer';
 
 interface Stats {
   posts: number;
@@ -11,8 +12,6 @@ interface Stats {
 export default function Home() {
   const [stats, setStats] = useState<Stats>({ posts: 0, views: 0, photos: 0 });
   const [searchQuery, setSearchQuery] = useState('');
-  const musicRef = useRef<HTMLDivElement>(null);
-  const playerReady = useRef(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -28,56 +27,6 @@ export default function Home() {
       }
     };
     fetchStats();
-  }, []);
-
-  useEffect(() => {
-    if (playerReady.current || !musicRef.current) return;
-    let destroyed = false;
-
-    const tryInit = (audioList: any[]) => {
-      const AP = (window as any).APlayer;
-      if (!AP || !musicRef.current || playerReady.current || destroyed) return false;
-
-      playerReady.current = true;
-
-      new AP({
-        container: musicRef.current,
-        mini: true,
-        autoplay: false,
-        mutex: true,
-        preload: 'auto',
-        theme: '#D4A76A',
-        loop: 'all',
-        lrcType: 3,
-        audio: audioList
-      });
-      return true;
-    };
-
-    const fetchAndPlay = async () => {
-      try {
-        const { data } = await api.get('/music/playlist/13521757209');
-        if (data.success && data.songs.length > 0) {
-          const audioList = data.songs.map((s: any) => ({
-            name: s.name,
-            artist: s.artist,
-            url: s.url,
-            cover: s.cover || '',
-            lrc: s.lrc || ''
-          })).filter((s: any) => s.url);
-
-          if (audioList.length > 0) {
-            tryInit(audioList);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch playlist:', err);
-      }
-    };
-
-    fetchAndPlay();
-
-    return () => { destroyed = true; };
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -157,7 +106,7 @@ export default function Home() {
             <div className="music-header">
               <span className="music-badge">CLOUD MUSIC</span>
             </div>
-            <div className="music-player-wrap" ref={musicRef} />
+            <MusicPlayer />
           </div>
         </div>
       </div>
