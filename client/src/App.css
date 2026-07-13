@@ -1315,7 +1315,7 @@ body {
 .profile-top {
   display: flex;
   gap: 1.5rem;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1.5rem;
 }
 
@@ -1335,6 +1335,14 @@ body {
   font-size: 1.8rem;
   font-weight: 600;
   color: white;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.5);
 }
 
@@ -1374,10 +1382,14 @@ body {
 
 .stat-number {
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-accent);
 }
+
+.stat-color-1 { color: #E85D75; }
+.stat-color-2 { color: #5BA4E8; }
+.stat-color-3 { color: #6BCB77; }
 
 .stat-label {
   font-size: 0.7rem;
@@ -1393,8 +1405,8 @@ body {
 }
 
 .social-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
   display: flex;
