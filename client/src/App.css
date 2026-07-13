@@ -1447,6 +1447,7 @@ body {
   transition: all 0.3s ease;
   overflow: hidden;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .home-music-card:hover {
