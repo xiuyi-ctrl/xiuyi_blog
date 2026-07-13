@@ -1479,6 +1479,7 @@ body {
   height: 36px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1491,6 +1492,30 @@ body {
   background: var(--color-accent);
   color: white;
   transform: translateY(-2px);
+}
+
+.toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 9999;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.toast-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
 }
 
 /* Right Column */

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import MusicPlayer from '../components/MusicPlayer';
 import CurrentLyric from '../components/CurrentLyric';
+import Toast from '../components/Toast';
 
 interface Stats {
   posts: number;
@@ -13,6 +14,7 @@ interface Stats {
 export default function Home() {
   const [stats, setStats] = useState<Stats>({ posts: 0, views: 0, photos: 0 });
   const [searchQuery, setSearchQuery] = useState('');
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -88,7 +90,7 @@ export default function Home() {
                 title="Email"
                 onClick={() => {
                   navigator.clipboard.writeText('2998526825@qq.com').then(() => {
-                    alert('邮箱已复制到剪贴板');
+                    setToast('邮箱已复制到剪贴板');
                   });
                 }}
               >
@@ -123,6 +125,8 @@ export default function Home() {
       <div className="home-lyrics-row">
         <CurrentLyric />
       </div>
+
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }
