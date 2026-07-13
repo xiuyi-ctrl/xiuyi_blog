@@ -9,13 +9,25 @@ interface Song {
   url: string;
 }
 
+const STORAGE_KEY = 'xiuyi_music_player';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function MusicPlayer() {
   const [songs, setSongs] = useState<Song[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(() => loadState()?.currentIndex ?? 0);
+  const [isPlaying, setIsPlaying] = useState(() => loadState()?.isPlaying ?? false);
+  const [currentTime, setCurrentTime] = useState(() => loadState()?.currentTime ?? 0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(new Audio());
+  const savedTimeRef = useRef<number | null>(null);
 
   const currentSong = songs[currentIndex];
 
@@ -24,7 +36,8 @@ export default function MusicPlayer() {
       try {
         const { data } = await api.get('/music/playlist/13521757209');
         if (data.success && data.songs.length > 0) {
-          setSongs(data.songs.filter((s: Song) => s.url));
+          const filtered = data.songs.filter((s: Song) => s.url);
+          setSongs(filtered);
         }
       } catch (err) {
         console.error('Failed to fetch playlist:', err);
@@ -34,6 +47,12 @@ export default function MusicPlayer() {
   }, []);
 
   useEffect(() => {
+    if (songs.length === 0) return;
+    const state = { currentIndex, isPlaying, currentTime };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [currentIndex, isPlaying, currentTime, songs.length]);
+
+  useEffect(() => {
     const audio = audioRef.current;
     if (!currentSong) return;
 
@@ -41,7 +60,13 @@ export default function MusicPlayer() {
     audio.load();
 
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const onLoadedMetadata = () => setDuration(audio.duration);
+    const onLoadedMetadata = () => {
+      setDuration(audio.duration);
+      if (savedTimeRef.current !== null) {
+        audio.currentTime = savedTimeRef.current;
+        savedTimeRef.current = null;
+      }
+    };
     const onEnded = () => {
       setCurrentIndex((prev) => (prev + 1) % songs.length);
       setIsPlaying(true);
@@ -80,13 +105,15 @@ export default function MusicPlayer() {
   const handlePrev = useCallback(() => {
     if (songs.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + songs.length) % songs.length);
-    setIsPlaying(false);
+    setIsPlaying(true);
+    setCurrentTime(0);
   }, [songs.length]);
 
   const handleNext = useCallback(() => {
     if (songs.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % songs.length);
-    setIsPlaying(false);
+    setIsPlaying(true);
+    setCurrentTime(0);
   }, [songs.length]);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
