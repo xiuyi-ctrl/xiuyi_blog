@@ -42,7 +42,10 @@ export default function MusicPlayer() {
 
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
     const onLoadedMetadata = () => setDuration(audio.duration);
-    const onEnded = () => handleNext();
+    const onEnded = () => {
+      setCurrentIndex((prev) => (prev + 1) % songs.length);
+      setIsPlaying(true);
+    };
 
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
@@ -54,6 +57,13 @@ export default function MusicPlayer() {
       audio.removeEventListener('ended', onEnded);
     };
   }, [currentIndex, songs]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (isPlaying && currentSong) {
+      audio.play().catch(() => {});
+    }
+  }, [currentIndex, isPlaying, currentSong]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
