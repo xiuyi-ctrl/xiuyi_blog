@@ -88,6 +88,20 @@ export default function Music() {
     }
   }, [activeLine]);
 
+  useEffect(() => {
+    if (activeTab === 'lyrics' && activeLine >= 0) {
+      setTimeout(() => {
+        const el = lineRefs.current[activeLine];
+        if (el && lyricsScrollRef.current) {
+          const container = lyricsScrollRef.current;
+          const offsetTop = el.offsetTop - container.offsetTop;
+          const scrollTo = offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+          container.scrollTo({ top: scrollTo, behavior: 'smooth' });
+        }
+      }, 50);
+    }
+  }, [activeTab]);
+
   const togglePlay = useCallback(() => music.togglePlay(), []);
   const handlePrev = useCallback(() => music.prev(), []);
   const handleNext = useCallback(() => music.next(), []);
