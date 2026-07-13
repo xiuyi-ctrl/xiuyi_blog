@@ -31,6 +31,8 @@ let state: MusicState = {
   duration: 0,
 };
 
+let lastNotifyTime = 0;
+
 function loadSavedState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -55,7 +57,10 @@ function saveState() {
   } catch {}
 }
 
-function notify() {
+function notify(throttle = false) {
+  const now = Date.now();
+  if (throttle && now - lastNotifyTime < 300) return;
+  lastNotifyTime = now;
   saveState();
   listeners.forEach(l => l());
 }
@@ -65,7 +70,7 @@ export function getAudio(): HTMLAudioElement {
     audio = new Audio();
     audio.addEventListener('timeupdate', () => {
       state.currentTime = audio!.currentTime;
-      notify();
+      notify(true);
     });
     audio.addEventListener('loadedmetadata', () => {
       state.duration = audio!.duration;
@@ -83,7 +88,7 @@ export function getAudio(): HTMLAudioElement {
 }
 
 export function getState(): MusicState {
-  return state;
+  return { ...state };
 }
 
 export function subscribe(listener: Listener): () => void {
