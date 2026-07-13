@@ -29,7 +29,7 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
   const [songs, setSongs] = useState<Song[]>([]);
   const savedState = useRef(loadState());
   const [currentIndex, setCurrentIndex] = useState(savedState.current?.currentIndex ?? 0);
-  const [isPlaying, setIsPlaying] = useState(savedState.current?.isPlaying ?? false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(savedState.current?.currentTime ?? 0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(new Audio());
