@@ -1898,6 +1898,9 @@ body {
   padding: 1.2rem;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  height: 600px;
+  box-sizing: border-box;
 }
 
 .music-tabs {
