@@ -1908,7 +1908,7 @@ body {
   transition: opacity 0.3s;
   position: absolute;
   bottom: calc(100% + 38px);
-  left: 50%;
+  left: calc(50% + 2px);
   transform: translateX(-50%) rotate(-90deg);
   transform-origin: bottom center;
 }
