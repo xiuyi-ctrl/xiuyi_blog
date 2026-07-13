@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
+import Posts from './pages/Posts';
 import PostDetail from './pages/PostDetail';
 import Write from './pages/Write';
 import Login from './pages/Login';
@@ -17,6 +18,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/posts" element={<Posts />} />
           <Route path="/post/:id" element={<PostDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
