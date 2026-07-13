@@ -1291,7 +1291,7 @@ body {
 
 .home-grid {
   display: grid;
-  grid-template-columns: 2.2fr 1fr;
+  grid-template-columns: 680px 1fr;
   gap: 1.2rem;
   align-items: stretch;
   width: 100%;
@@ -1306,7 +1306,8 @@ body {
   padding: 1.2rem 1.5rem;
   transition: all 0.3s ease;
   overflow: hidden;
-  min-width: 0;
+  width: 680px;
+  box-sizing: border-box;
 }
 
 .home-profile-card:hover {
@@ -1440,13 +1441,12 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   padding: 1.2rem 1.5rem;
-  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   transition: all 0.3s ease;
   overflow: hidden;
-  min-width: 280px;
+  box-sizing: border-box;
 }
 
 .home-music-card:hover {
