@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 
@@ -11,6 +11,7 @@ interface Stats {
 export default function Home() {
   const [stats, setStats] = useState<Stats>({ posts: 0, views: 0, photos: 0 });
   const [searchQuery, setSearchQuery] = useState('');
+  const musicRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -26,6 +27,22 @@ export default function Home() {
       }
     };
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    if (musicRef.current && !musicRef.current.querySelector('meting-js')) {
+      const meting = document.createElement('meting-js');
+      meting.setAttribute('server', 'netease');
+      meting.setAttribute('type', 'playlist');
+      meting.setAttribute('id', '13521757209');
+      meting.setAttribute('mini', 'true');
+      meting.setAttribute('autoplay', 'false');
+      meting.setAttribute('mutex', 'true');
+      meting.setAttribute('preload', 'auto');
+      meting.setAttribute('theme', '#D4A76A');
+      meting.setAttribute('loop', 'all');
+      musicRef.current.appendChild(meting);
+    }
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -96,7 +113,7 @@ export default function Home() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -105,23 +122,7 @@ export default function Home() {
             <div className="music-header">
               <span className="music-badge">CLOUD MUSIC</span>
             </div>
-            <div className="music-info">
-              <h3 className="music-title">如果呢</h3>
-              <p className="music-artist">郑润泽</p>
-              <p className="music-composer">作曲 : 郑润泽</p>
-            </div>
-            <div className="music-progress">
-              <span className="music-time">00:01</span>
-              <div className="progress-bar">
-                <div className="progress-fill" style={{ width: '0.3%' }}></div>
-              </div>
-              <span className="music-time">04:17</span>
-            </div>
-            <div className="music-controls">
-              <button className="music-btn">⏮</button>
-              <button className="music-btn music-play">▶</button>
-              <button className="music-btn">⏭</button>
-            </div>
+            <div className="music-player-wrap" ref={musicRef} />
           </div>
         </div>
       </div>
