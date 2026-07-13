@@ -43,16 +43,19 @@ router.get('/lyric/:id', async (req, res) => {
   try {
     const songId = req.params.id;
     const lyricRes = await fetch(
-      `https://music.163.com/api/song/lyric?id=${songId}&lv=1`,
+      `https://music.163.com/api/song/lyric?id=${songId}&lv=1&tv=1`,
       { headers: NETEASE_HEADERS }
     );
     const data = await lyricRes.json();
 
-    if (data.code !== 200 || !data.lrc) {
+    if (data.code !== 200) {
       return res.json({ success: true, lrc: '' });
     }
 
-    res.json({ success: true, lrc: data.lrc.lyric || '' });
+    const lrc = (data.lrc && data.lrc.lyric) || '';
+    const tlyric = (data.tlyric && data.tlyric.lyric) || '';
+
+    res.json({ success: true, lrc: lrc || tlyric });
   } catch (error) {
     console.error('Lyric API error:', error);
     res.status(500).json({ success: false, error: error.message });
