@@ -34,6 +34,7 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(new Audio());
   const savedTimeRef = useRef<number | null>(savedState.current?.currentTime ?? null);
+  const waitingForInteraction = useRef(false);
 
   const currentSong = songs[currentIndex];
 
@@ -71,6 +72,52 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
     }));
   }, [currentIndex, isPlaying, currentTime, songs.length]);
 
+  const tryAutoPlay = useCallback(() => {
+    const audio = audioRef.current;
+    if (!currentSong) return;
+
+    if (audio.readyState >= 2) {
+      audio.play().then(() => {
+        waitingForInteraction.current = false;
+      }).catch(() => {});
+    }
+  }, [currentSong]);
+
+  useEffect(() => {
+    if (!isPlaying || !currentSong) return;
+
+    const audio = audioRef.current;
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        waitingForInteraction.current = false;
+      }).catch(() => {
+        waitingForInteraction.current = true;
+      });
+    }
+  }, [currentIndex, currentSong]);
+
+  useEffect(() => {
+    if (!waitingForInteraction.current) return;
+
+    const handler = () => {
+      if (waitingForInteraction.current) {
+        tryAutoPlay();
+      }
+    };
+
+    document.addEventListener('click', handler, { once: true });
+    document.addEventListener('keydown', handler, { once: true });
+    document.addEventListener('touchstart', handler, { once: true });
+
+    return () => {
+      document.removeEventListener('click', handler);
+      document.removeEventListener('keydown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, [waitingForInteraction.current, tryAutoPlay]);
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!currentSong) return;
@@ -86,11 +133,6 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
         savedTimeRef.current = null;
       }
     };
-    const onCanPlay = () => {
-      if (isPlaying) {
-        audio.play().catch(() => {});
-      }
-    };
     const onEnded = () => {
       setCurrentIndex((prev) => (prev + 1) % songs.length);
       setIsPlaying(true);
@@ -98,23 +140,14 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
 
     audio.addEventListener('timeupdate', onTimeUpdateHandler);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
-    audio.addEventListener('canplay', onCanPlay);
     audio.addEventListener('ended', onEnded);
 
     return () => {
       audio.removeEventListener('timeupdate', onTimeUpdateHandler);
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-      audio.removeEventListener('canplay', onCanPlay);
       audio.removeEventListener('ended', onEnded);
     };
   }, [currentIndex, songs]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (isPlaying && currentSong) {
-      audio.play().catch(() => {});
-    }
-  }, [currentIndex, isPlaying, currentSong]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
