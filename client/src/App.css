@@ -1244,6 +1244,9 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem var(--side-padding);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .home-search {
@@ -1253,8 +1256,10 @@ body {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 50px;
-  padding: 0.8rem 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 0.6rem 1.2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 400px;
   transition: all 0.3s ease;
 }
 
@@ -1273,7 +1278,7 @@ body {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--color-text);
   outline: none;
   font-family: var(--font-body);
@@ -1286,9 +1291,10 @@ body {
 
 .home-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2.2fr 1fr;
   gap: 1.2rem;
-  align-items: start;
+  align-items: stretch;
+  width: 100%;
 }
 
 /* Profile Card */
@@ -1410,6 +1416,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  height: 100%;
 }
 
 /* Music Card */
@@ -1419,6 +1426,10 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
   padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   transition: all 0.3s ease;
 }
 
@@ -1570,13 +1581,8 @@ body {
     justify-content: center;
   }
 
-  .home-right-column {
-    flex-direction: row;
-  }
-
-  .home-music-card,
-  .home-photo-card {
-    flex: 1;
+  .home-search {
+    max-width: 100%;
   }
 }
 
