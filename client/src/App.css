@@ -1316,9 +1316,9 @@ body {
 
 .profile-top {
   display: flex;
-  gap: 1.2rem;
-  align-items: flex-start;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  align-items: stretch;
+  margin-bottom: 0.8rem;
 }
 
 .profile-avatar {
@@ -1326,8 +1326,8 @@ body {
 }
 
 .avatar-placeholder {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-accent), #e8c9a0);
   display: flex;
@@ -1341,8 +1341,8 @@ body {
 }
 
 .avatar-img {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.5);
@@ -1489,7 +1489,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  margin-bottom: 0.6rem;
+  margin-bottom: 1rem;
 }
 
 .cmp-cover {
