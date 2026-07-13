@@ -86,9 +86,19 @@ export default function Home() {
     fetchPosts(1, keyword, categoryId);
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className="container">
-      <h1>最新文章</h1>
+      <h1 className="page-title">Xiuyi's Blog</h1>
+      <p className="page-subtitle">思考、记录、分享</p>
 
       <div className="category-tags">
         <button
@@ -119,9 +129,9 @@ export default function Home() {
       </form>
 
       {loading ? (
-        <p>加载中...</p>
+        <p style={{ textAlign: 'center', opacity: 0.5 }}>加载中...</p>
       ) : posts.length === 0 ? (
-        <p>暂无文章</p>
+        <p style={{ textAlign: 'center', opacity: 0.5 }}>暂无文章</p>
       ) : (
         <div className="post-list">
           {posts.map((post) => (
@@ -132,10 +142,9 @@ export default function Home() {
               <div className="post-info">
                 <h2>{post.title}</h2>
                 <div className="post-meta">
-                  <span>{post.author_name}</span>
+                  <span>{formatDate(post.created_at)}</span>
                   {post.category_name && <span>{post.category_name}</span>}
-                  <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                  <span>{post.views} 次浏览</span>
+                  <span>{post.views} 次阅读</span>
                 </div>
                 <p>{post.content.slice(0, 150)}...</p>
                 {post.tags && post.tags.length > 0 && (
@@ -157,14 +166,14 @@ export default function Home() {
             disabled={pagination.page <= 1}
             onClick={() => fetchPosts(pagination.page - 1, keyword, selectedCategory)}
           >
-            上一页
+            ← 上一页
           </button>
           <span>{pagination.page} / {pagination.totalPages}</span>
           <button
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => fetchPosts(pagination.page + 1, keyword, selectedCategory)}
           >
-            下一页
+            下一页 →
           </button>
         </div>
       )}

@@ -34,7 +34,7 @@ export default function Register() {
   return (
     <div className="container">
       <div className="auth-form">
-        <h1>注册</h1>
+        <h1>创建账号</h1>
         {error && <p className="error">{error}</p>}
         <form onSubmit={handleSubmit}>
           <input

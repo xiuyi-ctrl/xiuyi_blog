@@ -33,27 +33,37 @@ export default function Profile() {
     navigate('/');
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   if (!user) return null;
 
   return (
     <div className="container">
       <div className="profile">
         <h1>个人中心</h1>
+        
         <div className="profile-info">
-          <p><strong>用户名：</strong>{user.username}</p>
-          <p><strong>邮箱：</strong>{user.email}</p>
+          <p><strong>用户名</strong>{user.username}</p>
+          <p><strong>邮箱</strong>{user.email}</p>
         </div>
 
         <h2>我的文章（{posts.length}）</h2>
         {posts.length === 0 ? (
-          <p>还没有发布文章</p>
+          <p style={{ opacity: 0.5 }}>还没有发布文章</p>
         ) : (
           <ul className="my-posts">
             {posts.map((post) => (
               <li key={post.id}>
                 <span onClick={() => navigate(`/post/${post.id}`)}>{post.title}</span>
-                <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                <span>{post.views} 次浏览</span>
+                <span>{formatDate(post.created_at)}</span>
+                <span>{post.views} 次阅读</span>
               </li>
             ))}
           </ul>

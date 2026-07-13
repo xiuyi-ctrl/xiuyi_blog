@@ -95,36 +95,33 @@ export default function Write() {
 
   return (
     <div className="container">
-      <h1>{editId ? '编辑文章' : '写文章'}</h1>
+      <h1 className="page-title">{editId ? '编辑文章' : '写文章'}</h1>
+      <p className="page-subtitle">记录你的想法</p>
 
       {error && <p className="error">{error}</p>}
 
       <form onSubmit={handleSubmit}>
-        <div className="write-top">
-          <input
-            type="text"
-            placeholder="文章标题"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="write-title"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="文章标题"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="write-title"
+        />
 
         <div className="write-meta">
           <input
             type="text"
-            placeholder="封面图 URL（可选）"
+            placeholder="封面图 URL"
             value={cover}
             onChange={(e) => setCover(e.target.value)}
           />
-
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="">选择分类</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
-
           <input
             type="text"
             placeholder="标签（逗号分隔）"

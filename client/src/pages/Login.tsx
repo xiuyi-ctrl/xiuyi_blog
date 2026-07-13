@@ -33,7 +33,7 @@ export default function Login() {
   return (
     <div className="container">
       <div className="auth-form">
-        <h1>登录</h1>
+        <h1>欢迎回来</h1>
         {error && <p className="error">{error}</p>}
         <form onSubmit={handleSubmit}>
           <input
