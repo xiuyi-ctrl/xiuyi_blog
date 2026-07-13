@@ -1,10 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api';
-
-interface CurrentLyricProps {
-  songId: number;
-  currentTime: number;
-}
+import * as music from '../lib/musicStore';
 
 interface LyricLine {
   time: number;
@@ -15,13 +10,11 @@ function parseLRC(lrc: string): LyricLine[] {
   if (!lrc) return [];
   const lines = lrc.split('\n');
   const result: LyricLine[] = [];
-
   for (const line of lines) {
     const match = line.match(/\[(\d+):(\d+\.?\d*)\]/g);
     if (!match) continue;
     const text = line.replace(/\[\d+:\d+\.?\d*\]/g, '').trim();
     if (!text) continue;
-
     for (const tag of match) {
       const m = tag.match(/\[(\d+):(\d+\.?\d*)\]/);
       if (m) {
@@ -30,7 +23,6 @@ function parseLRC(lrc: string): LyricLine[] {
       }
     }
   }
-
   result.sort((a, b) => a.time - b.time);
   return result;
 }
@@ -41,44 +33,42 @@ const NoteIcon = () => (
   </svg>
 );
 
-export default function CurrentLyric({ songId, currentTime }: CurrentLyricProps) {
+export default function CurrentLyric() {
+  const [state, setState] = useState(music.getState());
   const [currentText, setCurrentText] = useState('');
   const [lines, setLines] = useState<LyricLine[]>([]);
 
   useEffect(() => {
+    return music.subscribe(() => setState(music.getState()));
+  }, []);
+
+  const currentSong = state.songs[state.currentIndex];
+
+  useEffect(() => {
     setLines([]);
     setCurrentText('');
+    if (!currentSong) return;
 
-    const fetchLyric = async () => {
-      try {
-        const { data } = await api.get(`/music/lyric/${songId}`);
-        if (data.success && data.lrc) {
-          setLines(parseLRC(data.lrc));
-        }
-      } catch (err) {
-        console.error('Failed to fetch lyric:', err);
-      }
-    };
-
-    fetchLyric();
-  }, [songId]);
+    const lrc = currentSong.lrc || '';
+    if (lrc) {
+      setLines(parseLRC(lrc));
+    }
+  }, [currentSong?.id]);
 
   useEffect(() => {
     if (lines.length === 0) {
       setCurrentText('');
       return;
     }
-
     let idx = -1;
     for (let i = lines.length - 1; i >= 0; i--) {
-      if (currentTime >= lines[i].time) {
+      if (state.currentTime >= lines[i].time) {
         idx = i;
         break;
       }
     }
-
     setCurrentText(idx >= 0 ? lines[idx].text : '');
-  }, [currentTime, lines]);
+  }, [state.currentTime, lines]);
 
   return (
     <div className="current-lyric-card">

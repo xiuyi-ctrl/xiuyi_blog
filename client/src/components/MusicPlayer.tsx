@@ -1,187 +1,29 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import api from '../api';
+import { useState, useEffect, useCallback } from 'react';
+import * as music from '../lib/musicStore';
 
-interface Song {
-  id: number;
-  name: string;
-  artist: string;
-  cover: string;
-  url: string;
-}
-
-const STORAGE_KEY = 'xiuyi_music_player';
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-interface MusicPlayerProps {
-  onSongChange?: (songId: number, time: number) => void;
-  onTimeUpdate?: (time: number) => void;
-}
-
-export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerProps) {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const savedState = useRef(loadState());
-  const [currentIndex, setCurrentIndex] = useState(savedState.current?.currentIndex ?? 0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(savedState.current?.currentTime ?? 0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(new Audio());
-  const savedTimeRef = useRef<number | null>(savedState.current?.currentTime ?? null);
-  const waitingForInteraction = useRef(false);
-
-  const currentSong = songs[currentIndex];
+export default function MusicPlayer() {
+  const [state, setState] = useState(music.getState());
 
   useEffect(() => {
-    if (currentSong) {
-      onSongChange?.(currentSong.id, currentTime);
-    }
-  }, [currentSong?.id, currentTime, onSongChange]);
-
-  useEffect(() => {
-    onTimeUpdate?.(currentTime);
-  }, [currentTime, onTimeUpdate]);
-
-  useEffect(() => {
-    const fetchPlaylist = async () => {
-      try {
-        const { data } = await api.get('/music/playlist/18146875685');
-        if (data.success && data.songs.length > 0) {
-          const filtered = data.songs.filter((s: Song) => s.url);
-          setSongs(filtered);
-        }
-      } catch (err) {
-        console.error('Failed to fetch playlist:', err);
-      }
-    };
-    fetchPlaylist();
+    return music.subscribe(() => setState(music.getState()));
   }, []);
 
   useEffect(() => {
-    if (songs.length === 0) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      currentIndex,
-      isPlaying,
-      currentTime,
-    }));
-  }, [currentIndex, isPlaying, currentTime, songs.length]);
-
-  const tryAutoPlay = useCallback(() => {
-    const audio = audioRef.current;
-    if (!currentSong) return;
-
-    if (audio.readyState >= 2) {
-      audio.play().then(() => {
-        waitingForInteraction.current = false;
-      }).catch(() => {});
+    if (state.songs.length === 0) {
+      music.loadPlaylist();
     }
-  }, [currentSong]);
+  }, []);
 
-  useEffect(() => {
-    if (!isPlaying || !currentSong) return;
+  const currentSong = state.songs[state.currentIndex];
 
-    const audio = audioRef.current;
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        waitingForInteraction.current = false;
-      }).catch(() => {
-        waitingForInteraction.current = true;
-      });
-    }
-  }, [currentIndex, currentSong]);
-
-  useEffect(() => {
-    if (!waitingForInteraction.current) return;
-
-    const handler = () => {
-      if (waitingForInteraction.current) {
-        tryAutoPlay();
-      }
-    };
-
-    document.addEventListener('click', handler, { once: true });
-    document.addEventListener('keydown', handler, { once: true });
-    document.addEventListener('touchstart', handler, { once: true });
-
-    return () => {
-      document.removeEventListener('click', handler);
-      document.removeEventListener('keydown', handler);
-      document.removeEventListener('touchstart', handler);
-    };
-  }, [waitingForInteraction.current, tryAutoPlay]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!currentSong) return;
-
-    audio.src = currentSong.url;
-    audio.load();
-
-    const onTimeUpdateHandler = () => setCurrentTime(audio.currentTime);
-    const onLoadedMetadata = () => {
-      setDuration(audio.duration);
-      if (savedTimeRef.current !== null) {
-        audio.currentTime = savedTimeRef.current;
-        savedTimeRef.current = null;
-      }
-    };
-    const onEnded = () => {
-      setCurrentIndex((prev) => (prev + 1) % songs.length);
-      setIsPlaying(true);
-    };
-
-    audio.addEventListener('timeupdate', onTimeUpdateHandler);
-    audio.addEventListener('loadedmetadata', onLoadedMetadata);
-    audio.addEventListener('ended', onEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdateHandler);
-      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-      audio.removeEventListener('ended', onEnded);
-    };
-  }, [currentIndex, songs]);
-
-  const togglePlay = useCallback(() => {
-    const audio = audioRef.current;
-    if (!currentSong) return;
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play().catch(() => {});
-    }
-    setIsPlaying(!isPlaying);
-  }, [isPlaying, currentSong]);
-
-  const handlePrev = useCallback(() => {
-    if (songs.length === 0) return;
-    setCurrentIndex((prev) => (prev - 1 + songs.length) % songs.length);
-    setIsPlaying(true);
-    setCurrentTime(0);
-    savedTimeRef.current = null;
-  }, [songs.length]);
-
-  const handleNext = useCallback(() => {
-    if (songs.length === 0) return;
-    setCurrentIndex((prev) => (prev + 1) % songs.length);
-    setIsPlaying(true);
-    setCurrentTime(0);
-    savedTimeRef.current = null;
-  }, [songs.length]);
+  const togglePlay = useCallback(() => music.togglePlay(), []);
+  const handlePrev = useCallback(() => music.prev(), []);
+  const handleNext = useCallback(() => music.next(), []);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = percent * duration;
+    music.seek(percent * state.duration);
   };
 
   const formatTime = (sec: number) => {
@@ -190,7 +32,7 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = state.duration > 0 ? (state.currentTime / state.duration) * 100 : 0;
 
   if (!currentSong) {
     return (
@@ -215,8 +57,8 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
           <div className="cmp-progress-bar" style={{ width: `${progress}%` }} />
         </div>
         <div className="cmp-time">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+          <span>{formatTime(state.currentTime)}</span>
+          <span>{formatTime(state.duration)}</span>
         </div>
         <div className="cmp-controls">
           <button className="cmp-btn" onClick={handlePrev}>
@@ -225,7 +67,7 @@ export default function MusicPlayer({ onSongChange, onTimeUpdate }: MusicPlayerP
             </svg>
           </button>
           <button className="cmp-btn cmp-play" onClick={togglePlay}>
-            {isPlaying ? (
+            {state.isPlaying ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
               </svg>
