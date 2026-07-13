@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 
@@ -11,6 +11,8 @@ interface Stats {
 export default function Home() {
   const [stats, setStats] = useState<Stats>({ posts: 0, views: 0, photos: 0 });
   const [searchQuery, setSearchQuery] = useState('');
+  const musicRef = useRef<HTMLDivElement>(null);
+  const playerReady = useRef(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -26,6 +28,42 @@ export default function Home() {
       }
     };
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    if (playerReady.current || !musicRef.current) return;
+
+    const tryInit = () => {
+      const AP = (window as any).APlayer;
+      if (!AP || !musicRef.current || playerReady.current) return false;
+
+      playerReady.current = true;
+
+      new AP({
+        container: musicRef.current,
+        mini: true,
+        autoplay: false,
+        mutex: true,
+        preload: 'auto',
+        theme: '#D4A76A',
+        loop: 'all',
+        lrcType: 3,
+        audio: [
+          { name: '如果呢', artist: '郑润泽', url: 'https://music.163.com/song/media/outer/url?id=2161245025.mp3', cover: '' },
+          { name: '于是', artist: '郑润泽', url: 'https://music.163.com/song/media/outer/url?id=1974443814.mp3', cover: '' },
+          { name: '随风', artist: '郑润泽', url: 'https://music.163.com/song/media/outer/url?id=2058267230.mp3', cover: '' },
+        ]
+      });
+      return true;
+    };
+
+    if (tryInit()) return;
+
+    const check = setInterval(() => {
+      if (tryInit()) clearInterval(check);
+    }, 300);
+
+    return () => clearInterval(check);
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -105,12 +143,7 @@ export default function Home() {
             <div className="music-header">
               <span className="music-badge">CLOUD MUSIC</span>
             </div>
-            <div
-              className="music-player-wrap"
-              dangerouslySetInnerHTML={{
-                __html: '<meting-js server="netease" type="playlist" id="13521757209" mini="true" autoplay="false" mutex="true" preload="auto" theme="#D4A76A" loop="all"></meting-js>'
-              }}
-            />
+            <div className="music-player-wrap" ref={musicRef} />
           </div>
         </div>
       </div>
