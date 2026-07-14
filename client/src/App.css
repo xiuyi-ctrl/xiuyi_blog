@@ -1769,6 +1769,7 @@ body {
   overflow: hidden;
   width: 680px;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .home-profile-card:hover {
@@ -1893,23 +1894,50 @@ body {
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(99, 102, 241, 0.92);
+  backdrop-filter: blur(12px);
   color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: 12px 28px;
+  border-radius: 40px;
   font-size: 14px;
+  font-weight: 500;
   z-index: 9999;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.35), 0 2px 8px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.toast-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.toast-text {
+  letter-spacing: 0.3px;
 }
 
 .toast-visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
 .toast-hidden {
   opacity: 0;
-  transform: translateX(-50%) translateY(20px);
+  transform: translateX(-50%) translateY(16px) scale(0.95);
 }
 
 /* Right Column */
@@ -1934,6 +1962,7 @@ body {
   overflow: hidden;
   box-sizing: border-box;
   height: 100%;
+  cursor: pointer;
 }
 
 .home-music-card:hover {

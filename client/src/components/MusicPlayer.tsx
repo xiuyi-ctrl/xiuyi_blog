@@ -80,7 +80,7 @@ export default function MusicPlayer() {
   }
 
   return (
-    <div className="cmp-player">
+    <div className="cmp-player" onClick={(e) => e.stopPropagation()}>
       <div className="cmp-top">
         <img className="cmp-cover" src={currentSong.cover} alt={currentSong.name} />
         <div className="cmp-info">
