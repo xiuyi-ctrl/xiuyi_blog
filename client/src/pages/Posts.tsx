@@ -155,21 +155,14 @@ export default function Posts() {
                 </div>
               )}
               <div className="post-info">
-                {post.category_name && (
-                  <span className="post-category">{post.category_name}</span>
-                )}
+                <span className="post-date">{formatDate(post.created_at)}</span>
                 <h2>{post.title}</h2>
                 <p className="post-excerpt">{post.content.slice(0, 120)}...</p>
                 <div className="post-footer">
-                  <div className="post-meta">
-                    <span>{formatDate(post.created_at)}</span>
-                    <span className="meta-dot" />
-                    <span>{post.views} 次阅读</span>
-                  </div>
                   {post.tags && post.tags.length > 0 && (
                     <div className="post-tags">
                       {post.tags.slice(0, 3).map((tag, i) => (
-                        <span key={i} className="tag">{tag}</span>
+                        <span key={i} className="tag">#{tag}</span>
                       ))}
                     </div>
                   )}
