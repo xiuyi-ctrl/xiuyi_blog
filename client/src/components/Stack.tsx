@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Stack.css';
 
 function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }) {
@@ -75,11 +75,8 @@ export default function Stack({
     return [];
   });
 
-  useEffect(() => {
-    if (cards.length) {
-      setStack(cards.map((content, index) => ({ id: index + 1, content })));
-    }
-  }, [cards]);
+  const stackRef = useRef(stack);
+  stackRef.current = stack;
 
   const sendToBack = id => {
     setStack(prev => {
