@@ -31,9 +31,17 @@ router.get('/playlist/:id', async (req, res) => {
       for (let i = 0; i < missingIds.length; i += batchSize) {
         const batch = missingIds.slice(i, i + batchSize);
         try {
+          const cParam = batch.map(id => JSON.stringify({ id })).join(',');
           const songRes = await fetch(
-            `https://music.163.com/api/v6/song/detail?ids=[${batch.join(',')}]`,
-            { headers: NETEASE_HEADERS }
+            `https://music.163.com/api/v3/song/detail`,
+            {
+              method: 'POST',
+              headers: {
+                ...NETEASE_HEADERS,
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: `c=[${cParam}]`
+            }
           );
           const songData = await songRes.json();
           if (songData.songs) {
