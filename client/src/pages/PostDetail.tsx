@@ -82,8 +82,8 @@ export default function PostDetail() {
     });
   };
 
-  if (loading) return <div className="container"><p style={{ textAlign: 'center', opacity: 0.5 }}>加载中...</p></div>;
-  if (error) return <div className="container"><p className="error">{error}</p></div>;
+  if (loading) return <div className="container"><p style={{ textAlign: 'center', opacity: 0.5, color: '#fff' }}>加载中...</p></div>;
+  if (error) return <div className="container"><p className="error" style={{ color: '#f87171' }}>{error}</p></div>;
   if (!post) return null;
 
   return (
