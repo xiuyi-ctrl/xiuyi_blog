@@ -2009,6 +2009,52 @@ body {
   letter-spacing: 2px;
 }
 
+.photos-view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.photos-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: rgba(99, 102, 241, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.photos-toggle-btn:hover {
+  background: rgba(99, 102, 241, 0.14);
+  color: #fff;
+}
+
+.photos-toggle-btn.active {
+  background: #6366f1;
+  color: #fff;
+  border-color: #6366f1;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+}
+
+.photos-stack-wrapper {
+  width: 100%;
+  height: 500px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
 .photos-gallery-wrapper {
   width: 100%;
   height: 600px;

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import CircularGallery from '../components/CircularGallery';
+import Stack from '../components/Stack';
 
 interface Album {
   id: number;
@@ -84,6 +85,7 @@ function AlbumDetail() {
   const navigate = useNavigate();
   const [album, setAlbum] = useState<Album | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'gallery' | 'stack'>('gallery');
   const [lightbox, setLightbox] = useState<{ items: GalleryItem[]; index: number } | null>(null);
 
   useEffect(() => {
@@ -118,6 +120,13 @@ function AlbumDetail() {
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowLeft') navigateLightbox(-1);
     if (e.key === 'ArrowRight') navigateLightbox(1);
+  };
+
+  const handleStackClick = (item: GalleryItem) => {
+    if (!album) return;
+    const items = getGalleryItems(album);
+    const idx = items.findIndex(i => i.image === item.image && i.text === item.text);
+    setLightbox({ items, index: idx >= 0 ? idx : 0 });
   };
 
   if (loading) {
@@ -161,21 +170,71 @@ function AlbumDetail() {
         <p className="photos-subtitle">{album.description}</p>
       </div>
 
-      {items.length > 0 ? (
-        <div className="photos-grid">
-          {items.map((item, idx) => (
-            <div
-              key={idx}
-              className="photos-grid-item"
-              onClick={() => setLightbox({ items, index: idx })}
-            >
-              <img src={item.image} alt={item.text} />
-              <span className="photos-grid-label">{item.text}</span>
-            </div>
-          ))}
+      {items.length > 0 && (
+        <div className="photos-view-toggle">
+          <button
+            className={`photos-toggle-btn ${viewMode === 'gallery' ? 'active' : ''}`}
+            onClick={() => setViewMode('gallery')}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+            </svg>
+            旋转画廊
+          </button>
+          <button
+            className={`photos-toggle-btn ${viewMode === 'stack' ? 'active' : ''}`}
+            onClick={() => setViewMode('stack')}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="8" y="2" width="13" height="13" rx="2" /><rect x="3" y="7" width="13" height="13" rx="2" />
+            </svg>
+            叠放卡片
+          </button>
+        </div>
+      )}
+
+      {viewMode === 'gallery' ? (
+        <div className="photos-gallery-wrapper">
+          {items.length > 0 ? (
+            <CircularGallery
+              items={items}
+              bend={3}
+              textColor="#ffffff"
+              borderRadius={0.05}
+              font="bold 28px Figtree"
+              fontUrl="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap"
+              scrollSpeed={2}
+              scrollEase={0.05}
+              onItemClick={(item) => {
+                const idx = items.findIndex(i => i.image === item.image && i.text === item.text);
+                setLightbox({ items, index: idx >= 0 ? idx : 0 });
+              }}
+            />
+          ) : (
+            <div className="photos-empty"><p>该相册暂无照片</p></div>
+          )}
         </div>
       ) : (
-        <div className="photos-empty"><p>该相册暂无照片</p></div>
+        <div className="photos-stack-wrapper">
+          {items.length > 0 ? (
+            <Stack
+              cards={items.map((item, i) => (
+                <div key={i} className="stack-card" onClick={() => handleStackClick(item)}>
+                  <img src={item.image} alt={item.text} className="stack-card-image" />
+                  <span className="stack-card-label">{item.text}</span>
+                </div>
+              ))}
+              randomRotation={true}
+              sensitivity={180}
+              sendToBackOnClick={true}
+              autoplay={true}
+              autoplayDelay={3000}
+              pauseOnHover={true}
+            />
+          ) : (
+            <div className="photos-empty"><p>该相册暂无照片</p></div>
+          )}
+        </div>
       )}
 
       {lightbox && (
