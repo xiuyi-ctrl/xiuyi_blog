@@ -2055,6 +2055,38 @@ body {
   box-sizing: border-box;
 }
 
+.stack-album-name {
+  position: absolute;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  pointer-events: none;
+  animation: stackNameFadeIn 0.4s ease;
+}
+
+@keyframes stackNameFadeIn {
+  from { opacity: 0; transform: translateY(-50%) translateX(-10px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+.stack-album-name-text {
+  font-family: 'Playfair Display', 'Noto Serif SC', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  letter-spacing: 4px;
+}
+
+.stack-album-name .split-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(15px);
+}
+
 .photos-gallery-wrapper {
   width: 100%;
   height: 600px;

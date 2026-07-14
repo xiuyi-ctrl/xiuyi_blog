@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import CircularGallery from '../components/CircularGallery';
 import Stack from '../components/Stack';
+import SplitText from '../components/SplitText';
 
 interface Album {
   id: number;
@@ -22,6 +23,7 @@ function AlbumList() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'gallery' | 'stack'>('gallery');
+  const [topAlbumIndex, setTopAlbumIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -108,20 +110,33 @@ function AlbumList() {
               <div className="loading-dots"><span></span><span></span><span></span></div>
             </div>
           ) : albumItems.length > 0 ? (
-            <Stack
-              cards={albumItems.map((item, i) => (
-                <div key={i} className="stack-card" onClick={() => handleStackClick(item)}>
-                  <img src={item.image} alt={item.text} className="stack-card-image" />
-                  <span className="stack-card-label">{item.text}</span>
-                </div>
-              ))}
-              randomRotation={true}
-              sensitivity={180}
-              sendToBackOnClick={true}
-              autoplay={true}
-              autoplayDelay={3000}
-              pauseOnHover={true}
-            />
+            <>
+              <div className="stack-album-name" key={topAlbumIndex}>
+                <SplitText
+                  text={albums[topAlbumIndex]?.title || ''}
+                  className="stack-album-name-text"
+                  delay={80}
+                  duration={0.5}
+                  splitType="chars"
+                  tag="span"
+                />
+              </div>
+              <Stack
+                cards={albumItems.map((item, i) => (
+                  <div key={i} className="stack-card" onClick={() => handleStackClick(item)}>
+                    <img src={item.image} alt={item.text} className="stack-card-image" />
+                    <span className="stack-card-label">{item.text}</span>
+                  </div>
+                ))}
+                randomRotation={true}
+                sensitivity={180}
+                sendToBackOnClick={true}
+                autoplay={true}
+                autoplayDelay={3000}
+                pauseOnHover={true}
+                onTopChange={setTopAlbumIndex}
+              />
+            </>
           ) : (
             <div className="photos-empty"><p>暂无照片集</p></div>
           )}

@@ -50,7 +50,8 @@ export default function Stack({
   autoplayDelay = 3000,
   pauseOnHover = false,
   mobileClickOnly = false,
-  mobileBreakpoint = 768
+  mobileBreakpoint = 768,
+  onTopChange
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -89,6 +90,13 @@ export default function Stack({
       return newStack;
     });
   };
+
+  useEffect(() => {
+    if (stack.length > 0 && onTopChange) {
+      const topIndex = stack[stack.length - 1].id - 1;
+      onTopChange(topIndex);
+    }
+  }, [stack, onTopChange]);
 
   useEffect(() => {
     if (autoplay && stack.length > 1 && !isPaused) {
