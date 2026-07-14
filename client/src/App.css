@@ -1954,8 +1954,8 @@ body {
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--color-accent);
-  background: rgba(212, 167, 106, 0.15);
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
 }
@@ -2029,7 +2029,8 @@ body {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 2px;
   cursor: pointer;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 .cmp-progress:hover {
@@ -2038,9 +2039,35 @@ body {
 
 .cmp-progress-bar {
   height: 100%;
-  background: var(--color-accent);
+  background: #6366f1;
   border-radius: 2px;
   transition: width 0.1s linear;
+}
+
+.cmp-progress-dot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: #6366f1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.5);
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  cursor: grab;
+  z-index: 10;
+}
+
+.cmp-progress-dot:hover,
+.cmp-progress-dot.dragging {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
+  cursor: grabbing;
+}
+
+.cmp-progress:hover .cmp-progress-dot {
+  opacity: 1;
 }
 
 .cmp-time {
@@ -2082,12 +2109,12 @@ body {
 .cmp-play {
   width: 40px;
   height: 40px;
-  background: var(--color-accent);
+  background: #6366f1;
   color: white;
 }
 
 .cmp-play:hover {
-  background: var(--color-accent);
+  background: #6366f1;
   opacity: 0.9;
   transform: scale(1.05);
 }
@@ -2245,12 +2272,21 @@ body {
   top: 50%;
   width: 12px;
   height: 12px;
-  background: #a78bfa;
+  background: #6366f1;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.1s;
+  cursor: grab;
+  z-index: 10;
+}
+
+.music-progress-dot:hover,
+.music-progress-dot.dragging {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
+  cursor: grabbing;
 }
 
 .music-progress-bar:hover .music-progress-dot {
@@ -2390,29 +2426,29 @@ body {
   transition: all 0.2s;
 }
 
-.music-tab-active {
-  background: rgba(139, 92, 246, 0.85);
+.music-tab.active {
+  background: rgba(99, 102, 241, 0.85);
   color: white;
-  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
 }
 
-.music-lyrics-scroll {
+.music-lyrics {
   flex: 1;
   overflow-y: auto;
   scroll-behavior: smooth;
   scrollbar-width: none;
 }
 
-.music-lyrics-scroll::-webkit-scrollbar {
+.music-lyrics::-webkit-scrollbar {
   display: none;
 }
 
-.music-lyrics-scroll::-webkit-scrollbar-track {
+.music-lyrics::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.music-lyrics-scroll::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
+.music-lyrics::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
   border-radius: 2px;
 }
 
@@ -2428,13 +2464,14 @@ body {
   transition: all 0.4s ease;
   line-height: 1.6;
   border-radius: 8px;
+  cursor: pointer;
 }
 
-.music-lyric-active {
+.music-lyric-line.active {
   color: rgba(255, 255, 255, 0.95);
   font-size: 1.1rem;
   font-weight: 600;
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(99, 102, 241, 0.15);
 }
 
 .music-lyric-empty {
@@ -2472,8 +2509,8 @@ body {
   background: rgba(255, 255, 255, 0.06);
 }
 
-.music-playlist-active {
-  background: rgba(139, 92, 246, 0.15);
+.music-playlist-item.active {
+  background: rgba(99, 102, 241, 0.15);
 }
 
 .music-playlist-cover {

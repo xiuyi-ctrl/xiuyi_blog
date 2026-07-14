@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import * as music from '../lib/musicStore';
 
 export default function MusicPlayer() {
   const [state, setState] = useState(music.getState());
+  const [isDragging, setIsDragging] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return music.subscribe(() => setState(music.getState()));
@@ -21,10 +23,45 @@ export default function MusicPlayer() {
   const handleNext = useCallback(() => music.next(), []);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isDragging) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     music.seek(percent * state.duration);
   };
+
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (!isDragging || !progressRef.current) return;
+    
+    const rect = progressRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    music.seek(percent * state.duration);
+  }, [isDragging, state.duration]);
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove);
+      window.addEventListener('touchend', handleDragEnd);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -53,8 +90,18 @@ export default function MusicPlayer() {
       </div>
 
       <div className="cmp-bottom">
-        <div className="cmp-progress" onClick={handleProgressClick}>
+        <div 
+          ref={progressRef}
+          className="cmp-progress" 
+          onClick={handleProgressClick}
+        >
           <div className="cmp-progress-bar" style={{ width: `${progress}%` }} />
+          <div 
+            className={`cmp-progress-dot ${isDragging ? 'dragging' : ''}`}
+            style={{ left: `${progress}%` }}
+            onMouseDown={handleDragStart}
+            onTouchStart={handleDragStart}
+          />
         </div>
         <div className="cmp-time">
           <span>{formatTime(state.currentTime)}</span>

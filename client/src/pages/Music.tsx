@@ -32,8 +32,10 @@ export default function Music() {
   const [activeTab, setActiveTab] = useState<'lyrics' | 'playlist'>('lyrics');
   const [lines, setLines] = useState<LyricLine[]>([]);
   const [activeLine, setActiveLine] = useState(-1);
+  const [isDragging, setIsDragging] = useState(false);
   const lyricsScrollRef = useRef<HTMLDivElement>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return music.subscribe(() => setState(music.getState()));
@@ -51,22 +53,17 @@ export default function Music() {
     setLines([]);
     setActiveLine(-1);
     if (!currentSong) return;
-
-    const fetchLyric = async () => {
-      try {
-        const lrc = currentSong.lrc || '';
-        if (lrc) {
-          setLines(parseLRC(lrc));
-        }
-      } catch (err) {
-        console.error('Failed to load lyric:', err);
-      }
-    };
-    fetchLyric();
+    const lrc = currentSong.lrc || '';
+    if (lrc) {
+      setLines(parseLRC(lrc));
+    }
   }, [currentSong?.id]);
 
   useEffect(() => {
-    if (lines.length === 0) return;
+    if (lines.length === 0) {
+      setActiveLine(-1);
+      return;
+    }
     let idx = -1;
     for (let i = lines.length - 1; i >= 0; i--) {
       if (state.currentTime >= lines[i].time) {
@@ -76,17 +73,6 @@ export default function Music() {
     }
     setActiveLine(idx);
   }, [state.currentTime, lines]);
-
-  useEffect(() => {
-    if (activeLine < 0) return;
-    const el = lineRefs.current[activeLine];
-    if (el && lyricsScrollRef.current) {
-      const container = lyricsScrollRef.current;
-      const offsetTop = el.offsetTop - container.offsetTop;
-      const scrollTo = offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
-      container.scrollTo({ top: scrollTo, behavior: 'smooth' });
-    }
-  }, [activeLine]);
 
   useEffect(() => {
     if (activeTab === 'lyrics' && activeLine >= 0) {
@@ -100,7 +86,7 @@ export default function Music() {
         }
       }, 50);
     }
-  }, [activeTab]);
+  }, [activeTab, activeLine]);
 
   const togglePlay = useCallback(() => music.togglePlay(), []);
   const handlePrev = useCallback(() => music.prev(), []);
@@ -113,10 +99,45 @@ export default function Music() {
   };
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isDragging) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     music.seek(percent * state.duration);
   };
+
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (!isDragging || !progressRef.current) return;
+    
+    const rect = progressRef.current.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    music.seek(percent * state.duration);
+  }, [isDragging, state.duration]);
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleDragMove);
+      window.addEventListener('mouseup', handleDragEnd);
+      window.addEventListener('touchmove', handleDragMove);
+      window.addEventListener('touchend', handleDragEnd);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleDragMove);
+      window.removeEventListener('mouseup', handleDragEnd);
+      window.removeEventListener('touchmove', handleDragMove);
+      window.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -152,9 +173,18 @@ export default function Music() {
           </div>
 
           <div className="music-progress">
-            <div className="music-progress-bar" onClick={handleProgressClick}>
+            <div 
+              ref={progressRef}
+              className="music-progress-bar" 
+              onClick={handleProgressClick}
+            >
               <div className="music-progress-fill" style={{ width: `${progress}%` }} />
-              <div className="music-progress-dot" style={{ left: `${progress}%` }} />
+              <div 
+                className={`music-progress-dot ${isDragging ? 'dragging' : ''}`}
+                style={{ left: `${progress}%` }}
+                onMouseDown={handleDragStart}
+                onTouchStart={handleDragStart}
+              />
             </div>
             <div className="music-progress-time">
               <span>{formatTime(state.currentTime)}</span>
@@ -205,17 +235,17 @@ export default function Music() {
               </svg>
             </button>
             <button className="music-ctrl-btn music-volume-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
               </svg>
               <input
                 type="range"
-                className="music-volume-slider"
                 min="0"
                 max="1"
                 step="0.01"
                 value={state.volume}
                 onChange={handleVolumeChange}
+                className="music-volume-slider"
               />
             </button>
           </div>
@@ -224,13 +254,13 @@ export default function Music() {
         <div className="music-right">
           <div className="music-tabs">
             <button
-              className={`music-tab ${activeTab === 'lyrics' ? 'music-tab-active' : ''}`}
+              className={`music-tab ${activeTab === 'lyrics' ? 'active' : ''}`}
               onClick={() => setActiveTab('lyrics')}
             >
               歌词
             </button>
             <button
-              className={`music-tab ${activeTab === 'playlist' ? 'music-tab-active' : ''}`}
+              className={`music-tab ${activeTab === 'playlist' ? 'active' : ''}`}
               onClick={() => setActiveTab('playlist')}
             >
               歌单
@@ -238,30 +268,31 @@ export default function Music() {
           </div>
 
           {activeTab === 'lyrics' ? (
-            <div className="music-lyrics-scroll" ref={lyricsScrollRef}>
-              <div className="music-lyrics-spacer" />
+            <div className="music-lyrics" ref={lyricsScrollRef}>
               {lines.length > 0 ? (
                 lines.map((line, i) => (
                   <div
-                    key={`${currentSong.id}-${i}`}
-                    ref={(el) => { lineRefs.current[i] = el; }}
-                    className={`music-lyric-line ${i === activeLine ? 'music-lyric-active' : ''}`}
+                    key={i}
+                    ref={el => { lineRefs.current[i] = el; }}
+                    className={`music-lyric-line ${i === activeLine ? 'active' : ''}`}
+                    onClick={() => music.seek(line.time)}
                   >
                     {line.text}
                   </div>
                 ))
               ) : (
-                <div className="music-lyric-empty">纯音乐，请欣赏</div>
+                <div className="music-lyric-empty">暂无歌词</div>
               )}
-              <div className="music-lyrics-spacer" />
             </div>
           ) : (
             <div className="music-playlist">
               {state.songs.map((song, i) => (
                 <div
                   key={song.id}
-                  className={`music-playlist-item ${i === state.currentIndex ? 'music-playlist-active' : ''}`}
-                  onClick={() => music.setSong(i)}
+                  className={`music-playlist-item ${i === state.currentIndex ? 'active' : ''}`}
+                  onClick={() => {
+                    music.playSong(i);
+                  }}
                 >
                   <img className="music-playlist-cover" src={song.cover} alt={song.name} />
                   <div className="music-playlist-info">

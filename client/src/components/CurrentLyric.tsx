@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as music from '../lib/musicStore';
 
 interface LyricLine {
@@ -32,6 +32,77 @@ const NoteIcon = () => (
     <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
   </svg>
 );
+
+interface SplitTextProps {
+  text: string;
+  className?: string;
+  delay?: number;
+  duration?: number;
+  splitType?: 'chars' | 'words';
+}
+
+function SplitText({ 
+  text, 
+  className = '', 
+  delay = 50, 
+  duration = 0.6,
+  splitType = 'chars'
+}: SplitTextProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prevTextRef = useRef('');
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    if (text !== prevTextRef.current) {
+      prevTextRef.current = text;
+      setKey(prev => prev + 1);
+    }
+  }, [text]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    const elements = containerRef.current.querySelectorAll('.split-char, .split-word');
+    elements.forEach((el, i) => {
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.opacity = '0';
+      htmlEl.style.transform = 'translateY(20px)';
+      htmlEl.style.transition = `opacity ${duration}s ease ${i * (delay / 1000)}s, transform ${duration}s ease ${i * (delay / 1000)}s`;
+      
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          htmlEl.style.opacity = '1';
+          htmlEl.style.transform = 'translateY(0)';
+        });
+      });
+    });
+  }, [text, key, delay, duration]);
+
+  const renderContent = () => {
+    if (splitType === 'chars') {
+      return text.split('').map((char, i) => (
+        <span key={`${key}-${i}`} className="split-char" style={{ display: 'inline-block' }}>
+          {char === ' ' ? '\u00A0' : char}
+        </span>
+      ));
+    }
+    return text.split(' ').map((word, i) => (
+      <span key={`${key}-${i}`} className="split-word" style={{ display: 'inline-block' }}>
+        {word}
+      </span>
+    ));
+  };
+
+  return (
+    <div 
+      ref={containerRef} 
+      className={`split-parent ${className}`}
+      style={{ display: 'inline-block' }}
+    >
+      {renderContent()}
+    </div>
+  );
+}
 
 export default function CurrentLyric() {
   const [state, setState] = useState(music.getState());
@@ -74,7 +145,16 @@ export default function CurrentLyric() {
     <div className="current-lyric-card">
       <NoteIcon />
       <div className={`current-lyric-text ${!currentText ? 'current-lyric-empty' : ''}`}>
-        {currentText || '♪ 纯音乐，请欣赏'}
+        {currentText ? (
+          <SplitText 
+            text={currentText} 
+            delay={30}
+            duration={0.5}
+            splitType="chars"
+          />
+        ) : (
+          '♪ 纯音乐，请欣赏'
+        )}
       </div>
       <NoteIcon />
     </div>
