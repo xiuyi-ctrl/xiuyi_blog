@@ -51,7 +51,8 @@ export default function Projects() {
 
   const projectEmojis: Record<string, string> = {
     'Xiuyi Blog': '🚀',
-    'Music Player': '🎵',
+    'Nocode': '📝',
+    'Personal Blog': '🌐',
     'default': '✨'
   };
 
