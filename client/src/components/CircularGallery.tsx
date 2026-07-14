@@ -338,12 +338,13 @@ class Media {
 }
 
 class App {
-  constructor(container, { items, bend, textColor = '#ffffff', borderRadius = 0, font = 'bold 30px Figtree', scrollSpeed = 2, scrollEase = 0.05 } = {}) {
+  constructor(container, { items, bend, textColor = '#ffffff', borderRadius = 0, font = 'bold 30px Figtree', scrollSpeed = 2, scrollEase = 0.05, onItemClick } = {}) {
     document.documentElement.classList.remove('no-js');
     this.container = container;
     this.scrollSpeed = scrollSpeed;
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
     this.onCheckDebounce = debounce(this.onCheck, 200);
+    this.onItemClick = onItemClick;
     this.createRenderer();
     this.createCamera();
     this.createScene();
@@ -396,6 +397,7 @@ class App {
   }
   onTouchDown(e) {
     this.isDown = true;
+    this.hasMoved = false;
     this.scroll.position = this.scroll.current;
     this.start = e.touches ? e.touches[0].clientX : e.clientX;
   }
@@ -403,9 +405,31 @@ class App {
     if (!this.isDown) return;
     const x = e.touches ? e.touches[0].clientX : e.clientX;
     const distance = (this.start - x) * (this.scrollSpeed * 0.025);
+    if (Math.abs(distance) > 3) this.hasMoved = true;
     this.scroll.target = this.scroll.position + distance;
   }
   onTouchUp() { this.isDown = false; this.onCheck(); }
+  onClick(e) {
+    if (this.hasMoved || !this.onItemClick || !this.medias || !this.medias[0]) return;
+    const rect = this.container.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const centerX = rect.width / 2;
+    let closest = null;
+    let closestDist = Infinity;
+    for (let i = 0; i < this.medias.length; i++) {
+      const m = this.medias[i];
+      const screenX = (m.plane.position.x / this.viewport.width) * rect.width + centerX;
+      const dist = Math.abs(screenX - clickX);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = m;
+      }
+    }
+    if (closest && closestDist < rect.width * 0.35) {
+      const idx = closest.index % (this.mediasImages.length / 2);
+      this.onItemClick(this.mediasImages[idx]);
+    }
+  }
   onWheel(e) {
     const delta = e.deltaY || e.wheelDelta || e.detail;
     this.scroll.target += (delta > 0 ? this.scrollSpeed : -this.scrollSpeed) * 0.2;
@@ -455,6 +479,7 @@ class App {
     this.boundOnTouchMove = this.onTouchMove.bind(this);
     this.boundOnTouchUp = this.onTouchUp.bind(this);
     this.boundOnKeyDown = this.onKeyDown.bind(this);
+    this.boundOnClick = this.onClick.bind(this);
     window.addEventListener('resize', this.boundOnResize);
     window.addEventListener('mousewheel', this.boundOnWheel);
     window.addEventListener('wheel', this.boundOnWheel);
@@ -465,6 +490,7 @@ class App {
     window.addEventListener('touchmove', this.boundOnTouchMove);
     window.addEventListener('touchend', this.boundOnTouchUp);
     this.container?.addEventListener('keydown', this.boundOnKeyDown);
+    this.container?.addEventListener('click', this.boundOnClick);
   }
   destroy() {
     window.cancelAnimationFrame(this.raf);
@@ -482,6 +508,7 @@ class App {
     }
     if (this.container) {
       this.container.removeEventListener('keydown', this.boundOnKeyDown);
+      this.container.removeEventListener('click', this.boundOnClick);
     }
   }
 }
@@ -494,7 +521,8 @@ export default function CircularGallery({
   font = 'bold 30px Figtree',
   fontUrl,
   scrollSpeed = 2,
-  scrollEase = 0.05
+  scrollEase = 0.05,
+  onItemClick
 }) {
   const containerRef = useRef(null);
   useEffect(() => {
@@ -504,14 +532,14 @@ export default function CircularGallery({
     resolveFont(font, fontUrl).then(resolvedFont => {
       if (!isMounted || !containerRef.current) return;
       app = new App(containerRef.current, {
-        items, bend, textColor, borderRadius, font: resolvedFont, scrollSpeed, scrollEase
+        items, bend, textColor, borderRadius, font: resolvedFont, scrollSpeed, scrollEase, onItemClick
       });
     });
     return () => {
       isMounted = false;
       if (app) app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, fontUrl, scrollSpeed, scrollEase]);
+  }, [items, bend, textColor, borderRadius, font, fontUrl, scrollSpeed, scrollEase, onItemClick]);
   return (
     <div
       className="circular-gallery"
