@@ -118,10 +118,10 @@ export async function loadPlaylist() {
       const { data } = await api.get('/music/playlist/18149408390');
       if (data.success && data.songs.length > 0) {
         state.songs = data.songs;
-      const saved = loadSavedState();
-      if (saved.currentIndex < filtered.length) {
-        state.currentIndex = saved.currentIndex;
-      }
+        const saved = loadSavedState();
+        if (saved.currentIndex < data.songs.length) {
+          state.currentIndex = saved.currentIndex;
+        }
       state.playMode = saved.playMode;
       state.volume = saved.volume;
       notify();

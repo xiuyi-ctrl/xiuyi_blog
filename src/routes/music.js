@@ -20,10 +20,32 @@ router.get('/playlist/:id', async (req, res) => {
       return res.status(500).json({ success: false, error: detail.message || 'Failed to fetch playlist' });
     }
 
-    const tracks = detail.playlist.tracks || [];
+    let tracks = detail.playlist.tracks || [];
     const songIds = (detail.playlist.trackIds || []).map(t => t.id);
 
-    const songs = tracks.slice(0, 100).map(track => ({
+    const trackIdSet = new Set(tracks.map(t => t.id));
+    const missingIds = songIds.filter(id => !trackIdSet.has(id));
+
+    if (missingIds.length > 0) {
+      const batchSize = 50;
+      for (let i = 0; i < missingIds.length; i += batchSize) {
+        const batch = missingIds.slice(i, i + batchSize);
+        try {
+          const songRes = await fetch(
+            `https://music.163.com/api/v6/song/detail?ids=[${batch.join(',')}]`,
+            { headers: NETEASE_HEADERS }
+          );
+          const songData = await songRes.json();
+          if (songData.songs) {
+            tracks = tracks.concat(songData.songs);
+          }
+        } catch (e) {
+          console.error('Batch fetch songs failed:', e.message);
+        }
+      }
+    }
+
+    const songs = tracks.map(track => ({
       id: track.id,
       name: track.name,
       artist: (track.ar || []).map(a => a.name).join(' / '),
