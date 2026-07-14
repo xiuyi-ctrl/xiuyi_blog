@@ -311,28 +311,28 @@ body {
   flex: 1;
 }
 
+.post-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 6px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.7rem;
+  color: #6366f1;
+  margin-bottom: 0.75rem;
+  width: fit-content;
+  font-variant-numeric: tabular-nums;
+}
+
 .post-category {
   display: inline-block;
   font-size: 0.65rem;
   font-weight: 500;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 0.4rem;
-}
-
-.post-date {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: rgba(212, 167, 106, 0.12);
-  border: 1px solid rgba(212, 167, 106, 0.15);
-  border-radius: 6px;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.7rem;
-  color: var(--color-accent);
-  margin-bottom: 0.75rem;
-  width: fit-content;
-  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 0.4rem;
 }
 
 .post-card h2 {
@@ -375,7 +375,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-top: auto;
+  margin-top: 15px;
 }
 
 .post-meta {

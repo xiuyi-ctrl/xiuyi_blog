@@ -155,7 +155,12 @@ export default function Posts() {
                 </div>
               )}
               <div className="post-info">
-                <span className="post-date">{formatDate(post.created_at)}</span>
+                <div className="post-date">
+                  <span>{formatDate(post.created_at)}</span>
+                  {post.category_name && (
+                    <span className="post-category">· {post.category_name}</span>
+                  )}
+                </div>
                 <h2>{post.title}</h2>
                 <p className="post-excerpt">{post.content.slice(0, 120)}...</p>
                 <div className="post-footer">
