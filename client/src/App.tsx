@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Music from './pages/Music';
+import Photos from './pages/Photos';
 import './App.css';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <Route path="/write" element={<ProtectedRoute><Write /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/music" element={<Music />} />
+          <Route path="/photos" element={<Photos />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

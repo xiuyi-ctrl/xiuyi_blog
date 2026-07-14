@@ -1940,6 +1940,67 @@ body {
   transform: translateX(-50%) translateY(16px) scale(0.95);
 }
 
+/* ==================== Photos Page ==================== */
+.photos-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.photos-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.photos-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  color: var(--text-primary, #2c2c2c);
+  margin: 0 0 0.5rem;
+}
+
+.photos-subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.95rem;
+  color: var(--text-secondary, #888);
+  margin: 0;
+}
+
+.photos-gallery-wrapper {
+  width: 100%;
+  height: 600px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.photos-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.photos-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary, #888);
+  font-size: 1.1rem;
+}
+
+.photos-hint {
+  text-align: center;
+  margin-top: 1.2rem;
+  color: var(--text-secondary, #aaa);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+}
+
 /* Right Column */
 .home-right-column {
   display: flex;
