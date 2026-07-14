@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 
@@ -68,9 +68,21 @@ export default function Posts() {
     fetchCategories();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchPosts(1, keyword, selectedCategory);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const debouncedSearch = useCallback((searchKeyword: string) => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    debounceTimer.current = setTimeout(() => {
+      fetchPosts(1, searchKeyword, selectedCategory);
+    }, 300);
+  }, [selectedCategory]);
+
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setKeyword(value);
+    debouncedSearch(value);
   };
 
   const handleCategoryClick = (categoryId: number | null) => {
@@ -97,6 +109,16 @@ export default function Posts() {
           <span className="divider-dot" />
         </div>
         <p className="page-subtitle">思考、记录、分享</p>
+        
+        <form onSubmit={(e) => e.preventDefault()} className="home-search">
+          <span className="home-search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="搜索文章..."
+            value={keyword}
+            onChange={handleSearchInput}
+          />
+        </form>
       </div>
 
       <div className="posts-filter-bar">
@@ -117,28 +139,31 @@ export default function Posts() {
             </button>
           ))}
         </div>
-
-        <form onSubmit={handleSearch} className="search-form">
-          <input
-            type="text"
-            placeholder="搜索文章..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <button type="submit">搜索</button>
-        </form>
       </div>
 
       {loading ? (
         <div className="posts-empty">
-          <span className="empty-icon">&#8943;</span>
+          <div className="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
           <p>加载中</p>
         </div>
       ) : posts.length === 0 ? (
         <div className="posts-empty">
-          <span className="empty-icon">&#9744;</span>
-          <p>暂无文章</p>
-          <span className="empty-hint">换个分类或关键词试试</span>
+          <div className="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+              <path d="M8 11h6"/>
+            </svg>
+          </div>
+          <p>未找到相关文章</p>
+          <span className="empty-hint">换个关键词或分类试试</span>
+          <button className="empty-action" onClick={() => { setKeyword(''); setSelectedCategory(null); fetchPosts(1, '', null); }}>
+            查看全部文章
+          </button>
         </div>
       ) : (
         <div className="post-list">
