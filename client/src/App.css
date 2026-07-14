@@ -271,7 +271,7 @@ body {
 .post-card {
   background: rgba(18, 20, 30, 0.75);
   backdrop-filter: blur(12px);
-  border-radius: 14px;
+  border-radius: 20px;
   text-decoration: none;
   color: inherit;
   overflow: hidden;
@@ -413,7 +413,7 @@ body {
   padding: 0.15rem 0.55rem;
   border-radius: 20px;
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: lab(65.5349% -2.25151 -14.5072);
   white-space: nowrap;
   transition: background 0.2s ease;
 }
