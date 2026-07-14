@@ -2063,7 +2063,7 @@ body {
 
 .stack-album-name {
   flex-shrink: 0;
-  width: 50px;
+  width: 60px;
   height: 500px;
   display: flex;
   align-items: center;
@@ -2071,15 +2071,16 @@ body {
   writing-mode: vertical-rl;
   text-orientation: mixed;
   pointer-events: none;
+  margin-left: -0.5rem;
 }
 
 .stack-album-name-text {
   font-family: 'Playfair Display', 'Noto Serif SC', serif;
-  font-size: 1.6rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #fff;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-  letter-spacing: 4px;
+  letter-spacing: 6px;
 }
 
 .stack-album-name .split-char {
