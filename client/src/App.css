@@ -269,7 +269,8 @@ body {
 }
 
 .post-card {
-  background: linear-gradient(160deg, #2a3040 0%, #1e2433 50%, #1a1f2e 100%);
+  background: rgba(18, 20, 30, 0.75);
+  backdrop-filter: blur(12px);
   border-radius: 14px;
   text-decoration: none;
   color: inherit;
@@ -1262,7 +1263,7 @@ body {
   }
   
   .post-card {
-    background: linear-gradient(160deg, #2a3040 0%, #1e2433 50%, #1a1f2e 100%);
+    background: rgba(18, 20, 30, 0.75);
   }
   
   .post-card:hover {
