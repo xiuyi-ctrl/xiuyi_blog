@@ -9,5 +9,6 @@ router.use('/auth', require('./auth'));
 router.use('/posts', require('./posts'));
 router.use('/music', require('./music'));
 router.use('/categories', require('./categories'));
+router.use('/projects', require('./projects'));
 
 module.exports = router;
