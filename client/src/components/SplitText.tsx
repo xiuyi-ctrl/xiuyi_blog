@@ -31,11 +31,10 @@ export default function SplitText({
     items.forEach((item, i) => {
       const htmlItem = item as HTMLElement;
       htmlItem.style.opacity = '0';
-      htmlItem.style.transform = 'translateY(20px)';
-      htmlItem.style.transition = `opacity ${duration}s ease, transform ${duration}s ease`;
+      htmlItem.style.transition = `opacity ${duration}s ease`;
       setTimeout(() => {
         htmlItem.style.opacity = '1';
-        htmlItem.style.transform = 'translateY(0)';
+        htmlItem.classList.add('visible');
       }, i * delay);
     });
   }, [text, key, delay, duration]);

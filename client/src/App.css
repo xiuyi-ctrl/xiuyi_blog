@@ -2064,18 +2064,13 @@ body {
 .stack-album-name {
   flex-shrink: 0;
   width: 50px;
+  height: 500px;
   display: flex;
   align-items: center;
   justify-content: center;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   pointer-events: none;
-  animation: stackNameFadeIn 0.4s ease;
-}
-
-@keyframes stackNameFadeIn {
-  from { opacity: 0; transform: translateY(-50%) translateX(-10px); }
-  to { opacity: 1; transform: translateY(-50%) translateX(0); }
 }
 
 .stack-album-name-text {
@@ -2090,7 +2085,12 @@ body {
 .stack-album-name .split-char {
   display: inline-block;
   opacity: 0;
-  transform: translateY(15px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.stack-album-name .split-char.visible {
+  opacity: 1;
+  transform: none;
 }
 
 .photos-gallery-wrapper {
