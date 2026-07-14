@@ -2055,12 +2055,18 @@ body {
   box-sizing: border-box;
 }
 
+.photos-stack-layout {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
 .stack-album-name {
-  position: absolute;
-  left: 1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
+  flex-shrink: 0;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   pointer-events: none;

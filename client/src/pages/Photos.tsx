@@ -104,23 +104,23 @@ function AlbumList() {
           )}
         </div>
       ) : (
-        <div className="photos-stack-wrapper">
-          {loading ? (
-            <div className="photos-loading">
-              <div className="loading-dots"><span></span><span></span><span></span></div>
-            </div>
-          ) : albumItems.length > 0 ? (
-            <>
-              <div className="stack-album-name" key={topAlbumIndex}>
-                <SplitText
-                  text={albums[topAlbumIndex]?.title || ''}
-                  className="stack-album-name-text"
-                  delay={80}
-                  duration={0.5}
-                  splitType="chars"
-                  tag="span"
-                />
+        <div className="photos-stack-layout">
+          <div className="stack-album-name" key={topAlbumIndex}>
+            <SplitText
+              text={albums[topAlbumIndex]?.title || ''}
+              className="stack-album-name-text"
+              delay={80}
+              duration={0.5}
+              splitType="chars"
+              tag="span"
+            />
+          </div>
+          <div className="photos-stack-wrapper">
+            {loading ? (
+              <div className="photos-loading">
+                <div className="loading-dots"><span></span><span></span><span></span></div>
               </div>
+            ) : albumItems.length > 0 ? (
               <Stack
                 cards={albumItems.map((item, i) => (
                   <div key={i} className="stack-card" onClick={() => handleStackClick(item)}>
@@ -136,10 +136,10 @@ function AlbumList() {
                 pauseOnHover={true}
                 onTopChange={setTopAlbumIndex}
               />
-            </>
-          ) : (
-            <div className="photos-empty"><p>暂无照片集</p></div>
-          )}
+            ) : (
+              <div className="photos-empty"><p>暂无照片集</p></div>
+            )}
+          </div>
         </div>
       )}
 
