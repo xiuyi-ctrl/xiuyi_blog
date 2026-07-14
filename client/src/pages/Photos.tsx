@@ -106,13 +106,6 @@ function AlbumDetail() {
     return Object.entries(imageUrls).map(([name, url]) => ({ image: url, text: name }));
   };
 
-  const handleItemClick = (item: GalleryItem) => {
-    if (!album) return;
-    const items = getGalleryItems(album);
-    const idx = items.findIndex(i => i.image === item.image && i.text === item.text);
-    setLightbox({ items, index: idx >= 0 ? idx : 0 });
-  };
-
   const closeLightbox = () => setLightbox(null);
 
   const navigateLightbox = (dir: number) => {
@@ -168,27 +161,22 @@ function AlbumDetail() {
         <p className="photos-subtitle">{album.description}</p>
       </div>
 
-      <div className="photos-gallery-wrapper">
-        {items.length > 0 ? (
-          <CircularGallery
-            items={items}
-            bend={3}
-            textColor="#ffffff"
-            borderRadius={0.05}
-            font="bold 28px Figtree"
-            fontUrl="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap"
-            scrollSpeed={2}
-            scrollEase={0.05}
-            onItemClick={handleItemClick}
-          />
-        ) : (
-          <div className="photos-empty"><p>该相册暂无照片</p></div>
-        )}
-      </div>
-
-      <div className="photos-hint">
-        <span>← 拖动或滚轮浏览，点击照片可放大 →</span>
-      </div>
+      {items.length > 0 ? (
+        <div className="photos-grid">
+          {items.map((item, idx) => (
+            <div
+              key={idx}
+              className="photos-grid-item"
+              onClick={() => setLightbox({ items, index: idx })}
+            >
+              <img src={item.image} alt={item.text} />
+              <span className="photos-grid-label">{item.text}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="photos-empty"><p>该相册暂无照片</p></div>
+      )}
 
       {lightbox && (
         <div className="lightbox" onClick={closeLightbox} onKeyDown={handleLightboxKeyDown} tabIndex={0}>
