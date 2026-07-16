@@ -19,6 +19,8 @@ interface Post {
   tags: string[];
 }
 
+const fetchTimestamps: Record<string, number> = {};
+
 export default function PostDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -29,6 +31,14 @@ export default function PostDetail() {
   const [readingProgress, setReadingProgress] = useState(0);
 
   useEffect(() => {
+    const now = Date.now();
+    const lastTime = fetchTimestamps[id || ''] || 0;
+    if (now - lastTime < 1500) {
+      setLoading(false);
+      return;
+    }
+    fetchTimestamps[id || ''] = now;
+
     const fetchPost = async () => {
       try {
         const { data } = await api.get(`/posts/${id}`);

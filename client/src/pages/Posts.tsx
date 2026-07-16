@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 
-const INITIAL_COUNT = 9;
+const INITIAL_COUNT = 10;
 const DEFAULT_COVER = 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png';
 
 interface Post {
@@ -117,7 +117,17 @@ export default function Posts() {
   const getExcerpt = (content: string) => {
     const lines = content.split('\n');
     const contentWithoutTitle = lines.slice(1).join('\n').trim();
-    return stripMarkdown(contentWithoutTitle.slice(0, 120));
+    const clean = stripMarkdown(contentWithoutTitle);
+    if (clean.length <= 120) return clean;
+    const truncated = clean.slice(0, 120);
+    const lastSentence = Math.max(
+      truncated.lastIndexOf('。'),
+      truncated.lastIndexOf('！'),
+      truncated.lastIndexOf('？'),
+      truncated.lastIndexOf('.'),
+      truncated.lastIndexOf(' '),
+    );
+    return lastSentence > 30 ? truncated.slice(0, lastSentence + 1) : truncated;
   };
 
   const handleCoverError = (postId: number) => {
@@ -233,46 +243,56 @@ export default function Posts() {
       ) : (
         <>
           <div className="post-list" ref={postListRef}>
-            {visiblePosts.map((post, index) => (
-              <Link
-                to={`/post/${post.id}`}
-                key={post.id}
-                className="post-card"
-                style={{ animationDelay: `${index * 0.12}s` }}
-              >
-                {coverErrors[post.id] ? (
-                  <div className="post-cover-placeholder" />
-                ) : (
-                  <div className="post-cover-wrap">
-                    <img
-                      src={getCoverSrc(post)}
-                      alt={post.title}
-                      className="post-cover"
-                      onError={() => handleCoverError(post.id)}
-                    />
+            {visiblePosts.map((post, index) => {
+              const isHero = index === 0 && !keyword && !selectedCategory;
+              return (
+                <Link
+                  to={`/post/${post.id}`}
+                  key={post.id}
+                  className={`post-card ${isHero ? 'post-card-hero' : ''}`}
+                  style={{ animationDelay: `${index * 0.12}s` }}
+                >
+                  {coverErrors[post.id] ? (
+                    <div className="post-cover-placeholder" />
+                  ) : (
+                    <div className="post-cover-wrap">
+                      <img
+                        src={getCoverSrc(post)}
+                        alt={post.title}
+                        className="post-cover"
+                        onError={() => handleCoverError(post.id)}
+                      />
+                    </div>
+                  )}
+                  <div className="post-info">
+                    <div className="post-date-row">
+                      <span className="post-date">{formatDate(post.created_at)}</span>
+                      {post.category_name && (
+                        <span className="post-category">{post.category_name}</span>
+                      )}
+                    </div>
+                    <h2>{post.title}</h2>
+                    <p className="post-excerpt">{getExcerpt(post.content)}</p>
+                    <div className="post-footer">
+                      {post.tags && post.tags.length > 0 && (
+                        <div className="post-tags">
+                          {post.tags.slice(0, isHero ? 3 : 2).map((tag, i) => (
+                            <span key={i} className="tag">#{tag}</span>
+                          ))}
+                        </div>
+                      )}
+                      <span className="post-views">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        {post.views}
+                      </span>
+                    </div>
                   </div>
-                )}
-                <div className="post-info">
-                  <div className="post-date-row">
-                    <span className="post-date">{formatDate(post.created_at)}</span>
-                    {post.category_name && (
-                      <span className="post-category">{post.category_name}</span>
-                    )}
-                  </div>
-                  <h2>{post.title}</h2>
-                  <p className="post-excerpt">{getExcerpt(post.content)}...</p>
-                  <div className="post-footer">
-                    {post.tags && post.tags.length > 0 && (
-                      <div className="post-tags">
-                        {post.tags.slice(0, 3).map((tag, i) => (
-                          <span key={i} className="tag">#{tag}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
           {hasMore && (
             <div className="load-more-wrap">

@@ -101,7 +101,16 @@ const getPostById = async (req, res) => {
 
     await pool.query('UPDATE posts SET views = views + 1 WHERE id = ?', [id]);
 
-    res.json({ post: posts[0] });
+    const [updated] = await pool.query(
+      `SELECT p.*, u.username as author_name, c.name as category_name
+       FROM posts p
+       LEFT JOIN users u ON p.author_id = u.id
+       LEFT JOIN categories c ON p.category_id = c.id
+       WHERE p.id = ?`,
+      [id]
+    );
+
+    res.json({ post: updated[0] });
   } catch (error) {
     console.error('Get post error:', error);
     res.status(500).json({ message: '服务器错误' });
