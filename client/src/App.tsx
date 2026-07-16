@@ -12,6 +12,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Music from './pages/Music';
 import { AlbumList, AlbumDetail } from './pages/Photos';
+import Archive from './pages/Archive';
 import './App.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/write" element={<ProtectedRoute><Write /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/music" element={<Music />} />
+          <Route path="/archive" element={<Archive />} />
           <Route path="/photos" element={<AlbumList />} />
           <Route path="/photos/:id" element={<AlbumDetail />} />
         </Routes>
