@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     `);
 
     const [allPosts] = await pool.query(`
-      SELECT p.id, p.title, p.created_at, c.name as category_name
+      SELECT p.id, p.title, p.tags, p.created_at, c.name as category_name
       FROM posts p
       LEFT JOIN categories c ON p.category_id = c.id
       ORDER BY p.created_at DESC
