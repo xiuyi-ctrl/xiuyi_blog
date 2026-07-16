@@ -221,13 +221,60 @@ export default function Archive() {
         {viewMode === 'horizontal' && (
           <div className="archive-horizontal">
             <div className="h-timeline-track">
-              <div className="h-timeline-line" />
+              {(() => {
+                const NODE_W = 220;
+                const GAP = 32;
+                const AMP = 12;
+                const LINE_Y = 80;
+                const totalW = allItems.length * NODE_W + (allItems.length - 1) * GAP + 60;
+
+                const pts = allItems.map((item, i) => {
+                  const x = 30 + i * (NODE_W + GAP) + NODE_W / 2;
+                  const y = i % 2 === 0 ? LINE_Y - AMP : LINE_Y + AMP;
+                  return { x, y, i };
+                });
+
+                let path = `M${pts[0].x},${LINE_Y}`;
+                pts.forEach((p, i) => {
+                  if (i === 0) return;
+                  const prev = pts[i - 1];
+                  const cpx1 = prev.x + (p.x - prev.x) / 2;
+                  const cpx2 = prev.x + (p.x - prev.x) / 2;
+                  path += ` C${cpx1},${prev.y} ${cpx2},${p.y} ${p.x},${p.y}`;
+                });
+
+                return (
+                  <svg className="h-timeline-svg" viewBox={`0 0 ${totalW} ${LINE_Y * 2}`} preserveAspectRatio="none">
+                    <defs>
+                      <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="blur" />
+                        <feMerge>
+                          <feMergeNode in="blur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    <path d={path} fill="none" stroke="rgba(0,212,255,0.15)" strokeWidth="3" filter="url(#glow)" />
+                    <path d={path} fill="none" stroke="#00d4ff" strokeWidth="2" opacity="0.7" />
+                  </svg>
+                );
+              })()}
+
               {allItems.map((item, i) => {
                 const d = new Date(item.created_at);
                 const dateStr = `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
                 const isTop = i % 2 === 0;
                 const cover = item.type === 'post' ? (item as Post).cover :
                               item.type === 'photo' ? (item as Photo).cover : null;
+
+                const NODE_W = 220;
+                const GAP = 32;
+                const AMP = 12;
+                const LINE_Y = 80;
+                const nodeX = 30 + i * (NODE_W + GAP);
+                const dotY = isTop ? LINE_Y - AMP : LINE_Y + AMP;
+                const connectorTop = isTop ? dotY : LINE_Y;
+                const connectorH = isTop ? LINE_Y - dotY : dotY - LINE_Y;
 
                 const card = (
                   <div className={`h-timeline-card ${item.type}`} onClick={() => handleItemClick(item)}>
@@ -259,16 +306,18 @@ export default function Archive() {
                 );
 
                 return (
-                  <div key={`${item.type}-${item.id}`} className={`h-timeline-node ${isTop ? 'top' : 'bottom'}`}>
+                  <div key={`${item.type}-${item.id}`} className="h-timeline-node" style={{ position: 'absolute', left: nodeX, top: 0, width: NODE_W, height: '100%' }}>
                     {isTop && card}
-                    <div className="h-timeline-connector" />
-                    <div className="h-timeline-dot" onClick={() => handleItemClick(item)}>
+                    <div className="h-timeline-connector" style={{ position: 'absolute', left: '50%', top: connectorTop, height: connectorH }} />
+                    <div className="h-timeline-dot" style={{ position: 'absolute', left: '50%', top: dotY, transform: 'translate(-50%, -50%)' }} onClick={() => handleItemClick(item)}>
                       <span className="h-timeline-date">{dateStr}</span>
                     </div>
                     {!isTop && (
                       <>
-                        <div className="h-timeline-connector" />
-                        {card}
+                        <div className="h-timeline-connector" style={{ position: 'absolute', left: '50%', top: LINE_Y, height: dotY - LINE_Y }} />
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%' }}>
+                          {card}
+                        </div>
                       </>
                     )}
                   </div>
