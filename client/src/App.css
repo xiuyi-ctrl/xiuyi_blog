@@ -1484,9 +1484,24 @@ body {
 
   .hero-card,
   .guestbook-form-wrapper,
-  .message-card {
+  .message-card,
+  .about-profile-card,
+  .about-card {
     background: rgba(18, 20, 30, 0.75);
     border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .about-contact-item {
+    background: rgba(18, 20, 30, 0.5);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .about-contact-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .about-stat-item {
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .guestbook-input,
@@ -4137,6 +4152,298 @@ body {
   background: var(--color-accent);
   color: #fff;
   border-color: var(--color-accent);
+}
+
+/* ========== ABOUT ========== */
+.about-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 100px var(--side-padding) 80px;
+}
+
+.about-profile-card {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.about-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+
+.about-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--color-accent);
+  flex-shrink: 0;
+}
+
+.about-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about-profile-info {
+  flex: 1;
+}
+
+.about-name {
+  font-family: var(--font-display);
+  font-size: var(--size-h1);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.about-bio {
+  font-size: 1rem;
+  color: var(--color-text);
+  opacity: 0.75;
+  line-height: 1.8;
+}
+
+.about-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.about-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  color: var(--color-text);
+}
+
+.about-contact-item:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.contact-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  color: var(--color-text);
+}
+
+.contact-label {
+  font-size: 0.8rem;
+  color: var(--color-text);
+  opacity: 0.5;
+  display: block;
+}
+
+.contact-value {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.about-card {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 28px;
+}
+
+.about-card-title {
+  font-family: var(--font-display);
+  font-size: var(--size-h3);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+.skills-group {
+  margin-bottom: 16px;
+}
+
+.skills-group:last-child {
+  margin-bottom: 0;
+}
+
+.skills-category {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text);
+  opacity: 0.6;
+  margin-bottom: 10px;
+}
+
+.skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.about-stat-item {
+  text-align: center;
+  padding: 16px 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+}
+
+.about-stat-number {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-bottom: 4px;
+}
+
+.about-stat-label {
+  font-size: 0.8rem;
+  color: var(--color-text);
+  opacity: 0.6;
+}
+
+.about-blog-card {
+  margin-bottom: 24px;
+}
+
+.about-blog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about-blog-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.blog-item-label {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  opacity: 0.5;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.blog-item-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.about-blog-link {
+  font-size: 0.95rem;
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.about-blog-link:hover {
+  opacity: 0.7;
+}
+
+.about-blog-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.features-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feature-tag {
+  background: rgba(212, 167, 106, 0.12);
+  color: var(--color-accent);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(212, 167, 106, 0.2);
+}
+
+/* About responsive */
+@media (max-width: 768px) {
+  .about-container {
+    padding: 80px var(--side-padding) 60px;
+  }
+
+  .about-profile-top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .about-contact-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .about-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-blog-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }
 
 /* Guestbook responsive */

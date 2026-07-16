@@ -12,6 +12,7 @@ import Music from './pages/Music';
 import { AlbumList, AlbumDetail } from './pages/Photos';
 import Archive from './pages/Archive';
 import Guestbook from './pages/Guestbook';
+import About from './pages/About';
 import './App.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/photos" element={<AlbumList />} />
           <Route path="/photos/:id" element={<AlbumDetail />} />
           <Route path="/guestbook" element={<Guestbook />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
