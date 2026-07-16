@@ -12,5 +12,6 @@ router.use('/categories', require('./categories'));
 router.use('/projects', require('./projects'));
 router.use('/photos', require('./photos'));
 router.use('/archive', require('./archive'));
+router.use('/guestbook', require('./guestbook'));
 
 module.exports = router;

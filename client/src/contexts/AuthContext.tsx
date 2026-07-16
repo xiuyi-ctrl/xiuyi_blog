@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import api from '../api';
 
 interface User {
   id: number;
@@ -11,8 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  loginWithGitHub: () => void;
   logout: () => void;
   loading: boolean;
 }
@@ -25,25 +23,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get('token');
+    const urlUser = params.get('user');
+
+    if (urlToken && urlUser) {
+      try {
+        const parsedUser = JSON.parse(decodeURIComponent(urlUser));
+        localStorage.setItem('token', urlToken);
+        localStorage.setItem('user', JSON.stringify(parsedUser));
+        setToken(urlToken);
+        setUser(parsedUser);
+        window.history.replaceState({}, '', window.location.pathname);
+      } catch (e) {
+        console.error('Failed to parse user from URL:', e);
+      }
+    } else {
+      const savedToken = localStorage.getItem('token');
+      const savedUser = localStorage.getItem('user');
+      if (savedToken && savedUser) {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser));
+      }
     }
     setLoading(false);
   }, []);
 
-  const login = async (username: string, password: string) => {
-    const { data } = await api.post('/auth/login', { username, password });
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setToken(data.token);
-    setUser(data.user);
-  };
-
-  const register = async (username: string, email: string, password: string) => {
-    await api.post('/auth/register', { username, email, password });
+  const loginWithGitHub = () => {
+    window.location.href = '/api/auth/github';
   };
 
   const logout = () => {
@@ -54,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, loginWithGitHub, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

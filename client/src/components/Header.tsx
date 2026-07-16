@@ -83,17 +83,8 @@ export default function Header() {
             </button>
             
             {user ? (
-              <>
-                <Link to="/write">
-                  <span className="nav-icon">✎</span>
-                  写文章
-                </Link>
-                <Link to="/profile">{user.username}</Link>
-                <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>退出</a>
-              </>
-            ) : (
-              <Link to="/login">登录</Link>
-            )}
+              <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>退出</a>
+            ) : null}
           </nav>
         </div>
       </header>
