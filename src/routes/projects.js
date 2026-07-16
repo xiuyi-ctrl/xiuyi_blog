@@ -9,8 +9,8 @@ router.get('/', async (req, res) => {
     const params = [];
 
     if (keyword) {
-      sql += ' WHERE title LIKE ? OR description LIKE ?';
-      params.push(`%${keyword}%`, `%${keyword}%`);
+      sql += ' WHERE title LIKE ?';
+      params.push(`%${keyword}%`);
     }
 
     sql += ' ORDER BY id DESC';

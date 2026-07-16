@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 
+const INITIAL_COUNT = 9;
+const DEFAULT_COVER = 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png';
+
 interface Post {
   id: number;
   title: string;
@@ -22,30 +25,25 @@ interface Category {
   post_count: number;
 }
 
-interface Pagination {
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}
-
 export default function Posts() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ page: 1, pageSize: 10, total: 0, totalPages: 0 });
   const [keyword, setKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+  const [coverErrors, setCoverErrors] = useState<Record<number, boolean>>({});
 
-  const fetchPosts = async (page = 1, search = '', categoryId: number | null = null) => {
+  const fetchPosts = async (search = '', categoryId: number | null = null) => {
     setLoading(true);
     try {
-      const params: Record<string, string | number> = { page, pageSize: 10 };
+      const params: Record<string, string | number> = { page: 1, pageSize: 1000 };
       if (search) params.keyword = search;
       if (categoryId) params.category = categoryId;
       const { data } = await api.get('/posts', { params });
       setPosts(data.posts);
-      setPagination(data.pagination);
+      setVisibleCount(INITIAL_COUNT);
     } catch (error) {
       console.error('Failed to fetch posts:', error);
     } finally {
@@ -76,7 +74,7 @@ export default function Posts() {
       clearTimeout(debounceTimer.current);
     }
     debounceTimer.current = setTimeout(() => {
-      fetchPosts(1, searchKeyword, selectedCategory);
+      fetchPosts(searchKeyword, selectedCategory);
     }, 300);
   }, [selectedCategory]);
 
@@ -88,7 +86,7 @@ export default function Posts() {
 
   const handleCategoryClick = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
-    fetchPosts(1, keyword, categoryId);
+    fetchPosts(keyword, categoryId);
   };
 
   const formatDate = (dateString: string) => {
@@ -121,6 +119,45 @@ export default function Posts() {
     const contentWithoutTitle = lines.slice(1).join('\n').trim();
     return stripMarkdown(contentWithoutTitle.slice(0, 120));
   };
+
+  const handleCoverError = (postId: number) => {
+    setCoverErrors(prev => ({ ...prev, [postId]: true }));
+  };
+
+  const getCoverSrc = (post: Post) => {
+    if (coverErrors[post.id]) return DEFAULT_COVER;
+    return post.cover || DEFAULT_COVER;
+  };
+
+  const visiblePosts = posts.slice(0, visibleCount);
+  const hasMore = visibleCount < posts.length;
+
+  const postListRef = useRef<HTMLDivElement>(null);
+
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    setVisibleCount(prev => prev + INITIAL_COUNT);
+  };
+
+  useEffect(() => {
+    if (!loadingMore) return;
+    let rafId: number;
+    const check = () => {
+      const list = postListRef.current;
+      if (!list) return;
+      const cards = list.querySelectorAll('.post-card');
+      const last = cards[cards.length - 1] as HTMLElement;
+      if (!last) return;
+      const style = getComputedStyle(last);
+      if (style.animationPlayState === 'running') {
+        rafId = requestAnimationFrame(check);
+      } else {
+        setLoadingMore(false);
+      }
+    };
+    rafId = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(rafId);
+  }, [loadingMore, visibleCount]);
 
   return (
     <div className="container">
@@ -189,90 +226,68 @@ export default function Posts() {
           </div>
           <p>未找到相关文章</p>
           <span className="empty-hint">换个关键词或分类试试</span>
-          <button className="empty-action" onClick={() => { setKeyword(''); setSelectedCategory(null); fetchPosts(1, '', null); }}>
+          <button className="empty-action" onClick={() => { setKeyword(''); setSelectedCategory(null); fetchPosts('', null); }}>
             查看全部文章
           </button>
         </div>
       ) : (
-        <div className="post-list">
-          {posts.map((post, index) => (
-            <Link
-              to={`/post/${post.id}`}
-              key={post.id}
-              className="post-card"
-              style={{ animationDelay: `${index * 0.06}s` }}
-            >
-              {post.cover && (
-                <div className="post-cover-wrap">
-                  <img src={post.cover} alt={post.title} className="post-cover" />
-                </div>
-              )}
-              <div className="post-info">
-                <div className="post-date-row">
-                  <span className="post-date">{formatDate(post.created_at)}</span>
-                  {post.category_name && (
-                    <span className="post-category">{post.category_name}</span>
-                  )}
-                </div>
-                <h2>{post.title}</h2>
-                <p className="post-excerpt">{getExcerpt(post.content)}...</p>
-                <div className="post-footer">
-                  {post.tags && post.tags.length > 0 && (
-                    <div className="post-tags">
-                      {post.tags.slice(0, 3).map((tag, i) => (
-                        <span key={i} className="tag">#{tag}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {pagination.totalPages > 1 && (
-        <div className="pagination">
-          <button
-            disabled={pagination.page <= 1}
-            onClick={() => fetchPosts(pagination.page - 1, keyword, selectedCategory)}
-          >
-            &#8592;
-          </button>
-          <div className="pagination-pages">
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-              .filter(p => {
-                const diff = Math.abs(p - pagination.page);
-                return diff === 0 || diff === 1 || p === 1 || p === pagination.totalPages;
-              })
-              .reduce<(number | string)[]>((acc, p, i, arr) => {
-                if (i > 0 && typeof arr[i - 1] === 'number' && p - (arr[i - 1] as number) > 1) {
-                  acc.push('...');
-                }
-                acc.push(p);
-                return acc;
-              }, [])
-              .map((p, i) =>
-                typeof p === 'string' ? (
-                  <span key={`ellipsis-${i}`} className="pagination-ellipsis">{p}</span>
+        <>
+          <div className="post-list" ref={postListRef}>
+            {visiblePosts.map((post, index) => (
+              <Link
+                to={`/post/${post.id}`}
+                key={post.id}
+                className="post-card"
+                style={{ animationDelay: `${index * 0.12}s` }}
+              >
+                {coverErrors[post.id] ? (
+                  <div className="post-cover-placeholder" />
                 ) : (
-                  <button
-                    key={p}
-                    className={`pagination-num ${p === pagination.page ? 'pagination-active' : ''}`}
-                    onClick={() => fetchPosts(p, keyword, selectedCategory)}
-                  >
-                    {p}
-                  </button>
-                )
-              )}
+                  <div className="post-cover-wrap">
+                    <img
+                      src={getCoverSrc(post)}
+                      alt={post.title}
+                      className="post-cover"
+                      onError={() => handleCoverError(post.id)}
+                    />
+                  </div>
+                )}
+                <div className="post-info">
+                  <div className="post-date-row">
+                    <span className="post-date">{formatDate(post.created_at)}</span>
+                    {post.category_name && (
+                      <span className="post-category">{post.category_name}</span>
+                    )}
+                  </div>
+                  <h2>{post.title}</h2>
+                  <p className="post-excerpt">{getExcerpt(post.content)}...</p>
+                  <div className="post-footer">
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="post-tags">
+                        {post.tags.slice(0, 3).map((tag, i) => (
+                          <span key={i} className="tag">#{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-          <button
-            disabled={pagination.page >= pagination.totalPages}
-            onClick={() => fetchPosts(pagination.page + 1, keyword, selectedCategory)}
-          >
-            &#8594;
-          </button>
-        </div>
+          {hasMore && (
+            <div className="load-more-wrap">
+              <button className="load-more-btn" onClick={handleLoadMore} disabled={loadingMore}>
+                {loadingMore ? (
+                  <span className="load-more-dots">
+                    <span /><span /><span />
+                  </span>
+                ) : (
+                  <>加载更多<span className="load-more-hint">（{posts.length - visibleCount} 篇）</span></>
+                )}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

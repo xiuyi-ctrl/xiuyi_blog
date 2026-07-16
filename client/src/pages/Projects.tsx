@@ -68,7 +68,10 @@ export default function Projects() {
         <p className="page-subtitle">探索与创造</p>
         
         <form onSubmit={(e) => e.preventDefault()} className="home-search">
-          <span className="home-search-icon">🔍</span>
+          <svg className="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
           <input
             type="text"
             placeholder="搜索项目..."

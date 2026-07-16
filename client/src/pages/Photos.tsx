@@ -55,6 +55,11 @@ function AlbumList() {
     <div className="photos-page">
       <div className="photos-header">
         <h1 className="photos-title">光影留痕</h1>
+        <div className="page-divider">
+          <span className="divider-dot" />
+          <span className="divider-line" />
+          <span className="divider-dot" />
+        </div>
         <p className="photos-subtitle">用镜头记录生活的每一帧美好</p>
       </div>
 
