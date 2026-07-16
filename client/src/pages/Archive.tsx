@@ -234,31 +234,65 @@ export default function Archive() {
                     className={`h-timeline-node ${isTop ? 'top' : 'bottom'}`}
                     onClick={() => handleItemClick(item)}
                   >
-                    <div className={`h-timeline-card ${item.type}`}>
-                      {cover && (
-                        <div className="h-timeline-cover">
-                          <img src={cover} alt={item.title} />
+                    {isTop && (
+                      <>
+                        <div className={`h-timeline-card ${item.type}`}>
+                          {cover && (
+                            <div className="h-timeline-cover">
+                              <img src={cover} alt={item.title} />
+                            </div>
+                          )}
+                          <div className="h-timeline-body">
+                            <span className="h-timeline-icon">{typeIcon(item.type)}</span>
+                            <h4 className="h-timeline-title">{item.title}</h4>
+                            {item.type === 'post' && (item as Post).category_name && (
+                              <span className="h-timeline-category">{(item as Post).category_name}</span>
+                            )}
+                            {item.type === 'project' && (item as Project).description && (
+                              <p className="h-timeline-desc">{(item as Project).description}</p>
+                            )}
+                            {item.type === 'photo' && (
+                              <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
+                            )}
+                            <div className="h-timeline-meta">
+                              <span className="h-timeline-type">{typeLabel(item.type)}</span>
+                            </div>
+                          </div>
                         </div>
-                      )}
-                      <div className="h-timeline-body">
-                        <span className="h-timeline-icon">{typeIcon(item.type)}</span>
-                        <h4 className="h-timeline-title">{item.title}</h4>
-                        {item.type === 'post' && (item as Post).category_name && (
-                          <span className="h-timeline-category">{(item as Post).category_name}</span>
-                        )}
-                        {item.type === 'project' && (item as Project).description && (
-                          <p className="h-timeline-desc">{(item as Project).description}</p>
-                        )}
-                        {item.type === 'photo' && (
-                          <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
-                        )}
-                        <div className="h-timeline-meta">
-                          <span className="h-timeline-type">{typeLabel(item.type)}</span>
-                          <span className="h-timeline-date">{dateStr}</span>
-                        </div>
-                      </div>
+                        <div className="h-timeline-connector" />
+                      </>
+                    )}
+                    <div className="h-timeline-dot">
+                      <span className="h-timeline-date">{dateStr}</span>
                     </div>
-                    <div className="h-timeline-dot" />
+                    {!isTop && (
+                      <>
+                        <div className="h-timeline-connector" />
+                        <div className={`h-timeline-card ${item.type}`}>
+                          {cover && (
+                            <div className="h-timeline-cover">
+                              <img src={cover} alt={item.title} />
+                            </div>
+                          )}
+                          <div className="h-timeline-body">
+                            <span className="h-timeline-icon">{typeIcon(item.type)}</span>
+                            <h4 className="h-timeline-title">{item.title}</h4>
+                            {item.type === 'post' && (item as Post).category_name && (
+                              <span className="h-timeline-category">{(item as Post).category_name}</span>
+                            )}
+                            {item.type === 'project' && (item as Project).description && (
+                              <p className="h-timeline-desc">{(item as Project).description}</p>
+                            )}
+                            {item.type === 'photo' && (
+                              <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
+                            )}
+                            <div className="h-timeline-meta">
+                              <span className="h-timeline-type">{typeLabel(item.type)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 );
               })}
