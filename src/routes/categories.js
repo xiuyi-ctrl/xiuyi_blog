@@ -4,7 +4,13 @@ const pool = require('../config/database');
 
 router.get('/', async (req, res) => {
   try {
-    const [categories] = await pool.query('SELECT * FROM categories ORDER BY id');
+    const [categories] = await pool.query(`
+      SELECT c.*, COUNT(p.id) AS post_count 
+      FROM categories c 
+      LEFT JOIN posts p ON c.id = p.category_id 
+      GROUP BY c.id 
+      ORDER BY c.id
+    `);
     res.json({ success: true, categories });
   } catch (error) {
     console.error('Failed to fetch categories:', error);

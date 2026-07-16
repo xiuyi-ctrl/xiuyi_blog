@@ -19,6 +19,7 @@ interface Category {
   id: number;
   name: string;
   description: string;
+  post_count: number;
 }
 
 interface Pagination {
@@ -153,6 +154,7 @@ export default function Posts() {
             onClick={() => handleCategoryClick(null)}
           >
             全部
+            <span className="category-count">{categories.reduce((sum, c) => sum + c.post_count, 0)}</span>
           </button>
           {categories.map((cat) => (
             <button
@@ -161,6 +163,7 @@ export default function Posts() {
               onClick={() => handleCategoryClick(cat.id)}
             >
               {cat.name}
+              <span className="category-count">{cat.post_count}</span>
             </button>
           ))}
         </div>
