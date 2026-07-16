@@ -79,6 +79,18 @@ body {
   display: flex;
   gap: 1.5rem;
   align-items: center;
+  position: relative;
+}
+
+.nav-indicator {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  height: 2px;
+  background: #6366f1;
+  border-radius: 1px;
+  transition: transform 0.3s ease, width 0.3s ease;
+  pointer-events: none;
 }
 
 .nav a {
@@ -108,30 +120,9 @@ body {
   opacity: 1;
 }
 
-.nav a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  width: 0;
-  height: 1px;
-  background: #6366f1;
-  transition: all 0.3s ease;
-  transform: translateX(-50%);
-}
-
-.nav a:hover::after {
-  width: 100%;
-}
-
 .nav a.active {
   color: #6366f1;
   opacity: 1;
-}
-
-.nav a.active::after {
-  width: 100%;
-  background: #6366f1;
 }
 
 /* ========== MAIN CONTENT ========== */
