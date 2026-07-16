@@ -21,15 +21,16 @@ export default function Home() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [postsRes, projectsRes] = await Promise.all([
+        const [postsRes, projectsRes, photosRes] = await Promise.all([
           api.get('/posts', { params: { pageSize: 1 } }),
-          api.get('/projects')
+          api.get('/projects'),
+          api.get('/photos/count')
         ]);
         setStats({
           posts: postsRes.data.pagination.total,
           projects: projectsRes.data.projects?.length || 0,
           views: postsRes.data.posts.reduce((sum: number, p: any) => sum + (p.views || 0), 0),
-          photos: 0
+          photos: photosRes.data.data?.total || 0
         });
       } catch (error) {
         console.error('Failed to fetch stats:', error);
@@ -85,7 +86,7 @@ export default function Home() {
               <span className="stat-label">项目</span>
             </div>
             <div className="stat-item">
-              <span className="stat-number stat-color-3">71</span>
+              <span className="stat-number stat-color-3">{stats.photos}</span>
               <span className="stat-label">照片</span>
             </div>
 
