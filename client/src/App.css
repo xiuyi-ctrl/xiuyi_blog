@@ -1581,77 +1581,97 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.2s ease;
+  animation: fadeIn 0.25s ease;
 }
 
 .bg-settings-panel {
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
   padding: 1.5rem;
   width: 90%;
-  max-width: 400px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  max-width: 380px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  animation: panelSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes panelSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .bg-settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .bg-settings-header h3 {
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   margin: 0;
+  color: var(--color-text);
 }
 
 .close-btn {
-  background: none;
+  width: 28px;
+  height: 28px;
   border: none;
-  font-size: 1.5rem;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 50%;
   cursor: pointer;
+  font-size: 1.1rem;
   color: var(--color-text);
   opacity: 0.5;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
   padding: 0;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
   opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 /* ========== CAROUSEL ========== */
 .bg-carousel {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 
 .carousel-btn {
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--color-border);
-  background: white;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 50%;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: var(--color-text);
   transition: all 0.2s ease;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
 }
 
 .carousel-btn:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border-color: #6366f1;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.08);
 }
 
 .carousel-preview {
@@ -1661,34 +1681,53 @@ body {
 
 .carousel-image {
   width: 100%;
-  height: 150px;
+  height: 140px;
   background-size: cover;
   background-position: center;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 0.5rem;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+  border-radius: 0 0 12px 12px;
+  pointer-events: none;
 }
 
 .carousel-name {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text);
-  opacity: 0.7;
+  opacity: 0.8;
+  position: relative;
+  margin-top: -1.5rem;
+  display: inline-block;
 }
 
 /* ========== BLUR CONTROL ========== */
 .bg-blur-control {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: var(--color-base);
-  border-radius: 8px;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 0.875rem 1rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .bg-blur-control label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--color-text);
   white-space: nowrap;
+  opacity: 0.8;
 }
 
 .bg-blur-control input[type="range"] {
@@ -1704,51 +1743,60 @@ body {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  background: var(--color-accent);
+  background: #6366f1;
   border-radius: 50%;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.bg-blur-control input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
 }
 
 .blur-value {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--color-text);
-  opacity: 0.6;
-  min-width: 40px;
+  opacity: 0.5;
+  min-width: 36px;
   text-align: right;
+  font-family: var(--font-code);
 }
 
 /* ========== THUMBNAILS ========== */
 .bg-thumbnails {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
 }
 
 .thumbnail {
   background: none;
   border: 2px solid transparent;
-  border-radius: 8px;
-  padding: 0.25rem;
+  border-radius: 10px;
+  padding: 0.3rem;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
 }
 
 .thumbnail:hover {
-  border-color: var(--color-border);
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-2px);
 }
 
 .thumbnail.active {
-  border-color: var(--color-accent);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 .thumbnail-img {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 16/10;
   background-size: cover;
   background-position: center;
-  border-radius: 4px;
-  margin-bottom: 0.25rem;
+  border-radius: 6px;
+  margin-bottom: 0.3rem;
 }
 
 .thumbnail span {

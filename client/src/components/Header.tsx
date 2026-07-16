@@ -23,7 +23,7 @@ export default function Header() {
   const { user, logout } = useAuth();
   const [showBgSettings, setShowBgSettings] = useState(false);
   const [bgImage, setBgImage] = useState(() => 
-    localStorage.getItem('bgImage') || 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg'
+    localStorage.getItem('bgImage') || 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png'
   );
   const [bgBlur, setBgBlur] = useState(() => 
     Number(localStorage.getItem('bgBlur')) || 20

@@ -10,9 +10,9 @@ interface BackgroundSettingsProps {
 }
 
 const backgrounds = [
-  { id: 1, name: '背景1', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg' },
+  { id: 1, name: '背景1', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png' },
   { id: 2, name: '背景2', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/bg3.jpg' },
-  { id: 3, name: '背景3', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png' },
+  { id: 3, name: '背景3', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg' },
 ];
 
 export default function BackgroundSettings({
