@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
     `);
 
     const [allProjects] = await pool.query(`
-      SELECT id, title, github_url, created_at
+      SELECT id, title, description, github_url, created_at
       FROM projects
       ORDER BY created_at DESC
     `);
@@ -60,8 +60,9 @@ router.get('/', async (req, res) => {
       const key = `${d.getFullYear()}年${d.getMonth() + 1}月`;
       if (!grouped[key]) grouped[key] = { year: d.getFullYear(), month: d.getMonth() + 1, items: [] };
       const images = typeof p.image_url === 'string' ? JSON.parse(p.image_url) : p.image_url;
+      const imageCount = images && typeof images === 'object' ? Object.keys(images).length : 0;
       const firstImage = images && typeof images === 'object' ? Object.values(images)[0] : null;
-      grouped[key].items.push({ ...p, image_url: undefined, cover: p.cover || firstImage, type: 'photo' });
+      grouped[key].items.push({ ...p, image_url: undefined, cover: p.cover || firstImage, imageCount, type: 'photo' });
     });
 
     Object.values(grouped).forEach(g => {

@@ -16,6 +16,7 @@ interface Post {
 interface Project {
   id: number;
   title: string;
+  description: string;
   cover: string;
   created_at: string;
   type: 'project';
@@ -25,6 +26,7 @@ interface Photo {
   id: number;
   title: string;
   cover: string;
+  imageCount: number;
   created_at: string;
   type: 'photo';
 }
@@ -180,6 +182,15 @@ export default function Archive() {
                           <div className="timeline-card-body">
                             <span className="timeline-card-icon">{typeIcon(item.type)}</span>
                             <h4 className="timeline-card-title">{item.title}</h4>
+                            {item.type === 'post' && (item as Post).category_name && (
+                              <span className="timeline-card-category">{(item as Post).category_name}</span>
+                            )}
+                            {item.type === 'project' && (item as Project).description && (
+                              <p className="timeline-card-desc">{(item as Project).description}</p>
+                            )}
+                            {item.type === 'photo' && (
+                              <span className="timeline-card-count">{(item as Photo).imageCount} 张照片</span>
+                            )}
                             <div className="timeline-card-meta">
                               <span className="timeline-card-type">{typeLabel(item.type)}</span>
                               <span className="timeline-card-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
