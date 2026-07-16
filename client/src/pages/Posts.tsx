@@ -99,6 +99,28 @@ export default function Posts() {
     });
   };
 
+  const stripMarkdown = (text: string) => {
+    return text
+      .replace(/#{1,6}\s/g, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/`{1,3}[^`]*`{1,3}/g, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
+      .replace(/^\s*[-*+]\s/gm, '')
+      .replace(/^\s*\d+\.\s/gm, '')
+      .replace(/^>\s/gm, '')
+      .replace(/---/g, '')
+      .replace(/\n+/g, ' ')
+      .trim();
+  };
+
+  const getExcerpt = (content: string) => {
+    const lines = content.split('\n');
+    const contentWithoutTitle = lines.slice(1).join('\n').trim();
+    return stripMarkdown(contentWithoutTitle.slice(0, 120));
+  };
+
   return (
     <div className="container">
       <div className="posts-header">
@@ -111,7 +133,10 @@ export default function Posts() {
         <p className="page-subtitle">思考、记录、分享</p>
         
         <form onSubmit={(e) => e.preventDefault()} className="home-search">
-          <span className="home-search-icon">🔍</span>
+          <svg className="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
           <input
             type="text"
             placeholder="搜索文章..."
@@ -187,7 +212,7 @@ export default function Posts() {
                   )}
                 </div>
                 <h2>{post.title}</h2>
-                <p className="post-excerpt">{post.content.slice(0, 120)}...</p>
+                <p className="post-excerpt">{getExcerpt(post.content)}...</p>
                 <div className="post-footer">
                   {post.tags && post.tags.length > 0 && (
                     <div className="post-tags">

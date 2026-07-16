@@ -82,8 +82,37 @@ export default function PostDetail() {
     });
   };
 
-  if (loading) return <div className="container"><p style={{ textAlign: 'center', opacity: 0.5, color: '#fff' }}>加载中...</p></div>;
-  if (error) return <div className="container"><p className="error" style={{ color: '#f87171' }}>{error}</p></div>;
+  if (loading) {
+    return (
+      <div className="container">
+        <div className="skeleton-loading">
+          <div className="skeleton-back"></div>
+          <div className="skeleton-article">
+            <div className="skeleton-cover"></div>
+            <div className="skeleton-title"></div>
+            <div className="skeleton-meta">
+              <div className="skeleton-meta-item"></div>
+              <div className="skeleton-meta-item"></div>
+              <div className="skeleton-meta-item"></div>
+            </div>
+            <div className="skeleton-tags">
+              <div className="skeleton-tag"></div>
+              <div className="skeleton-tag"></div>
+            </div>
+            <div className="skeleton-content">
+              <div className="skeleton-line"></div>
+              <div className="skeleton-line"></div>
+              <div className="skeleton-line short"></div>
+              <div className="skeleton-line"></div>
+              <div className="skeleton-line medium"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) return <div className="container"><p className="post-error">{error}</p></div>;
   if (!post) return null;
 
   return (
