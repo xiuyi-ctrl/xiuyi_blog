@@ -40,30 +40,19 @@ interface TimelineGroup {
   items: ArchiveItem[];
 }
 
-interface TagItem {
-  name: string;
-  count: number;
-}
-
 export default function Archive() {
   const navigate = useNavigate();
   const [topPosts, setTopPosts] = useState<Post[]>([]);
   const [timeline, setTimeline] = useState<TimelineGroup[]>([]);
-  const [tagCloud, setTagCloud] = useState<TagItem[]>([]);
   const [openMonths, setOpenMonths] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<'timeline' | 'horizontal' | 'list'>('timeline');
+  const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
   const [loading, setLoading] = useState(true);
-
-  const allItems: ArchiveItem[] = timeline.flatMap(g => g.items).sort((a, b) =>
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
 
   useEffect(() => {
     axios.get('/api/archive').then(res => {
       if (res.data.success) {
         setTopPosts(res.data.topPosts);
         setTimeline(res.data.timeline);
-        setTagCloud(res.data.tagCloud);
         if (res.data.timeline.length > 0) {
           setOpenMonths(new Set([res.data.timeline[0].key]));
         }
@@ -98,10 +87,6 @@ export default function Archive() {
     else navigate(`/photos/${item.id}`);
   };
 
-  const handleTagClick = (name: string) => {
-    navigate(`/posts?keyword=${encodeURIComponent(name)}`);
-  };
-
   if (loading) {
     return (
       <div className="archive-loading">
@@ -113,7 +98,7 @@ export default function Archive() {
   return (
     <div className="archive-page">
       <div className="archive-header">
-        <h1 className="archive-title">归档</h1>
+        <h1 className="archive-title">拾光纪事</h1>
         <p className="archive-subtitle">记录成长的每一步</p>
       </div>
 
@@ -146,19 +131,13 @@ export default function Archive() {
 
       <section className="archive-timeline-section">
         <div className="archive-timeline-header">
-          <h2 className="archive-section-title">归档记录</h2>
+          <h2 className="archive-section-title">拾光纪事</h2>
           <div className="archive-view-toggle">
             <button
               className={`view-toggle-btn ${viewMode === 'timeline' ? 'active' : ''}`}
               onClick={() => setViewMode('timeline')}
             >
               <span className="toggle-icon">◉</span> 时间轴
-            </button>
-            <button
-              className={`view-toggle-btn ${viewMode === 'horizontal' ? 'active' : ''}`}
-              onClick={() => setViewMode('horizontal')}
-            >
-              <span className="toggle-icon">↔</span> 横向
             </button>
             <button
               className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
@@ -218,113 +197,6 @@ export default function Archive() {
           </div>
         )}
 
-        {viewMode === 'horizontal' && (
-          <div className="archive-horizontal">
-            <div className="h-timeline-track">
-              {(() => {
-                const NODE_W = 220;
-                const GAP = 32;
-                const AMP = 25;
-                const LINE_Y = 150;
-                const TRACK_H = 300;
-                const totalW = allItems.length * NODE_W + (allItems.length - 1) * GAP + 60;
-
-                const pts = allItems.map((item, i) => {
-                  const x = 30 + i * (NODE_W + GAP) + NODE_W / 2;
-                  const y = i % 2 === 0 ? LINE_Y - AMP : LINE_Y + AMP;
-                  return { x, y, i };
-                });
-
-                let path = `M${pts[0].x},${LINE_Y}`;
-                pts.forEach((p, i) => {
-                  if (i === 0) return;
-                  const prev = pts[i - 1];
-                  const cpx1 = prev.x + (p.x - prev.x) / 2;
-                  const cpx2 = prev.x + (p.x - prev.x) / 2;
-                  path += ` C${cpx1},${prev.y} ${cpx2},${p.y} ${p.x},${p.y}`;
-                });
-
-                return (
-                  <svg className="h-timeline-svg" viewBox={`0 0 ${totalW} ${TRACK_H}`} preserveAspectRatio="none">
-                    <defs>
-                      <filter id="glow">
-                        <feGaussianBlur stdDeviation="3" result="blur" />
-                        <feMerge>
-                          <feMergeNode in="blur" />
-                          <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                      </filter>
-                    </defs>
-                    <path d={path} fill="none" stroke="rgba(0,212,255,0.15)" strokeWidth="3" filter="url(#glow)" />
-                    <path d={path} fill="none" stroke="#00d4ff" strokeWidth="2" opacity="0.7" />
-                  </svg>
-                );
-              })()}
-
-              {allItems.map((item, i) => {
-                const d = new Date(item.created_at);
-                const dateStr = `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-                const isTop = i % 2 === 0;
-                const cover = item.type === 'post' ? (item as Post).cover :
-                              item.type === 'photo' ? (item as Photo).cover : null;
-
-                const NODE_W = 220;
-                const GAP = 32;
-                const AMP = 25;
-                const LINE_Y = 150;
-                const TRACK_H = 300;
-                const nodeX = 30 + i * (NODE_W + GAP);
-                const dotY = isTop ? LINE_Y - AMP : LINE_Y + AMP;
-
-                const card = (
-                  <div className={`h-timeline-card ${item.type}`} onClick={() => handleItemClick(item)}>
-                    {cover && (
-                      <div className="h-timeline-cover">
-                        <img src={cover} alt={item.title} />
-                      </div>
-                    )}
-                    <div className="h-timeline-body">
-                      <h4 className="h-timeline-title">
-                        <span className="h-timeline-icon">{typeIcon(item.type)}</span>
-                        {item.title}
-                      </h4>
-                      {item.type === 'project' && (item as Project).description && (
-                        <p className="h-timeline-desc">{(item as Project).description}</p>
-                      )}
-                      {item.type === 'photo' && (
-                        <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
-                      )}
-                      <div className="h-timeline-meta">
-                        {(item.type === 'post' && (item as Post).category_name) && (
-                          <span className="h-timeline-category">{(item as Post).category_name}</span>
-                        )}
-                        {item.type === 'project' && <span className="h-timeline-category">项目</span>}
-                        {item.type === 'photo' && <span className="h-timeline-category">照片</span>}
-                      </div>
-                    </div>
-                  </div>
-                );
-
-                return (
-                  <div key={`${item.type}-${item.id}`} className="h-timeline-node" style={{ position: 'absolute', left: nodeX, top: 0, width: NODE_W, height: '100%' }}>
-                    {isTop && card}
-                    {isTop && (
-                      <div className="h-timeline-connector" style={{ position: 'absolute', left: '50%', top: dotY, height: LINE_Y - dotY }} />
-                    )}
-                    {!isTop && (
-                      <div className="h-timeline-connector" style={{ position: 'absolute', left: '50%', top: LINE_Y, height: dotY - LINE_Y }} />
-                    )}
-                    <div className="h-timeline-dot" style={{ position: 'absolute', left: '50%', top: dotY, transform: 'translate(-50%, -50%)' }} onClick={() => handleItemClick(item)}>
-                      <span className="h-timeline-date">{dateStr}</span>
-                    </div>
-                    {!isTop && card}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {viewMode === 'list' && (
           <div className="archive-timeline-list">
             {timeline.map(group => (
@@ -352,25 +224,6 @@ export default function Archive() {
           </div>
         )}
       </section>
-
-      {tagCloud.length > 0 && (
-        <section className="archive-tags">
-          <h2 className="archive-section-title">标签云</h2>
-          <div className="archive-tag-list">
-            {tagCloud.map(tag => (
-              <span
-                key={tag.name}
-                className="archive-tag"
-                onClick={() => handleTagClick(tag.name)}
-                style={{ fontSize: `${Math.min(1 + tag.count * 0.15, 1.8)}rem` }}
-              >
-                #{tag.name}
-                <span className="tag-count">{tag.count}</span>
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
