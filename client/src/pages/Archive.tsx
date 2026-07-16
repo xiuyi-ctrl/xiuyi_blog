@@ -51,7 +51,7 @@ export default function Archive() {
   const [timeline, setTimeline] = useState<TimelineGroup[]>([]);
   const [tagCloud, setTagCloud] = useState<TagItem[]>([]);
   const [openMonths, setOpenMonths] = useState<Set<string>>(new Set());
-  const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
+  const [viewMode, setViewMode] = useState<'timeline' | 'horizontal' | 'list'>('timeline');
   const [loading, setLoading] = useState(true);
 
   const allItems: ArchiveItem[] = timeline.flatMap(g => g.items).sort((a, b) =>
@@ -117,31 +117,6 @@ export default function Archive() {
         <p className="archive-subtitle">记录成长的每一步</p>
       </div>
 
-      <section className="archive-horizontal">
-        <div className="h-timeline-track">
-          <div className="h-timeline-line" />
-          {allItems.map((item, i) => {
-            const d = new Date(item.created_at);
-            const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
-            const isTop = i % 2 === 0;
-            return (
-              <div
-                key={`${item.type}-${item.id}`}
-                className={`h-timeline-node ${isTop ? 'top' : 'bottom'}`}
-                onClick={() => handleItemClick(item)}
-              >
-                <div className={`h-timeline-card ${item.type}`}>
-                  <span className="h-timeline-icon">{typeIcon(item.type)}</span>
-                  <span className="h-timeline-title">{item.title}</span>
-                </div>
-                <div className="h-timeline-dot" />
-                <span className="h-timeline-date">{dateStr}</span>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       <section className="archive-featured">
         <h2 className="archive-section-title">精华推荐</h2>
         <div className="archive-featured-grid">
@@ -180,6 +155,12 @@ export default function Archive() {
               <span className="toggle-icon">◉</span> 时间轴
             </button>
             <button
+              className={`view-toggle-btn ${viewMode === 'horizontal' ? 'active' : ''}`}
+              onClick={() => setViewMode('horizontal')}
+            >
+              <span className="toggle-icon">↔</span> 横向
+            </button>
+            <button
               className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
             >
@@ -188,7 +169,7 @@ export default function Archive() {
           </div>
         </div>
 
-        {viewMode === 'timeline' ? (
+        {viewMode === 'timeline' && (
           <div className="archive-timeline-cards">
             {timeline.map(group => (
               <div key={group.key} className="timeline-year-group">
@@ -235,7 +216,36 @@ export default function Archive() {
               </div>
             ))}
           </div>
-        ) : (
+        )}
+
+        {viewMode === 'horizontal' && (
+          <div className="archive-horizontal">
+            <div className="h-timeline-track">
+              <div className="h-timeline-line" />
+              {allItems.map((item, i) => {
+                const d = new Date(item.created_at);
+                const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
+                const isTop = i % 2 === 0;
+                return (
+                  <div
+                    key={`${item.type}-${item.id}`}
+                    className={`h-timeline-node ${isTop ? 'top' : 'bottom'}`}
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <div className={`h-timeline-card ${item.type}`}>
+                      <span className="h-timeline-icon">{typeIcon(item.type)}</span>
+                      <span className="h-timeline-title">{item.title}</span>
+                    </div>
+                    <div className="h-timeline-dot" />
+                    <span className="h-timeline-date">{dateStr}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {viewMode === 'list' && (
           <div className="archive-timeline-list">
             {timeline.map(group => (
               <div key={group.key} className="archive-month-group">
