@@ -45,6 +45,7 @@ export default function Archive() {
   const [timeline, setTimeline] = useState<TimelineGroup[]>([]);
   const [tagCloud, setTagCloud] = useState<TagItem[]>([]);
   const [openMonths, setOpenMonths] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -133,29 +134,78 @@ export default function Archive() {
         </div>
       </section>
 
-      <section className="archive-timeline">
-        {timeline.map(group => (
-          <div key={group.key} className="archive-month-group">
-            <div className="archive-month-header" onClick={() => toggleMonth(group.key)}>
-              <div className="month-dot" />
-              <h3 className="month-title">{group.key}</h3>
-              <span className="month-count">{group.items.length} 条记录</span>
-              <span className={`month-arrow ${openMonths.has(group.key) ? 'open' : ''}`}>▸</span>
-            </div>
-            {openMonths.has(group.key) && (
-              <div className="archive-month-items">
-                {group.items.map(item => (
-                  <div key={`${item.type}-${item.id}`} className="archive-item" onClick={() => handleItemClick(item)}>
-                    <span className="archive-item-icon">{typeIcon(item.type)}</span>
-                    <span className="archive-item-title">{item.title}</span>
-                    <span className="archive-item-type">{typeLabel(item.type)}</span>
-                    <span className="archive-item-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+      <section className="archive-timeline-section">
+        <div className="archive-timeline-header">
+          <h2 className="archive-section-title">归档记录</h2>
+          <div className="archive-view-toggle">
+            <button
+              className={`view-toggle-btn ${viewMode === 'timeline' ? 'active' : ''}`}
+              onClick={() => setViewMode('timeline')}
+            >
+              <span className="toggle-icon">◉</span> 时间轴
+            </button>
+            <button
+              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              <span className="toggle-icon">☰</span> 列表
+            </button>
           </div>
-        ))}
+        </div>
+
+        {viewMode === 'timeline' ? (
+          <div className="archive-timeline-cards">
+            {timeline.map(group => (
+              <div key={group.key} className="timeline-year-group">
+                <div className="timeline-year-badge">{group.key}</div>
+                <div className="timeline-cards-row">
+                  {group.items.map((item, i) => (
+                    <div
+                      key={`${item.type}-${item.id}`}
+                      className={`timeline-card ${i % 2 === 0 ? 'left' : 'right'}`}
+                      onClick={() => handleItemClick(item)}
+                    >
+                      <div className="timeline-card-dot" />
+                      <div className="timeline-card-content">
+                        <span className="timeline-card-icon">{typeIcon(item.type)}</span>
+                        <h4 className="timeline-card-title">{item.title}</h4>
+                        <div className="timeline-card-meta">
+                          <span className="timeline-card-type">{typeLabel(item.type)}</span>
+                          <span className="timeline-card-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="archive-timeline-list">
+            {timeline.map(group => (
+              <div key={group.key} className="archive-month-group">
+                <div className="archive-month-header" onClick={() => toggleMonth(group.key)}>
+                  <div className="month-dot" />
+                  <h3 className="month-title">{group.key}</h3>
+                  <span className="month-count">{group.items.length} 条记录</span>
+                  <span className={`month-arrow ${openMonths.has(group.key) ? 'open' : ''}`}>▸</span>
+                </div>
+                {openMonths.has(group.key) && (
+                  <div className="archive-month-items">
+                    {group.items.map(item => (
+                      <div key={`${item.type}-${item.id}`} className="archive-item" onClick={() => handleItemClick(item)}>
+                        <span className="archive-item-icon">{typeIcon(item.type)}</span>
+                        <span className="archive-item-title">{item.title}</span>
+                        <span className="archive-item-type">{typeLabel(item.type)}</span>
+                        <span className="archive-item-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {tagCloud.length > 0 && (
