@@ -55,7 +55,7 @@ export default function Header() {
             </Link>
             <Link to="/archive">
               <span className="nav-icon">⊞</span>
-              拾光纪事
+              归档
             </Link>
             <Link to="/photos">
               <span className="nav-icon">◫</span>

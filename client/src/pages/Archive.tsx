@@ -98,7 +98,7 @@ export default function Archive() {
   return (
     <div className="archive-page">
       <div className="archive-header">
-        <h1 className="archive-title">拾光纪事</h1>
+        <h1 className="archive-title">归档</h1>
         <p className="archive-subtitle">记录成长的每一步</p>
       </div>
 
