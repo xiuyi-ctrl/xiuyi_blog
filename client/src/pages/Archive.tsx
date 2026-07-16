@@ -16,6 +16,7 @@ interface Post {
 interface Project {
   id: number;
   title: string;
+  cover: string;
   created_at: string;
   type: 'project';
 }
@@ -23,6 +24,7 @@ interface Project {
 interface Photo {
   id: number;
   title: string;
+  cover: string;
   created_at: string;
   type: 'photo';
 }
@@ -159,23 +161,34 @@ export default function Archive() {
               <div key={group.key} className="timeline-year-group">
                 <div className="timeline-year-badge">{group.key}</div>
                 <div className="timeline-cards-row">
-                  {group.items.map((item, i) => (
-                    <div
-                      key={`${item.type}-${item.id}`}
-                      className={`timeline-card ${i % 2 === 0 ? 'left' : 'right'}`}
-                      onClick={() => handleItemClick(item)}
-                    >
-                      <div className="timeline-card-dot" />
-                      <div className="timeline-card-content">
-                        <span className="timeline-card-icon">{typeIcon(item.type)}</span>
-                        <h4 className="timeline-card-title">{item.title}</h4>
-                        <div className="timeline-card-meta">
-                          <span className="timeline-card-type">{typeLabel(item.type)}</span>
-                          <span className="timeline-card-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
+                  {group.items.map((item, i) => {
+                    const cover = item.type === 'post' ? (item as Post).cover :
+                                  item.type === 'photo' ? (item as Photo).cover : null;
+                    return (
+                      <div
+                        key={`${item.type}-${item.id}`}
+                        className={`timeline-card ${i % 2 === 0 ? 'left' : 'right'}`}
+                        onClick={() => handleItemClick(item)}
+                      >
+                        <div className="timeline-card-dot" />
+                        <div className="timeline-card-content">
+                          {cover && (
+                            <div className="timeline-card-cover">
+                              <img src={cover} alt={item.title} />
+                            </div>
+                          )}
+                          <div className="timeline-card-body">
+                            <span className="timeline-card-icon">{typeIcon(item.type)}</span>
+                            <h4 className="timeline-card-title">{item.title}</h4>
+                            <div className="timeline-card-meta">
+                              <span className="timeline-card-type">{typeLabel(item.type)}</span>
+                              <span className="timeline-card-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}

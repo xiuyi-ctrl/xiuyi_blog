@@ -15,20 +15,20 @@ router.get('/', async (req, res) => {
     `);
 
     const [allPosts] = await pool.query(`
-      SELECT p.id, p.title, p.tags, p.created_at, c.name as category_name
+      SELECT p.id, p.title, p.cover, p.tags, p.created_at, c.name as category_name
       FROM posts p
       LEFT JOIN categories c ON p.category_id = c.id
       ORDER BY p.created_at DESC
     `);
 
     const [allProjects] = await pool.query(`
-      SELECT id, title, created_at
+      SELECT id, title, github_url, created_at
       FROM projects
       ORDER BY created_at DESC
     `);
 
     const [allPhotos] = await pool.query(`
-      SELECT id, title, created_at
+      SELECT id, title, cover, image_url, created_at
       FROM photos
       ORDER BY created_at DESC
     `);
@@ -53,13 +53,15 @@ router.get('/', async (req, res) => {
       const d = new Date(p.created_at);
       const key = `${d.getFullYear()}年${d.getMonth() + 1}月`;
       if (!grouped[key]) grouped[key] = { year: d.getFullYear(), month: d.getMonth() + 1, items: [] };
-      grouped[key].items.push({ ...p, type: 'project' });
+      grouped[key].items.push({ ...p, cover: p.cover || null, type: 'project' });
     });
     allPhotos.forEach(p => {
       const d = new Date(p.created_at);
       const key = `${d.getFullYear()}年${d.getMonth() + 1}月`;
       if (!grouped[key]) grouped[key] = { year: d.getFullYear(), month: d.getMonth() + 1, items: [] };
-      grouped[key].items.push({ ...p, type: 'photo' });
+      const images = typeof p.image_url === 'string' ? JSON.parse(p.image_url) : p.image_url;
+      const firstImage = images && typeof images === 'object' ? Object.values(images)[0] : null;
+      grouped[key].items.push({ ...p, image_url: undefined, cover: p.cover || firstImage, type: 'photo' });
     });
 
     Object.values(grouped).forEach(g => {
