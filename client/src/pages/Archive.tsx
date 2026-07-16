@@ -226,6 +226,8 @@ export default function Archive() {
                 const d = new Date(item.created_at);
                 const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
                 const isTop = i % 2 === 0;
+                const cover = item.type === 'post' ? (item as Post).cover :
+                              item.type === 'photo' ? (item as Photo).cover : null;
                 return (
                   <div
                     key={`${item.type}-${item.id}`}
@@ -233,11 +235,30 @@ export default function Archive() {
                     onClick={() => handleItemClick(item)}
                   >
                     <div className={`h-timeline-card ${item.type}`}>
-                      <span className="h-timeline-icon">{typeIcon(item.type)}</span>
-                      <span className="h-timeline-title">{item.title}</span>
+                      {cover && (
+                        <div className="h-timeline-cover">
+                          <img src={cover} alt={item.title} />
+                        </div>
+                      )}
+                      <div className="h-timeline-body">
+                        <span className="h-timeline-icon">{typeIcon(item.type)}</span>
+                        <h4 className="h-timeline-title">{item.title}</h4>
+                        {item.type === 'post' && (item as Post).category_name && (
+                          <span className="h-timeline-category">{(item as Post).category_name}</span>
+                        )}
+                        {item.type === 'project' && (item as Project).description && (
+                          <p className="h-timeline-desc">{(item as Project).description}</p>
+                        )}
+                        {item.type === 'photo' && (
+                          <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
+                        )}
+                        <div className="h-timeline-meta">
+                          <span className="h-timeline-type">{typeLabel(item.type)}</span>
+                          <span className="h-timeline-date">{dateStr}</span>
+                        </div>
+                      </div>
                     </div>
                     <div className="h-timeline-dot" />
-                    <span className="h-timeline-date">{dateStr}</span>
                   </div>
                 );
               })}
