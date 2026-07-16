@@ -228,39 +228,39 @@ export default function Archive() {
                 const isTop = i % 2 === 0;
                 const cover = item.type === 'post' ? (item as Post).cover :
                               item.type === 'photo' ? (item as Photo).cover : null;
-                return (
-                  <div
-                    key={`${item.type}-${item.id}`}
-                    className={`h-timeline-node ${isTop ? 'top' : 'bottom'}`}
-                  >
-                    {isTop && (
-                      <div className={`h-timeline-card ${item.type}`} onClick={() => handleItemClick(item)}>
-                        {cover && (
-                          <div className="h-timeline-cover">
-                            <img src={cover} alt={item.title} />
-                          </div>
-                        )}
-                        <div className="h-timeline-body">
-                          <h4 className="h-timeline-title">
-                            <span className="h-timeline-icon">{typeIcon(item.type)}</span>
-                            {item.title}
-                          </h4>
-                          {item.type === 'project' && (item as Project).description && (
-                            <p className="h-timeline-desc">{(item as Project).description}</p>
-                          )}
-                          {item.type === 'photo' && (
-                            <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
-                          )}
-                          <div className="h-timeline-meta">
-                            {(item.type === 'post' && (item as Post).category_name) && (
-                              <span className="h-timeline-category">{(item as Post).category_name}</span>
-                            )}
-                            {item.type === 'project' && <span className="h-timeline-category">项目</span>}
-                            {item.type === 'photo' && <span className="h-timeline-category">照片</span>}
-                          </div>
-                        </div>
+
+                const card = (
+                  <div className={`h-timeline-card ${item.type}`} onClick={() => handleItemClick(item)}>
+                    {cover && (
+                      <div className="h-timeline-cover">
+                        <img src={cover} alt={item.title} />
                       </div>
                     )}
+                    <div className="h-timeline-body">
+                      <h4 className="h-timeline-title">
+                        <span className="h-timeline-icon">{typeIcon(item.type)}</span>
+                        {item.title}
+                      </h4>
+                      {item.type === 'project' && (item as Project).description && (
+                        <p className="h-timeline-desc">{(item as Project).description}</p>
+                      )}
+                      {item.type === 'photo' && (
+                        <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
+                      )}
+                      <div className="h-timeline-meta">
+                        {(item.type === 'post' && (item as Post).category_name) && (
+                          <span className="h-timeline-category">{(item as Post).category_name}</span>
+                        )}
+                        {item.type === 'project' && <span className="h-timeline-category">项目</span>}
+                        {item.type === 'photo' && <span className="h-timeline-category">照片</span>}
+                      </div>
+                    </div>
+                  </div>
+                );
+
+                return (
+                  <div key={`${item.type}-${item.id}`} className={`h-timeline-node ${isTop ? 'top' : 'bottom'}`}>
+                    {isTop && card}
                     <div className="h-timeline-connector" />
                     <div className="h-timeline-dot" onClick={() => handleItemClick(item)}>
                       <span className="h-timeline-date">{dateStr}</span>
@@ -268,32 +268,7 @@ export default function Archive() {
                     {!isTop && (
                       <>
                         <div className="h-timeline-connector" />
-                        <div className={`h-timeline-card ${item.type}`} onClick={() => handleItemClick(item)}>
-                          {cover && (
-                            <div className="h-timeline-cover">
-                              <img src={cover} alt={item.title} />
-                            </div>
-                          )}
-                          <div className="h-timeline-body">
-                            <h4 className="h-timeline-title">
-                              <span className="h-timeline-icon">{typeIcon(item.type)}</span>
-                              {item.title}
-                            </h4>
-                            {item.type === 'project' && (item as Project).description && (
-                              <p className="h-timeline-desc">{(item as Project).description}</p>
-                            )}
-                            {item.type === 'photo' && (
-                              <span className="h-timeline-count">{(item as Photo).imageCount} 张照片</span>
-                            )}
-                            <div className="h-timeline-meta">
-                              {(item.type === 'post' && (item as Post).category_name) && (
-                                <span className="h-timeline-category">{(item as Post).category_name}</span>
-                              )}
-                              {item.type === 'project' && <span className="h-timeline-category">项目</span>}
-                              {item.type === 'photo' && <span className="h-timeline-category">照片</span>}
-                            </div>
-                          </div>
-                        </div>
+                        {card}
                       </>
                     )}
                   </div>
