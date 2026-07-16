@@ -31,11 +31,13 @@ interface Photo {
   type: 'photo';
 }
 
+type ArchiveItem = Post | Project | Photo;
+
 interface TimelineGroup {
   key: string;
   year: number;
   month: number;
-  items: (Post | Project | Photo)[];
+  items: ArchiveItem[];
 }
 
 interface TagItem {
@@ -51,6 +53,10 @@ export default function Archive() {
   const [openMonths, setOpenMonths] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<'timeline' | 'list'>('timeline');
   const [loading, setLoading] = useState(true);
+
+  const allItems: ArchiveItem[] = timeline.flatMap(g => g.items).sort((a, b) =>
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
   useEffect(() => {
     axios.get('/api/archive').then(res => {
@@ -86,7 +92,7 @@ export default function Archive() {
     return '照片';
   };
 
-  const handleItemClick = (item: Post | Project | Photo) => {
+  const handleItemClick = (item: ArchiveItem) => {
     if (item.type === 'post') navigate(`/post/${item.id}`);
     else if (item.type === 'project') navigate('/projects');
     else navigate(`/photos/${item.id}`);
@@ -110,6 +116,31 @@ export default function Archive() {
         <h1 className="archive-title">归档</h1>
         <p className="archive-subtitle">记录成长的每一步</p>
       </div>
+
+      <section className="archive-horizontal">
+        <div className="h-timeline-track">
+          <div className="h-timeline-line" />
+          {allItems.map((item, i) => {
+            const d = new Date(item.created_at);
+            const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
+            const isTop = i % 2 === 0;
+            return (
+              <div
+                key={`${item.type}-${item.id}`}
+                className={`h-timeline-node ${isTop ? 'top' : 'bottom'}`}
+                onClick={() => handleItemClick(item)}
+              >
+                <div className={`h-timeline-card ${item.type}`}>
+                  <span className="h-timeline-icon">{typeIcon(item.type)}</span>
+                  <span className="h-timeline-title">{item.title}</span>
+                </div>
+                <div className="h-timeline-dot" />
+                <span className="h-timeline-date">{dateStr}</span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       <section className="archive-featured">
         <h2 className="archive-section-title">精华推荐</h2>
