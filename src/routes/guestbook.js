@@ -27,9 +27,12 @@ router.get('/', async (req, res) => {
 
     if (messageIds.length > 0) {
       [replies] = await pool.query(
-        `SELECT r.*, u.username, u.avatar
+        `SELECT r.*, u.username, u.avatar,
+                ru.username AS reply_to_username
          FROM guestbook_replies r
          LEFT JOIN users u ON r.user_id = u.id
+         LEFT JOIN guestbook_replies pr ON r.parent_id = pr.id
+         LEFT JOIN users ru ON pr.user_id = ru.id
          WHERE r.message_id IN (?)
          ORDER BY r.created_at ASC`,
         [messageIds]
@@ -178,7 +181,7 @@ router.post('/:id/like', auth, async (req, res) => {
 router.post('/:id/reply', auth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { content } = req.body;
+    const { content, parent_id } = req.body;
     const user_id = req.user.id;
 
     if (!content || !content.trim()) {
@@ -194,15 +197,28 @@ router.post('/:id/reply', auth, async (req, res) => {
       return res.status(404).json({ message: '留言不存在' });
     }
 
+    if (parent_id) {
+      const [parentReply] = await pool.query(
+        'SELECT * FROM guestbook_replies WHERE id = ? AND message_id = ?',
+        [parent_id, id]
+      );
+      if (parentReply.length === 0) {
+        return res.status(400).json({ message: '被回复的评论不存在' });
+      }
+    }
+
     const [result] = await pool.query(
-      'INSERT INTO guestbook_replies (message_id, user_id, content) VALUES (?, ?, ?)',
-      [id, user_id, content.trim()]
+      'INSERT INTO guestbook_replies (message_id, user_id, parent_id, content) VALUES (?, ?, ?, ?)',
+      [id, user_id, parent_id || null, content.trim()]
     );
 
     const [reply] = await pool.query(
-      `SELECT r.*, u.username, u.avatar
+      `SELECT r.*, u.username, u.avatar,
+              ru.username AS reply_to_username
        FROM guestbook_replies r
        LEFT JOIN users u ON r.user_id = u.id
+       LEFT JOIN guestbook_replies pr ON r.parent_id = pr.id
+       LEFT JOIN users ru ON pr.user_id = ru.id
        WHERE r.id = ?`,
       [result.insertId]
     );

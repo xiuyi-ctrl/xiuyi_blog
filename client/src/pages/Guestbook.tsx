@@ -12,15 +12,20 @@ interface Message {
   created_at: string;
   username: string;
   avatar: string | null;
+  user_id: number;
   replies: Reply[];
 }
 
 interface Reply {
   id: number;
+  message_id: number;
+  parent_id: number | null;
   content: string;
   created_at: string;
   username: string;
   avatar: string | null;
+  reply_to_username: string | null;
+  children?: Reply[];
 }
 
 interface HeroMessage {
@@ -29,6 +34,108 @@ interface HeroMessage {
   created_at: string;
   username: string;
   avatar: string | null;
+}
+
+function buildReplyTree(replies: Reply[]): Reply[] {
+  const map = new Map<number, Reply>();
+  const roots: Reply[] = [];
+
+  replies.forEach(r => {
+    map.set(r.id, { ...r, children: [] });
+  });
+
+  replies.forEach(r => {
+    const node = map.get(r.id)!;
+    if (r.parent_id && map.has(r.parent_id)) {
+      map.get(r.parent_id)!.children!.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+
+  return roots;
+}
+
+function ReplyItem({
+  reply,
+  currentUser,
+  onReply
+}: {
+  reply: Reply;
+  currentUser: { id: number; username: string; avatar: string | null } | null;
+  onReply: (messageId: number, content: string, parentId: number) => Promise<boolean>;
+}) {
+  const [showInput, setShowInput] = useState(false);
+  const [replyContent, setReplyContent] = useState('');
+
+  const handleSubmit = async () => {
+    if (!replyContent.trim()) return;
+    const success = await onReply(reply.message_id, replyContent.trim(), reply.id);
+    if (success) {
+      setReplyContent('');
+      setShowInput(false);
+    }
+  };
+
+  return (
+    <div className="reply-nested">
+      <div className="reply-item">
+        <div className="reply-avatar">
+          {reply.avatar ? (
+            <img src={reply.avatar} alt={reply.username} />
+          ) : (
+            <span>{reply.username?.charAt(0)}</span>
+          )}
+        </div>
+        <div className="reply-body">
+          <div className="reply-meta">
+            <span className="reply-username">{reply.username}</span>
+            {reply.reply_to_username && (
+              <span className="reply-to">
+                回复 <span className="reply-to-name">@{reply.reply_to_username}</span>
+              </span>
+            )}
+            <span className="reply-time">{formatTime(reply.created_at)}</span>
+          </div>
+          <p className="reply-content">{reply.content}</p>
+          {currentUser && (
+            <button className="reply-action-btn" onClick={() => setShowInput(!showInput)}>
+              回复
+            </button>
+          )}
+        </div>
+      </div>
+
+      {showInput && (
+        <div className="reply-nested-input">
+          <input
+            type="text"
+            placeholder={`回复 @${reply.username}...`}
+            className="reply-input"
+            maxLength={200}
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSubmit();
+              if (e.key === 'Escape') setShowInput(false);
+            }}
+            autoFocus
+          />
+          <button className="reply-send-btn" onClick={handleSubmit} disabled={!replyContent.trim()}>
+            发送
+          </button>
+        </div>
+      )}
+
+      {reply.children && reply.children.length > 0 && (
+        <div className="reply-children">
+          {reply.children.map(child => (
+            <ReplyItem key={child.id} reply={child} currentUser={currentUser} onReply={onReply} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Guestbook() {
@@ -111,13 +218,16 @@ export default function Guestbook() {
     }
   };
 
-  const handleReply = async (messageId: number, content: string) => {
+  const handleReply = async (messageId: number, content: string, parentId?: number) => {
     if (!user) {
       loginWithGitHub();
-      return;
+      return false;
     }
     try {
-      const { data } = await api.post(`/guestbook/${messageId}/reply`, { content });
+      const { data } = await api.post(`/guestbook/${messageId}/reply`, {
+        content,
+        parent_id: parentId || null
+      });
       setMessages(prev => prev.map(m =>
         m.id === messageId ? { ...m, replies: [...m.replies, data.data] } : m
       ));
@@ -235,89 +345,83 @@ export default function Guestbook() {
           </div>
         ) : (
           <div className="guestbook-list">
-            {messages.map(msg => (
-              <div key={msg.id} className="message-card">
-                <div className="message-header">
-                  <div className="message-user">
-                    <div className="message-avatar">
-                      {msg.avatar ? (
-                        <img src={msg.avatar} alt={msg.username} />
-                      ) : (
-                        <span>{msg.username?.charAt(0)}</span>
-                      )}
-                    </div>
-                    <div className="message-meta">
-                      <span className="message-username">{msg.username}</span>
-                      <span className="message-time">{formatTime(msg.created_at)}</span>
+            {messages.map(msg => {
+              const replyTree = buildReplyTree(msg.replies);
+              const totalReplies = msg.replies.length;
+              return (
+                <div key={msg.id} className="message-card">
+                  <div className="message-header">
+                    <div className="message-user">
+                      <div className="message-avatar">
+                        {msg.avatar ? (
+                          <img src={msg.avatar} alt={msg.username} />
+                        ) : (
+                          <span>{msg.username?.charAt(0)}</span>
+                        )}
+                      </div>
+                      <div className="message-meta">
+                        <span className="message-username">{msg.username}</span>
+                        <span className="message-time">{formatTime(msg.created_at)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <p className="message-content">{msg.content}</p>
-                <div className="message-actions">
-                  <button
-                    className={`message-action-btn ${msg.liked ? 'liked' : ''}`}
-                    onClick={() => handleLike(msg.id)}
-                  >
-                    <span className="action-icon">{msg.liked ? '❤️' : '🤍'}</span>
-                    <span className="action-count">{msg.likes || ''}</span>
-                  </button>
-                  <button className="message-action-btn">
-                    <span className="action-icon">💬</span>
-                    <span className="action-count">{msg.replies.length || ''}</span>
-                  </button>
-                  {user && user.id === msg.user_id && (
+                  <p className="message-content">{msg.content}</p>
+                  <div className="message-actions">
                     <button
-                      className="message-action-btn delete"
-                      onClick={() => handleDelete(msg.id)}
+                      className={`message-action-btn ${msg.liked ? 'liked' : ''}`}
+                      onClick={() => handleLike(msg.id)}
                     >
-                      <span className="action-icon">🗑️</span>
+                      <span className="action-icon">{msg.liked ? '❤️' : '🤍'}</span>
+                      <span className="action-count">{msg.likes || ''}</span>
                     </button>
+                    <button className="message-action-btn">
+                      <span className="action-icon">💬</span>
+                      <span className="action-count">{totalReplies || ''}</span>
+                    </button>
+                    {user && user.id === msg.user_id && (
+                      <button
+                        className="message-action-btn delete"
+                        onClick={() => handleDelete(msg.id)}
+                      >
+                        <span className="action-icon">🗑️</span>
+                      </button>
+                    )}
+                  </div>
+                  {replyTree.length > 0 && (
+                    <div className="message-replies">
+                      {replyTree.map(reply => (
+                        <ReplyItem
+                          key={reply.id}
+                          reply={reply}
+                          currentUser={user}
+                          onReply={(msgId, content, parentId) => handleReply(msgId, content, parentId)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {user && (
+                    <div className="message-reply-form">
+                      <input
+                        type="text"
+                        placeholder="写回复..."
+                        className="reply-input"
+                        maxLength={200}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const target = e.target as HTMLInputElement;
+                            if (target.value.trim()) {
+                              handleReply(msg.id, target.value).then(success => {
+                                if (success) target.value = '';
+                              });
+                            }
+                          }
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
-                {msg.replies.length > 0 && (
-                  <div className="message-replies">
-                    {msg.replies.map(reply => (
-                      <div key={reply.id} className="reply-item">
-                        <div className="reply-avatar">
-                          {reply.avatar ? (
-                            <img src={reply.avatar} alt={reply.username} />
-                          ) : (
-                            <span>{reply.username?.charAt(0)}</span>
-                          )}
-                        </div>
-                        <div className="reply-body">
-                          <div className="reply-meta">
-                            <span className="reply-username">{reply.username}</span>
-                            <span className="reply-time">{formatTime(reply.created_at)}</span>
-                          </div>
-                          <p className="reply-content">{reply.content}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {user && (
-                  <div className="message-reply-form">
-                    <input
-                      type="text"
-                      placeholder="写回复..."
-                      className="reply-input"
-                      maxLength={200}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          const target = e.target as HTMLInputElement;
-                          if (target.value.trim()) {
-                            handleReply(msg.id, target.value).then(success => {
-                              if (success) target.value = '';
-                            });
-                          }
-                        }
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

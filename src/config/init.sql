@@ -48,10 +48,12 @@ CREATE TABLE IF NOT EXISTS guestbook_replies (
   id         INT PRIMARY KEY AUTO_INCREMENT,
   message_id INT NOT NULL,
   user_id    INT NOT NULL,
+  parent_id  INT DEFAULT NULL,
   content    TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (message_id) REFERENCES guestbook(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (parent_id) REFERENCES guestbook_replies(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS guestbook_likes (
