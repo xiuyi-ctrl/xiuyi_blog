@@ -66,7 +66,7 @@ export default function Home() {
         >
           <div className="profile-top">
             <div className="profile-avatar">
-              <img src="/src/assets/pictures/background/yileina.png" alt="avatar" className="avatar-img" />
+              <img src="https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/yileina.png" alt="avatar" className="avatar-img" />
             </div>
             <div className="profile-info">
               <h1 className="profile-name">Xiuyi</h1>

@@ -112,7 +112,7 @@ export default function Archive() {
               onClick={() => navigate(`/post/${post.id}`)}
             >
               <div className="featured-cover">
-                <img src={post.cover || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=600'} alt={post.title} />
+                <img src={post.cover || 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg'} alt={post.title} />
                 <div className="featured-overlay">
                   <span className="featured-views">👁 {post.views} 阅读</span>
                 </div>
