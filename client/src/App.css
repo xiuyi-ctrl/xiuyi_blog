@@ -2976,7 +2976,7 @@ body {
   align-items: center;
   gap: 2rem;
   min-width: max-content;
-  padding: 0 3rem;
+  padding: 100px 3rem;
 }
 
 .h-timeline-line {
@@ -3002,18 +3002,13 @@ body {
   z-index: 1;
 }
 
-.h-timeline-node.top {
-  flex-direction: column;
-}
-
-.h-timeline-node.bottom {
-  flex-direction: column;
-}
-
-/* Dot on the wavy line */
+/* Dot pinned on the wavy line at vertical center */
 .h-timeline-dot {
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3043,18 +3038,20 @@ body {
   margin-top: 4px;
 }
 
-.h-timeline-node.bottom .h-timeline-date {
-  margin-top: 0;
-  margin-bottom: 4px;
-  order: -1;
-}
-
-/* Dashed connector */
+/* Dashed connector from card to center line */
 .h-timeline-connector {
-  width: 0;
-  height: 40px;
+  width: 1.5px;
   border-left: 1.5px dashed rgba(0,212,255,0.3);
   flex-shrink: 0;
+  align-self: center;
+}
+
+.h-timeline-node.top .h-timeline-connector {
+  height: 60px;
+}
+
+.h-timeline-node.bottom .h-timeline-connector {
+  height: 60px;
 }
 
 /* Card */
@@ -3712,7 +3709,7 @@ body {
   }
 
   .h-timeline-connector {
-    height: 30px;
+    height: 40px;
   }
 }
 
