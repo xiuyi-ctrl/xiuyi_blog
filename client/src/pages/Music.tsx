@@ -38,6 +38,9 @@ export default function Music() {
   const playlistItemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const progressRef = useRef<HTMLDivElement>(null);
+  const prevVolumeRef = useRef<number>(state.volume || 0.5);
+  const [showVolume, setShowVolume] = useState(false);
+  const volumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return music.subscribe(() => setState(music.getState()));
@@ -111,7 +114,28 @@ export default function Music() {
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const vol = parseFloat(e.target.value);
+    if (vol > 0) prevVolumeRef.current = vol;
     music.setVolume(vol);
+  };
+
+  const toggleMute = () => {
+    if (state.volume > 0) {
+      prevVolumeRef.current = state.volume;
+      music.setVolume(0);
+    } else {
+      music.setVolume(prevVolumeRef.current || 0.5);
+    }
+  };
+
+  const isMuted = state.volume === 0;
+
+  const handleVolumeEnter = () => {
+    if (volumeTimerRef.current) clearTimeout(volumeTimerRef.current);
+    setShowVolume(true);
+  };
+
+  const handleVolumeLeave = () => {
+    volumeTimerRef.current = setTimeout(() => setShowVolume(false), 200);
   };
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -250,20 +274,36 @@ export default function Music() {
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
               </svg>
             </button>
-            <button className="music-ctrl-btn music-volume-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-              </svg>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={state.volume}
-                onChange={handleVolumeChange}
-                className="music-volume-slider"
-              />
-            </button>
+            <div
+              className="music-volume-wrap"
+              onMouseEnter={handleVolumeEnter}
+              onMouseLeave={handleVolumeLeave}
+            >
+              <button className="music-ctrl-btn music-volume-btn" onClick={toggleMute}>
+                {isMuted ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor" stroke="none"/>
+                    <line x1="16" y1="9" x2="21" y2="15"/>
+                    <line x1="21" y1="9" x2="16" y2="15"/>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                  </svg>
+                )}
+              </button>
+              {showVolume && (
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={state.volume}
+                  onChange={handleVolumeChange}
+                  className="music-volume-slider"
+                />
+              )}
+            </div>
           </div>
         </div>
 

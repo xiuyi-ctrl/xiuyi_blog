@@ -3692,31 +3692,34 @@ body {
   box-shadow: 0 6px 28px rgba(139, 92, 246, 0.55);
 }
 
-.music-volume-btn {
+.music-volume-wrap {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.music-volume-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .music-volume-slider {
-  width: 80px;
-  height: 4px;
+  width: 4px;
+  height: 80px;
   appearance: none;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
   outline: none;
-  opacity: 0;
-  transition: opacity 0.3s;
   position: absolute;
-  bottom: calc(100% + 38px);
-  left: calc(50% + 2px);
-  transform: translateX(-50%) rotate(-90deg);
-  transform-origin: bottom center;
-}
-
-.music-volume-btn:hover .music-volume-slider {
-  opacity: 1;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  writing-mode: vertical-lr;
+  direction: rtl;
+  pointer-events: auto;
+  z-index: 10;
 }
 
 .music-volume-slider::-webkit-slider-thumb {
