@@ -3024,6 +3024,14 @@ body {
 }
 
 @media (max-width: 768px) {
+  .photos-header {
+    text-align: left;
+  }
+
+  .page-divider {
+    justify-content: flex-start;
+  }
+
   .photos-stack-layout {
     flex-direction: column;
     gap: 1rem;
@@ -4429,6 +4437,14 @@ body {
 }
 
 @media (max-width: 768px) {
+  .archive-header {
+    text-align: left;
+  }
+
+  .page-divider {
+    justify-content: flex-start;
+  }
+
   .archive-featured-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
