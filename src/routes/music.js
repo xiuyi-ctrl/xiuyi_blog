@@ -6,6 +6,97 @@ const NETEASE_HEADERS = {
   'Referer': 'https://music.163.com/'
 };
 
+const LRCLIB_HEADERS = {
+  'User-Agent': 'XiuyiBlog/1.0 (https://github.com/xiuyi-ctrl/xiuyi_blog)'
+};
+
+// ─── 歌词源 1: 网易云 ───
+async function fetchFromNetEase(songId) {
+  try {
+    const lr = await fetch(
+      `https://music.163.com/api/song/lyric?id=${songId}&lv=1&tv=1`,
+      { headers: NETEASE_HEADERS }
+    );
+    const ld = await lr.json();
+    const lrc = (ld.lrc && ld.lrc.lyric) || '';
+    const tlyric = (ld.tlyric && ld.tlyric.lyric) || '';
+    return lrc || tlyric || '';
+  } catch {
+    return '';
+  }
+}
+
+// ─── 歌词源 2: lrclib.net ───
+async function fetchFromLrclib(songName, artistName) {
+  try {
+    const params = new URLSearchParams({ track_name: songName });
+    if (artistName) {
+      const firstArtist = artistName.split('/')[0].trim();
+      params.set('artist_name', firstArtist);
+    }
+    const lr = await fetch(
+      `https://lrclib.net/api/get?${params}`,
+      { headers: LRCLIB_HEADERS }
+    );
+    if (lr.status !== 200) return '';
+    const ld = await lr.json();
+    return ld.syncedLyrics || ld.plainLyrics || '';
+  } catch {
+    return '';
+  }
+}
+
+// ─── 歌词源 3: QQ音乐 (OIAPI) ───
+async function fetchFromQQMusic(songName) {
+  try {
+    const searchRes = await fetch(
+      `https://www.oiapi.net/api/QQMusicLyric?keyword=${encodeURIComponent(songName)}`
+    );
+    const searchData = await searchRes.json();
+    if (searchData.code !== 1 || !searchData.data || !Array.isArray(searchData.data)) return '';
+
+    const matched = searchData.data.find(
+      d => d.name === songName || d.name.includes(songName)
+    );
+    if (!matched || !matched.mid) return '';
+
+    const lrcRes = await fetch(
+      `https://www.oiapi.net/api/QQMusicLyric?id=${matched.mid}&format=lrc`
+    );
+    const lrcData = await lrcRes.json();
+    if (lrcData.code !== 1) return '';
+
+    const content = lrcData.data && (lrcData.data.conteng || lrcData.data.content);
+    return content || '';
+  } catch {
+    return '';
+  }
+}
+
+// ─── 多源 fallback 主函数 ───
+async function fetchLyricMultiSource(songId, songName, artistName) {
+  const netease = await fetchFromNetEase(songId);
+  if (netease) {
+    return { lrc: netease, source: 'netease' };
+  }
+  console.warn(`[Lyrics] NetEase empty for "${songName}" (${songId}), trying lrclib...`);
+
+  const lrclib = await fetchFromLrclib(songName, artistName);
+  if (lrclib) {
+    return { lrc: lrclib, source: 'lrclib' };
+  }
+  console.warn(`[Lyrics] lrclib empty for "${songName}", trying QQ Music...`);
+
+  const qq = await fetchFromQQMusic(songName);
+  if (qq) {
+    return { lrc: qq, source: 'qqmusic' };
+  }
+  console.warn(`[Lyrics] All sources empty for "${songName}" (${songId})`);
+
+  return { lrc: '', source: 'none' };
+}
+
+// ─── 路由: 获取歌单 ───
 router.get('/playlist/:id', async (req, res) => {
   try {
     const playlistId = req.params.id;
@@ -64,18 +155,8 @@ router.get('/playlist/:id', async (req, res) => {
 
     const lyricResults = await Promise.all(
       songs.map(async (song) => {
-        try {
-          const lr = await fetch(
-            `https://music.163.com/api/song/lyric?id=${song.id}&lv=1&tv=1`,
-            { headers: NETEASE_HEADERS }
-          );
-          const ld = await lr.json();
-          const lrc = (ld.lrc && ld.lrc.lyric) || '';
-          const tlyric = (ld.tlyric && ld.tlyric.lyric) || '';
-          return lrc || tlyric;
-        } catch {
-          return '';
-        }
+        const { lrc } = await fetchLyricMultiSource(song.id, song.name, song.artist);
+        return lrc;
       })
     );
 
@@ -91,23 +172,16 @@ router.get('/playlist/:id', async (req, res) => {
   }
 });
 
+// ─── 路由: 获取单曲歌词 ───
 router.get('/lyric/:id', async (req, res) => {
   try {
     const songId = req.params.id;
-    const lyricRes = await fetch(
-      `https://music.163.com/api/song/lyric?id=${songId}&lv=1&tv=1`,
-      { headers: NETEASE_HEADERS }
-    );
-    const data = await lyricRes.json();
+    const songName = req.query.name || '';
+    const artistName = req.query.artist || '';
 
-    if (data.code !== 200) {
-      return res.json({ success: true, lrc: '' });
-    }
+    const { lrc } = await fetchLyricMultiSource(songId, songName, artistName);
 
-    const lrc = (data.lrc && data.lrc.lyric) || '';
-    const tlyric = (data.tlyric && data.tlyric.lyric) || '';
-
-    res.json({ success: true, lrc: lrc || tlyric });
+    res.json({ success: true, lrc });
   } catch (error) {
     console.error('Lyric API error:', error);
     res.status(500).json({ success: false, error: error.message });

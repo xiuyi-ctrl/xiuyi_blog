@@ -157,7 +157,8 @@ async function fetchLyric(index: number) {
   try {
     const song = state.songs[index];
     if (!song) return;
-    const { data } = await api.get(`/music/lyric/${song.id}`);
+    const params = new URLSearchParams({ name: song.name, artist: song.artist });
+    const { data } = await api.get(`/music/lyric/${song.id}?${params}`);
     if (data.success && data.lrc) {
       state.songs[index].lrc = data.lrc;
       notify();
