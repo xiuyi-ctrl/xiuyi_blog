@@ -147,6 +147,24 @@ export function loadSong(index: number) {
     audioEl.play().catch(() => {});
   }
   notify();
+
+  if (!state.songs[index].lrc) {
+    fetchLyric(index);
+  }
+}
+
+async function fetchLyric(index: number) {
+  try {
+    const song = state.songs[index];
+    if (!song) return;
+    const { data } = await api.get(`/music/lyric/${song.id}`);
+    if (data.success && data.lrc) {
+      state.songs[index].lrc = data.lrc;
+      notify();
+    }
+  } catch (err) {
+    console.error('Failed to fetch lyric:', err);
+  }
 }
 
 export function play() {
@@ -197,6 +215,10 @@ export function next() {
     audioEl.play().catch(() => {});
   }
   notify();
+
+  if (!state.songs[state.currentIndex].lrc) {
+    fetchLyric(state.currentIndex);
+  }
 }
 
 export function prev() {
@@ -224,6 +246,10 @@ export function prev() {
     audioEl.play().catch(() => {});
   }
   notify();
+
+  if (!state.songs[state.currentIndex].lrc) {
+    fetchLyric(state.currentIndex);
+  }
 }
 
 export function seek(time: number) {
