@@ -17,6 +17,7 @@ interface Album {
 }
 
 interface GalleryItem {
+  id: number;
   image: string;
   text: string;
 }
@@ -34,7 +35,7 @@ function AlbumList() {
       setLoading(true);
       setError(null);
       const res = await api.get('/photos');
-      setAlbums(res.data.data);
+      setAlbums(res.data?.data || []);
     } catch (err) {
       console.error('加载照片集失败:', err);
       setError('加载照片集失败，请检查网络连接后重试');
@@ -47,12 +48,11 @@ function AlbumList() {
     fetchAlbums();
   }, [fetchAlbums]);
 
-  const albumItems: GalleryItem[] = useMemo(() => albums.map(a => ({ image: a.cover, text: a.title })), [albums]);
+  const albumItems: GalleryItem[] = useMemo(() => albums.map(a => ({ id: a.id, image: a.cover, text: a.title })), [albums]);
 
   const handleAlbumClick = useCallback((item: GalleryItem) => {
-    const album = albums.find(a => a.title === item.text && a.cover === item.image);
-    if (album) navigate(`/photos/${album.id}`);
-  }, [albums, navigate]);
+    navigate(`/photos/${item.id}`);
+  }, [navigate]);
 
   const handleStackClick = useCallback((item: GalleryItem) => {
     handleAlbumClick(item);
@@ -166,7 +166,7 @@ function AlbumList() {
       )}
 
       <div className="photos-hint">
-        <span>← 拖动或滚轮浏览，点击进入相册 →</span>
+        <span>{viewMode === 'gallery' ? '← 拖动或滚轮浏览，点击进入相册 →' : '← 拖拽卡片或等待自动轮播，点击进入相册 →'}</span>
       </div>
     </div>
   );
@@ -184,13 +184,18 @@ function AlbumDetail() {
     try {
       setLoading(true);
       setError(null);
-      const res = await api.get('/photos');
-      const found = res.data.data.find((a: Album) => a.id === Number(id));
-      setAlbum(found || null);
-      if (!found) setError('相册不存在');
+      const res = await api.get(`/photos/${id}`);
+      const data = res.data?.data;
+      if (data) {
+        setAlbum(data);
+      } else {
+        setAlbum(null);
+        setError('相册不存在');
+      }
     } catch (err) {
       console.error('加载相册失败:', err);
       setError('加载相册失败，请检查网络连接后重试');
+      setAlbum(null);
     } finally {
       setLoading(false);
     }
@@ -216,8 +221,8 @@ function AlbumDetail() {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!lightbox) return;
     if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') navigateLightbox(-1);
-    if (e.key === 'ArrowRight') navigateLightbox(1);
+    if (e.key === 'ArrowLeft') { e.preventDefault(); navigateLightbox(-1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); navigateLightbox(1); }
   }, [lightbox]);
 
   useEffect(() => {
@@ -308,7 +313,7 @@ function AlbumDetail() {
             >
               <div className="lightbox-bg" />
 
-              <button className="lightbox-close" onClick={closeLightbox}>
+              <button className="lightbox-close" onClick={(e) => { e.stopPropagation(); closeLightbox(); }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>

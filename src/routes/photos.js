@@ -44,4 +44,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM photos WHERE id = ?', [req.params.id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ code: 1, message: '照片集不存在' });
+    }
+    const row = rows[0];
+    const photo = {
+      ...row,
+      image_url: typeof row.image_url === 'string' ? JSON.parse(row.image_url) : row.image_url
+    };
+    res.json({ code: 0, data: photo });
+  } catch (error) {
+    console.error('获取照片集详情失败:', error);
+    res.status(500).json({ code: 1, message: '获取照片集详情失败' });
+  }
+});
+
 module.exports = router;

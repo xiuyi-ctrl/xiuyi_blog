@@ -197,13 +197,16 @@ class Media {
     this.textColor = textColor;
     this.borderRadius = borderRadius;
     this.font = font;
+    this.loaded = false;
+    this.loading = false;
+    this.retryCount = 0;
     this.createShader();
     this.createMesh();
     this.createTitle();
     this.onResize();
   }
   createShader() {
-    const texture = new Texture(this.gl, { generateMipmaps: true });
+    this.texture = new Texture(this.gl, { generateMipmaps: true });
     this.program = new Program(this.gl, {
       depthTest: false,
       depthWrite: false,
@@ -229,6 +232,7 @@ class Media {
         uniform vec2 uPlaneSizes;
         uniform sampler2D tMap;
         uniform float uBorderRadius;
+        uniform float uAlpha;
         varying vec2 vUv;
 
         float roundedBoxSDF(vec2 p, vec2 b, float r) {
@@ -237,39 +241,74 @@ class Media {
         }
 
         void main() {
-          vec2 ratio = vec2(
-            min((uPlaneSizes.x / uPlaneSizes.y) / (uImageSizes.x / uImageSizes.y), 1.0),
-            min((uPlaneSizes.y / uPlaneSizes.x) / (uImageSizes.y / uImageSizes.x), 1.0)
-          );
-          vec2 uv = vec2(
-            vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
-            vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
-          );
-          vec4 color = texture2D(tMap, uv);
+          vec4 color = texture2D(tMap, vUv);
+          if (color.a < 0.01) {
+            color = vec4(0.35, 0.35, 0.4, 1.0);
+          } else {
+            vec2 ratio = vec2(
+              min((uPlaneSizes.x / uPlaneSizes.y) / (uImageSizes.x / uImageSizes.y), 1.0),
+              min((uPlaneSizes.y / uPlaneSizes.x) / (uImageSizes.y / uImageSizes.x), 1.0)
+            );
+            vec2 uv = vec2(
+              vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+              vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+            );
+            color = texture2D(tMap, uv);
+          }
 
           float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
           float edgeSmooth = 0.002;
-          float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
+          float shapeAlpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
 
-          gl_FragColor = vec4(color.rgb, alpha);
+          gl_FragColor = vec4(color.rgb, shapeAlpha * uAlpha);
         }
       `,
       uniforms: {
-        tMap: { value: texture },
+        tMap: { value: this.texture },
         uPlaneSizes: { value: [0, 0] },
         uImageSizes: { value: [0, 0] },
         uSpeed: { value: 0 },
         uTime: { value: 100 * Math.random() },
-        uBorderRadius: { value: this.borderRadius }
+        uBorderRadius: { value: this.borderRadius },
+        uAlpha: { value: 0 }
       },
       transparent: true
     });
+  }
+  lazyLoad() {
+    if (this.loading || this.loaded) return;
+    this.loading = true;
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = this.image;
     img.onload = () => {
-      texture.image = img;
-      this.program.uniforms.uImageSizes.value = [img.naturalWidth, img.naturalHeight];
+      let finalW = img.naturalWidth;
+      let finalH = img.naturalHeight;
+      let finalImg = img;
+      if (finalW > 1024 || finalH > 1024) {
+        const canvas = document.createElement('canvas');
+        const scale = 1024 / Math.max(finalW, finalH);
+        canvas.width = Math.round(finalW * scale);
+        canvas.height = Math.round(finalH * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        finalW = canvas.width;
+        finalH = canvas.height;
+        finalImg = canvas;
+      }
+      this.texture.image = finalImg;
+      this.program.uniforms.uImageSizes.value = [finalW, finalH];
+      this.loaded = true;
+    };
+    img.onerror = () => {
+      if (this.retryCount < 2) {
+        this.retryCount++;
+        this.loading = false;
+        setTimeout(() => this.lazyLoad(), 1000);
+      } else {
+        this.program.uniforms.uImageSizes.value = [1, 1];
+        this.loaded = true;
+      }
     };
   }
   createMesh() {
@@ -301,6 +340,12 @@ class Media {
         this.plane.position.y = arc;
         this.plane.rotation.z = Math.sign(x) * Math.asin(effectiveX / R);
       }
+    }
+    if (Math.abs(x) < this.viewport.width * 1.5) {
+      this.lazyLoad();
+    }
+    if (this.loaded && this.program.uniforms.uAlpha.value < 1) {
+      this.program.uniforms.uAlpha.value = Math.min(1, this.program.uniforms.uAlpha.value + 0.08);
     }
     this.speed = scroll.current - scroll.last;
     this.program.uniforms.uTime.value += 0.04;
@@ -345,13 +390,16 @@ class App {
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
     this.onCheckDebounce = debounce(this.onCheck, 200);
     this.onItemClick = onItemClick;
+    this.isInView = true;
+    this.raf = null;
     this.createRenderer();
     this.createCamera();
     this.createScene();
     this.onResize();
     this.createGeometry();
     this.createMedias(items, bend, textColor, borderRadius, font);
-    this.update();
+    this.boundUpdate = this.update.bind(this);
+    this.raf = window.requestAnimationFrame(this.boundUpdate);
     this.addEventListeners();
   }
   createRenderer() {
@@ -385,11 +433,12 @@ class App {
       { image: `https://picsum.photos/seed/12/800/600?grayscale`, text: 'Palm Trees' }
     ];
     const galleryItems = items && items.length ? items : defaultItems;
-    this.mediasImages = galleryItems.concat(galleryItems);
+    this.mediasImages = [...galleryItems];
+    this.originalLength = galleryItems.length;
     this.medias = this.mediasImages.map((data, index) => {
       return new Media({
         geometry: this.planeGeometry, gl: this.gl, image: data.image, index,
-        length: this.mediasImages.length, renderer: this.renderer, scene: this.scene,
+        length: this.originalLength, renderer: this.renderer, scene: this.scene,
         screen: this.screen, text: data.text, viewport: this.viewport,
         bend, textColor, borderRadius, font
       });
@@ -426,12 +475,15 @@ class App {
       }
     }
     if (closest && closestDist < rect.width * 0.35) {
-      const idx = closest.index % (this.mediasImages.length / 2);
+      const idx = closest.index % this.originalLength;
       this.onItemClick(this.mediasImages[idx]);
     }
   }
   onWheel(e) {
-    const delta = e.deltaY || e.wheelDelta || e.detail;
+    e.preventDefault();
+    let delta = e.deltaY;
+    if (e.deltaMode === 1) delta *= 16;
+    else if (e.deltaMode === 2) delta *= window.innerHeight;
     this.scroll.target += (delta > 0 ? this.scrollSpeed : -this.scrollSpeed) * 0.2;
     this.onCheckDebounce();
   }
@@ -470,7 +522,22 @@ class App {
     }
     this.renderer.render({ scene: this.scene, camera: this.camera });
     this.scroll.last = this.scroll.current;
-    this.raf = window.requestAnimationFrame(this.update.bind(this));
+    if (this.isInView && !document.hidden) {
+      this.raf = window.requestAnimationFrame(this.boundUpdate);
+    } else {
+      this.raf = null;
+    }
+  }
+  startRAF() {
+    if (!this.raf && this.isInView && !document.hidden) {
+      this.raf = window.requestAnimationFrame(this.boundUpdate);
+    }
+  }
+  stopRAF() {
+    if (this.raf) {
+      window.cancelAnimationFrame(this.raf);
+      this.raf = null;
+    }
   }
   addEventListeners() {
     this.boundOnResize = this.onResize.bind(this);
@@ -480,6 +547,10 @@ class App {
     this.boundOnTouchUp = this.onTouchUp.bind(this);
     this.boundOnKeyDown = this.onKeyDown.bind(this);
     this.boundOnClick = this.onClick.bind(this);
+    this.boundOnVisibility = () => {
+      if (document.hidden) this.stopRAF();
+      else this.startRAF();
+    };
     window.addEventListener('resize', this.boundOnResize);
     window.addEventListener('wheel', this.boundOnWheel);
     this.container?.addEventListener('mousedown', this.boundOnTouchDown);
@@ -490,9 +561,16 @@ class App {
     window.addEventListener('touchend', this.boundOnTouchUp);
     this.container?.addEventListener('keydown', this.boundOnKeyDown);
     this.container?.addEventListener('click', this.boundOnClick);
+    document.addEventListener('visibilitychange', this.boundOnVisibility);
+    this.observer = new IntersectionObserver(([entry]) => {
+      this.isInView = entry.isIntersecting;
+      if (this.isInView) this.startRAF();
+      else this.stopRAF();
+    }, { threshold: 0 });
+    this.observer.observe(this.container);
   }
   destroy() {
-    window.cancelAnimationFrame(this.raf);
+    this.stopRAF();
     window.removeEventListener('resize', this.boundOnResize);
     window.removeEventListener('wheel', this.boundOnWheel);
     this.container?.removeEventListener('mousedown', this.boundOnTouchDown);
@@ -501,6 +579,8 @@ class App {
     this.container?.removeEventListener('touchstart', this.boundOnTouchDown);
     window.removeEventListener('touchmove', this.boundOnTouchMove);
     window.removeEventListener('touchend', this.boundOnTouchUp);
+    document.removeEventListener('visibilitychange', this.boundOnVisibility);
+    if (this.observer) this.observer.disconnect();
     if (this.renderer && this.renderer.gl && this.renderer.gl.canvas.parentNode) {
       this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas);
     }
