@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import MusicPlayer from '../components/MusicPlayer';
 import CurrentLyric from '../components/CurrentLyric';
+import SearchSuggestions, { SearchSuggestionsHandle } from '../components/SearchSuggestions';
 import Toast from '../components/Toast';
 
 interface Stats {
@@ -17,6 +18,7 @@ export default function Home() {
   const [stats, setStats] = useState<Stats>({ posts: 0, projects: 0, views: 0, photos: 0 });
   const [searchQuery, setSearchQuery] = useState('');
   const [toast, setToast] = useState<string | null>(null);
+  const searchRef = useRef<SearchSuggestionsHandle>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -48,15 +50,22 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      <form onSubmit={handleSearch} className="home-search">
-        <span className="home-search-icon">🔍</span>
-        <input
-          type="text"
-          placeholder="输入标题、描述..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </form>
+      <div className="home-search-wrapper">
+        <form onSubmit={handleSearch} className="home-search">
+          <svg className="home-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input
+            type="text"
+            placeholder="输入标题、描述..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => searchRef.current?.handleKeyDown(e)}
+          />
+        </form>
+        <SearchSuggestions ref={searchRef} keyword={searchQuery} />
+      </div>
 
       <div className="home-grid">
         <div

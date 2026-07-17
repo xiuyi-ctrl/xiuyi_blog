@@ -13,5 +13,6 @@ router.use('/projects', require('./projects'));
 router.use('/photos', require('./photos'));
 router.use('/archive', require('./archive'));
 router.use('/guestbook', require('./guestbook'));
+router.use('/search', require('./search'));
 
 module.exports = router;

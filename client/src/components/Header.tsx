@@ -42,9 +42,15 @@ export default function Header() {
   }, [bgImage, bgBlur]);
 
   useLayoutEffect(() => {
-    const activeIndex = navItems.findIndex(item => 
-      item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path)
-    );
+    const activeIndex = navItems.findIndex(item => {
+      if (item.path === '/') {
+        return location.pathname === '/';
+      }
+      if (item.path === '/posts') {
+        return location.pathname.startsWith('/posts') || location.pathname.startsWith('/post/');
+      }
+      return location.pathname.startsWith(item.path);
+    });
     const link = linkRefs.current[activeIndex];
     const indicator = indicatorRef.current;
     const nav = navRef.current;
@@ -82,7 +88,13 @@ export default function Header() {
                 key={item.path} 
                 to={item.path}
                 ref={el => { linkRefs.current[index] = el; }}
-                className={location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path)) ? 'active' : ''}
+                className={
+                  item.path === '/'
+                    ? location.pathname === '/' ? 'active' : ''
+                    : item.path === '/posts'
+                      ? (location.pathname.startsWith('/posts') || location.pathname.startsWith('/post/')) ? 'active' : ''
+                      : location.pathname.startsWith(item.path) ? 'active' : ''
+                }
               >
                 <span className="nav-icon">
                   {item.isImg ? <img src={item.icon} alt={item.label} className="nav-icon-img" /> : item.icon}
