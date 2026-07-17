@@ -118,15 +118,12 @@ export default function Archive() {
             >
               <div className="featured-cover">
                 <img src={post.cover || 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg'} alt={post.title} />
-                <div className="featured-overlay">
-                  <span className="featured-views">👁 {post.views} 阅读</span>
-                </div>
-              </div>
-              <div className="featured-info">
-                <h3 className="featured-title">{post.title}</h3>
-                <div className="featured-meta">
-                  <span className="featured-date">{new Date(post.created_at).toLocaleDateString('zh-CN')}</span>
-                  {post.category_name && <span className="featured-category">{post.category_name}</span>}
+                <div className="featured-info">
+                  <h3 className="featured-title">{post.title}</h3>
+                  <div className="featured-meta">
+                    <span className="featured-date">{new Date(post.created_at).toLocaleDateString('zh-CN')}</span>
+                    {post.category_name && <span className="featured-category">{post.category_name}</span>}
+                  </div>
                 </div>
               </div>
             </div>
@@ -155,50 +152,45 @@ export default function Archive() {
 
         {viewMode === 'timeline' && (
           <div className="archive-timeline-cards">
-            {timeline.map(group => (
-              <div key={group.key} className="timeline-year-group">
-                <div className="timeline-year-badge">{group.key}</div>
-                <div className="timeline-cards-row">
-                  {group.items.map((item, i) => {
-                    const cover = item.type === 'post' ? (item as Post).cover :
-                                  item.type === 'photo' ? (item as Photo).cover : null;
-                    return (
-                      <div
-                        key={`${item.type}-${item.id}`}
-                        className={`timeline-card ${i % 2 === 0 ? 'left' : 'right'}`}
-                        onClick={() => handleItemClick(item)}
-                      >
-                        <div className="timeline-card-dot" />
-                        <div className="timeline-card-content">
-                          {cover && (
-                            <div className="timeline-card-cover">
-                              <img src={cover} alt={item.title} />
-                            </div>
-                          )}
-                          <div className="timeline-card-body">
-                            <span className="timeline-card-icon">{typeIcon(item.type)}</span>
-                            <h4 className="timeline-card-title">{item.title}</h4>
-                            {item.type === 'post' && (item as Post).category_name && (
-                              <span className="timeline-card-category">{(item as Post).category_name}</span>
-                            )}
-                            {item.type === 'project' && (item as Project).description && (
-                              <p className="timeline-card-desc">{(item as Project).description}</p>
-                            )}
-                            {item.type === 'photo' && (
-                              <span className="timeline-card-count">{(item as Photo).imageCount} 张照片</span>
-                            )}
-                            <div className="timeline-card-meta">
-                              <span className="timeline-card-type">{typeLabel(item.type)}</span>
-                              <span className="timeline-card-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
-                            </div>
-                          </div>
+            <div className="timeline-cards-row">
+              {timeline.flatMap(group => group.items).map((item, i) => {
+                const cover = item.type === 'post' ? (item as Post).cover :
+                              item.type === 'photo' ? (item as Photo).cover : null;
+                return (
+                  <div
+                    key={`${item.type}-${item.id}`}
+                    className={`timeline-card ${i % 2 === 0 ? 'left' : 'right'}`}
+                    onClick={() => handleItemClick(item)}
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  >
+                    <div className="timeline-card-dot" />
+                    <div className="timeline-card-content">
+                      {cover && (
+                        <div className="timeline-card-cover">
+                          <img src={cover} alt={item.title} />
+                        </div>
+                      )}
+                      <div className="timeline-card-body">
+                        <h4 className="timeline-card-title">{item.title}</h4>
+                        {item.type === 'post' && (item as Post).category_name && (
+                          <span className="timeline-card-category">{(item as Post).category_name}</span>
+                        )}
+                        {item.type === 'project' && (item as Project).description && (
+                          <p className="timeline-card-desc">{(item as Project).description}</p>
+                        )}
+                        {item.type === 'photo' && (
+                          <span className="timeline-card-count">{(item as Photo).imageCount} 张照片</span>
+                        )}
+                        <div className="timeline-card-meta">
+                          <span className="timeline-card-type">{typeLabel(item.type)}</span>
+                          <span className="timeline-card-date">{new Date(item.created_at).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -215,11 +207,11 @@ export default function Archive() {
                 {openMonths.has(group.key) && (
                   <div className="archive-month-items">
                     {group.items.map(item => (
-                      <div key={`${item.type}-${item.id}`} className="archive-item" onClick={() => handleItemClick(item)}>
+                      <div key={`${item.type}-${item.id}`} className="archive-item" data-type={item.type} onClick={() => handleItemClick(item)}>
                         <span className="archive-item-icon">{typeIcon(item.type)}</span>
                         <span className="archive-item-title">{item.title}</span>
                         <span className="archive-item-type">{typeLabel(item.type)}</span>
-                        <span className="archive-item-date">{new Date(item.created_at).toLocaleDateString('zh-CN')}</span>
+                        <span className="archive-item-date">{new Date(item.created_at).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     ))}
                   </div>
