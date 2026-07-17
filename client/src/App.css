@@ -47,6 +47,38 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ========== PAGE TRANSITION ========== */
+.page-transition {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.page-animate {
+  animation: pageSlideIn 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    opacity: 1;
+    transform: none;
+  }
+
+  .page-animate {
+    animation: none;
+  }
+}
+
 /* ========== HEADER ========== */
 .header {
   position: sticky;
@@ -163,8 +195,12 @@ body {
 }
 
 .posts-header .home-search-wrapper {
-  margin-top: 1.5rem;
+  margin-top: 2.5rem;
   margin-bottom: 0;
+}
+
+.posts-header .home-search {
+  margin-top: 2.5rem;
 }
 
 .page-divider {
