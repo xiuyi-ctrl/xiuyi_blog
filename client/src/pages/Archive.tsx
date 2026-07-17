@@ -171,15 +171,17 @@ export default function Archive() {
                         </div>
                       )}
                       <div className="timeline-card-body">
-                        <h4 className="timeline-card-title">{item.title}</h4>
+                        <div className="timeline-card-title-row">
+                          <h4 className="timeline-card-title">{item.title}</h4>
+                          {item.type === 'photo' && (
+                            <span className="timeline-card-count">{(item as Photo).imageCount} 张照片</span>
+                          )}
+                        </div>
                         {item.type === 'post' && (item as Post).category_name && (
                           <span className="timeline-card-category">{(item as Post).category_name}</span>
                         )}
                         {item.type === 'project' && (item as Project).description && (
                           <p className="timeline-card-desc">{(item as Project).description}</p>
-                        )}
-                        {item.type === 'photo' && (
-                          <span className="timeline-card-count">{(item as Photo).imageCount} 张照片</span>
                         )}
                         <div className="timeline-card-meta">
                           <span className="timeline-card-type">{typeLabel(item.type)}</span>
