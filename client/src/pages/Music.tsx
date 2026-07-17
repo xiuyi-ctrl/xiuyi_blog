@@ -308,7 +308,7 @@ export default function Music() {
                   ref={el => { playlistItemRefs.current[i] = el; }}
                   className={`music-playlist-item ${i === state.currentIndex ? 'active' : ''}`}
                   onClick={() => {
-                    music.playSong(i);
+                    music.setSong(i);
                   }}
                 >
                   <img className="music-playlist-cover" src={song.cover} alt={song.name} />
