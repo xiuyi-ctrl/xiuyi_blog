@@ -75,12 +75,6 @@ async function fetchFromQQMusic(songName) {
 
 // ─── 多源 fallback 主函数 ───
 async function fetchLyricMultiSource(songId, songName, artistName) {
-  const netease = await fetchFromNetEase(songId);
-  if (netease) {
-    return { lrc: netease, source: 'netease' };
-  }
-  console.warn(`[Lyrics] NetEase empty for "${songName}" (${songId}), trying lrclib...`);
-
   const lrclib = await fetchFromLrclib(songName, artistName);
   if (lrclib) {
     return { lrc: lrclib, source: 'lrclib' };
@@ -90,6 +84,12 @@ async function fetchLyricMultiSource(songId, songName, artistName) {
   const qq = await fetchFromQQMusic(songName);
   if (qq) {
     return { lrc: qq, source: 'qqmusic' };
+  }
+  console.warn(`[Lyrics] QQ Music empty for "${songName}", trying NetEase...`);
+
+  const netease = await fetchFromNetEase(songId);
+  if (netease) {
+    return { lrc: netease, source: 'netease' };
   }
   console.warn(`[Lyrics] All sources empty for "${songName}" (${songId})`);
 
