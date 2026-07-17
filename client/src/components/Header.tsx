@@ -42,25 +42,40 @@ export default function Header() {
   }, [bgImage, bgBlur]);
 
   useLayoutEffect(() => {
-    const activeIndex = navItems.findIndex(item => {
-      if (item.path === '/') {
-        return location.pathname === '/';
-      }
-      if (item.path === '/posts') {
-        return location.pathname.startsWith('/posts') || location.pathname.startsWith('/post/');
-      }
-      return location.pathname.startsWith(item.path);
-    });
-    const link = linkRefs.current[activeIndex];
-    const indicator = indicatorRef.current;
-    const nav = navRef.current;
+    const updateIndicator = () => {
+      const activeIndex = navItems.findIndex(item => {
+        if (item.path === '/') {
+          return location.pathname === '/';
+        }
+        if (item.path === '/posts') {
+          return location.pathname.startsWith('/posts') || location.pathname.startsWith('/post/');
+        }
+        return location.pathname.startsWith(item.path);
+      });
+      const link = linkRefs.current[activeIndex];
+      const indicator = indicatorRef.current;
+      const nav = navRef.current;
 
-    if (link && indicator && nav) {
-      const navRect = nav.getBoundingClientRect();
-      const linkRect = link.getBoundingClientRect();
-      indicator.style.width = `${linkRect.width}px`;
-      indicator.style.transform = `translateX(${linkRect.left - navRect.left}px)`;
-    }
+      if (link && indicator && nav) {
+        const navRect = nav.getBoundingClientRect();
+        const linkRect = link.getBoundingClientRect();
+        indicator.style.width = `${linkRect.width}px`;
+        indicator.style.transform = `translateX(${linkRect.left - navRect.left}px)`;
+      }
+    };
+
+    updateIndicator();
+
+    let rafId: number;
+    const handleResize = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateIndicator);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [location.pathname]);
 
   const handleLogout = () => {
