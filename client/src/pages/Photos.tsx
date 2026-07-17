@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,34 +24,39 @@ interface GalleryItem {
 function AlbumList() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'gallery' | 'stack'>('gallery');
   const [topAlbumIndex, setTopAlbumIndex] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchAlbums = async () => {
-      try {
-        const res = await api.get('/photos');
-        setAlbums(res.data.data);
-      } catch (err) {
-        console.error('加载照片集失败:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAlbums();
+  const fetchAlbums = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await api.get('/photos');
+      setAlbums(res.data.data);
+    } catch (err) {
+      console.error('加载照片集失败:', err);
+      setError('加载照片集失败，请检查网络连接后重试');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const albumItems: GalleryItem[] = albums.map(a => ({ image: a.cover, text: a.title }));
+  useEffect(() => {
+    fetchAlbums();
+  }, [fetchAlbums]);
 
-  const handleAlbumClick = (item: GalleryItem) => {
+  const albumItems: GalleryItem[] = useMemo(() => albums.map(a => ({ image: a.cover, text: a.title })), [albums]);
+
+  const handleAlbumClick = useCallback((item: GalleryItem) => {
     const album = albums.find(a => a.title === item.text && a.cover === item.image);
     if (album) navigate(`/photos/${album.id}`);
-  };
+  }, [albums, navigate]);
 
-  const handleStackClick = (item: GalleryItem) => {
+  const handleStackClick = useCallback((item: GalleryItem) => {
     handleAlbumClick(item);
-  };
+  }, [handleAlbumClick]);
 
   return (
     <div className="photos-page">
@@ -94,6 +99,11 @@ function AlbumList() {
             <div className="photos-loading">
               <div className="loading-dots"><span></span><span></span><span></span></div>
             </div>
+          ) : error ? (
+            <div className="photos-error">
+              <p>{error}</p>
+              <button className="photos-retry-btn" onClick={fetchAlbums}>重新加载</button>
+            </div>
           ) : albumItems.length > 0 ? (
             <CircularGallery
               items={albumItems}
@@ -126,6 +136,11 @@ function AlbumList() {
             {loading ? (
               <div className="photos-loading">
                 <div className="loading-dots"><span></span><span></span><span></span></div>
+              </div>
+            ) : error ? (
+              <div className="photos-error">
+                <p>{error}</p>
+                <button className="photos-retry-btn" onClick={fetchAlbums}>重新加载</button>
               </div>
             ) : albumItems.length > 0 ? (
               <Stack
@@ -162,22 +177,28 @@ function AlbumDetail() {
   const navigate = useNavigate();
   const [album, setAlbum] = useState<Album | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lightbox, setLightbox] = useState<{ items: GalleryItem[]; index: number } | null>(null);
 
-  useEffect(() => {
-    const fetchAlbum = async () => {
-      try {
-        const res = await api.get('/photos');
-        const found = res.data.data.find((a: Album) => a.id === Number(id));
-        setAlbum(found || null);
-      } catch (err) {
-        console.error('加载相册失败:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAlbum();
+  const fetchAlbum = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await api.get('/photos');
+      const found = res.data.data.find((a: Album) => a.id === Number(id));
+      setAlbum(found || null);
+      if (!found) setError('相册不存在');
+    } catch (err) {
+      console.error('加载相册失败:', err);
+      setError('加载相册失败，请检查网络连接后重试');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchAlbum();
+  }, [fetchAlbum]);
 
   const getGalleryItems = (a: Album): GalleryItem[] => {
     const imageUrls = a.image_url || {};
@@ -233,7 +254,10 @@ function AlbumDetail() {
             </svg>
             返回
           </button>
-          <h1 className="photos-title">相册不存在</h1>
+          <h1 className="photos-title">{error || '相册不存在'}</h1>
+          {error && (
+            <button className="photos-retry-btn" onClick={fetchAlbum}>重新加载</button>
+          )}
         </div>
       </div>
     );

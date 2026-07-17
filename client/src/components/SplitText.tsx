@@ -28,15 +28,19 @@ export default function SplitText({
     if (!ref.current) return;
     const el = ref.current;
     const items = el.querySelectorAll('.split-char');
+    const timers: ReturnType<typeof setTimeout>[] = [];
     items.forEach((item, i) => {
       const htmlItem = item as HTMLElement;
       htmlItem.style.opacity = '0';
       htmlItem.style.transition = `opacity ${duration}s ease`;
-      setTimeout(() => {
+      timers.push(setTimeout(() => {
         htmlItem.style.opacity = '1';
         htmlItem.classList.add('visible');
-      }, i * delay);
+      }, i * delay));
     });
+    return () => {
+      timers.forEach(t => clearTimeout(t));
+    };
   }, [text, key, delay, duration]);
 
   const splitText = (str: string) => {

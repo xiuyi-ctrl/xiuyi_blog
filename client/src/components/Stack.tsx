@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useTransform } from 'motion/react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import './Stack.css';
 
 function CardRotate({ children, onSendToBack, sensitivity, disableDrag = false }) {
@@ -75,6 +75,17 @@ export default function Stack({
     return [];
   });
 
+  useEffect(() => {
+    setStack(prev => {
+      if (prev.length === cards.length) return prev;
+      return cards.map((content, index) => ({ id: index + 1, content }));
+    });
+  }, [cards]);
+
+  const rotations = useMemo(() => {
+    return stack.map(() => randomRotation ? Math.random() * 10 - 5 : 0);
+  }, [stack, randomRotation]);
+
   const stackRef = useRef(stack);
   stackRef.current = stack;
 
@@ -112,7 +123,6 @@ export default function Stack({
       onMouseLeave={() => pauseOnHover && setIsPaused(false)}
     >
       {stack.map((card, index) => {
-        const randomRotate = randomRotation ? Math.random() * 10 - 5 : 0;
         return (
           <CardRotate
             key={card.id}
@@ -124,7 +134,7 @@ export default function Stack({
               className="card"
               onClick={() => shouldEnableClick && sendToBack(card.id)}
               animate={{
-                rotateZ: (stack.length - index - 1) * 4 + randomRotate,
+                rotateZ: (stack.length - index - 1) * 4 + rotations[index],
                 scale: 1 + index * 0.06 - stack.length * 0.06,
                 transformOrigin: '90% 90%'
               }}
