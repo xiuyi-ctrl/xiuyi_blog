@@ -110,6 +110,11 @@ export default function Projects() {
           </div>
           <p>未找到相关项目</p>
           <span className="empty-hint">换个关键词试试</span>
+          {keyword && (
+            <button className="empty-action" onClick={() => { setKeyword(''); fetchProjects(''); }}>
+              查看全部项目
+            </button>
+          )}
         </div>
       ) : (
         <div className="project-list">

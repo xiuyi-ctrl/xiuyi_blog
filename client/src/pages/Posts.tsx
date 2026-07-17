@@ -251,6 +251,9 @@ export default function Posts() {
                   key={post.id}
                   className={`post-card ${isHero ? 'post-card-hero' : ''}`}
                   style={{ animationDelay: `${index * 0.12}s` }}
+                  onAnimationEnd={(e) => {
+                    (e.target as HTMLElement).style.animation = 'none';
+                  }}
                 >
                   {coverErrors[post.id] ? (
                     <div className="post-cover-placeholder" />
