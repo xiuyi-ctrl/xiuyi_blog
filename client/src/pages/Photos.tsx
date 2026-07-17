@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
 import CircularGallery from '../components/CircularGallery';
 import Stack from '../components/Stack';
@@ -190,11 +192,26 @@ function AlbumDetail() {
     setLightbox({ ...lightbox, index: next });
   };
 
-  const handleLightboxKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!lightbox) return;
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowLeft') navigateLightbox(-1);
     if (e.key === 'ArrowRight') navigateLightbox(1);
-  };
+  }, [lightbox]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  useEffect(() => {
+    if (lightbox) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [lightbox]);
 
   if (loading) {
     return (
@@ -254,29 +271,61 @@ function AlbumDetail() {
         <div className="photos-empty"><p>该相册暂无照片</p></div>
       )}
 
-      {lightbox && (
-        <div className="lightbox" onClick={closeLightbox} onKeyDown={handleLightboxKeyDown} tabIndex={0}>
-          <button className="lightbox-close" onClick={closeLightbox}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-          <button className="lightbox-nav lightbox-prev" onClick={(e) => { e.stopPropagation(); navigateLightbox(-1); }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <img src={lightbox.items[lightbox.index].image} alt={lightbox.items[lightbox.index].text} />
-            <div className="lightbox-caption">{lightbox.items[lightbox.index].text}</div>
-            <div className="lightbox-counter">{lightbox.index + 1} / {lightbox.items.length}</div>
-          </div>
-          <button className="lightbox-nav lightbox-next" onClick={(e) => { e.stopPropagation(); navigateLightbox(1); }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </div>
+      {createPortal(
+        <AnimatePresence>
+          {lightbox && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="lightbox"
+              onClick={closeLightbox}
+            >
+              <div className="lightbox-bg" />
+
+              <button className="lightbox-close" onClick={closeLightbox}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+
+              {lightbox.items.length > 1 && (
+                <button className="lightbox-nav lightbox-prev" onClick={(e) => { e.stopPropagation(); navigateLightbox(-1); }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+              )}
+
+              <motion.div
+                key={lightbox.index}
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.85, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className="lightbox-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img src={lightbox.items[lightbox.index].image} alt={lightbox.items[lightbox.index].text} />
+                <div className="lightbox-caption">{lightbox.items[lightbox.index].text}</div>
+              </motion.div>
+
+              {lightbox.items.length > 1 && (
+                <div className="lightbox-counter">{lightbox.index + 1} / {lightbox.items.length}</div>
+              )}
+
+              {lightbox.items.length > 1 && (
+                <button className="lightbox-nav lightbox-next" onClick={(e) => { e.stopPropagation(); navigateLightbox(1); }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
       )}
     </div>
   );

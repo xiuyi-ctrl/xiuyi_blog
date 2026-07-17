@@ -4,4 +4,4 @@
 
 项目表需要：id、title（标题）、description（描述）、skill_using（技术栈，JSON数组）、created_at、github_url（github链接）
 
-照片集表需要：id、title（标题）、description（描述）、cover（封面图URL）、created_at、inage_url（`JSON对象，存储照片集下所有图片的URL，键为图片名，值为图片URL地址`)
+照片集表需要：id、title（标题）、description（描述）、cover（封面图URL）、created_at、image_url（`JSON对象，存储照片集下所有图片的URL，键为图片名，值为图片URL地址`)
