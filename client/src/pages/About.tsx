@@ -154,7 +154,7 @@ export default function About() {
         <div className="about-blog-content">
           <div className="about-blog-item">
             <span className="blog-item-label">博客名称</span>
-            <span className="blog-item-value">Xiuyiの小站</span>
+            <span className="blog-item-value">Xiuyiの夜航独白</span>
           </div>
           <div className="about-blog-item">
             <span className="blog-item-label">技术栈</span>
