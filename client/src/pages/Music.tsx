@@ -34,6 +34,8 @@ export default function Music() {
   const [activeLine, setActiveLine] = useState(-1);
   const [isDragging, setIsDragging] = useState(false);
   const lyricsScrollRef = useRef<HTMLDivElement>(null);
+  const playlistScrollRef = useRef<HTMLDivElement>(null);
+  const playlistItemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const progressRef = useRef<HTMLDivElement>(null);
 
@@ -87,6 +89,20 @@ export default function Music() {
       }, 50);
     }
   }, [activeTab, activeLine]);
+
+  useEffect(() => {
+    if (activeTab === 'playlist' && state.currentIndex >= 0) {
+      setTimeout(() => {
+        const el = playlistItemRefs.current[state.currentIndex];
+        if (el && playlistScrollRef.current) {
+          const container = playlistScrollRef.current;
+          const offsetTop = el.offsetTop - container.offsetTop;
+          const scrollTo = offsetTop - container.clientHeight / 2 + el.clientHeight / 2;
+          container.scrollTo({ top: scrollTo, behavior: 'smooth' });
+        }
+      }, 50);
+    }
+  }, [activeTab, state.currentIndex]);
 
   const togglePlay = useCallback(() => music.togglePlay(), []);
   const handlePrev = useCallback(() => music.prev(), []);
@@ -285,10 +301,11 @@ export default function Music() {
               )}
             </div>
           ) : (
-            <div className="music-playlist">
+            <div className="music-playlist" ref={playlistScrollRef}>
               {state.songs.map((song, i) => (
                 <div
                   key={song.id}
+                  ref={el => { playlistItemRefs.current[i] = el; }}
                   className={`music-playlist-item ${i === state.currentIndex ? 'active' : ''}`}
                   onClick={() => {
                     music.playSong(i);
