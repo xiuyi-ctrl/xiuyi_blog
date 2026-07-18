@@ -74,7 +74,25 @@ export default function MusicPlayer() {
   if (!currentSong) {
     return (
       <div className="cmp-player">
-        <div className="cmp-loading">加载中...</div>
+        <div className="cmp-top">
+          <div className="cmp-skeleton-cover" />
+          <div className="cmp-skeleton-info">
+            <div className="cmp-skeleton-line cmp-skeleton-line-name" />
+            <div className="cmp-skeleton-line cmp-skeleton-line-artist" />
+          </div>
+        </div>
+        <div className="cmp-bottom">
+          <div className="cmp-skeleton-progress" />
+          <div className="cmp-skeleton-time">
+            <span>0:00</span>
+            <span>0:00</span>
+          </div>
+          <div className="cmp-skeleton-controls">
+            <div className="cmp-skeleton-btn" />
+            <div className="cmp-skeleton-btn cmp-skeleton-btn-play" />
+            <div className="cmp-skeleton-btn" />
+          </div>
+        </div>
       </div>
     );
   }

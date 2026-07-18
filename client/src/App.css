@@ -3144,6 +3144,81 @@ body {
   padding: 1rem 0;
 }
 
+/* ========== SKELETON SHIMMER ========== */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.cmp-skeleton-cover {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--color-secondary) 25%, rgba(255,255,255,0.08) 50%, var(--color-secondary) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.cmp-skeleton-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cmp-skeleton-line {
+  height: 14px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, var(--color-secondary) 25%, rgba(255,255,255,0.08) 50%, var(--color-secondary) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.cmp-skeleton-line-name {
+  width: 70%;
+  margin-bottom: 8px;
+}
+
+.cmp-skeleton-line-artist {
+  width: 45%;
+}
+
+.cmp-skeleton-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-secondary) 25%, rgba(255,255,255,0.08) 50%, var(--color-secondary) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.cmp-skeleton-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--color-text);
+  opacity: 0.3;
+}
+
+.cmp-skeleton-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.cmp-skeleton-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--color-secondary) 25%, rgba(255,255,255,0.08) 50%, var(--color-secondary) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.cmp-skeleton-btn-play {
+  width: 36px;
+  height: 36px;
+}
+
 .cmp-top {
   display: flex;
   align-items: center;
