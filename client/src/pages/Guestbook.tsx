@@ -171,6 +171,7 @@ export default function Guestbook() {
   const [toast, setToast] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchHeroMessages();
@@ -410,7 +411,14 @@ export default function Guestbook() {
                       className={`message-action-btn ${replyingTo === msg.id ? 'active' : ''}`}
                       onClick={() => {
                         if (!user) { loginWithGitHub(); return; }
-                        setReplyingTo(replyingTo === msg.id ? null : msg.id);
+                        const next = replyingTo === msg.id ? null : msg.id;
+                        setReplyingTo(next);
+                        setExpandedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(msg.id)) next.delete(msg.id);
+                          else next.add(msg.id);
+                          return next;
+                        });
                       }}
                     >
                       <svg className="action-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -419,7 +427,7 @@ export default function Guestbook() {
                       <span className="action-count">{totalReplies || ''}</span>
                     </button>
                   </div>
-                  <div className={`message-replies ${replyingTo === msg.id ? '' : 'collapsed'}`}>
+                  <div className={`message-replies ${expandedIds.has(msg.id) ? '' : 'collapsed'}`}>
                     {user && replyingTo === msg.id && (
                       <div className="message-reply-form">
                         <input
@@ -436,11 +444,23 @@ export default function Guestbook() {
                                   if (success) {
                                     target.value = '';
                                     setReplyingTo(null);
+                                    setExpandedIds(prev => {
+                                      const next = new Set(prev);
+                                      next.delete(msg.id);
+                                      return next;
+                                    });
                                   }
                                 });
                               }
                             }
-                            if (e.key === 'Escape') setReplyingTo(null);
+                            if (e.key === 'Escape') {
+                              setReplyingTo(null);
+                              setExpandedIds(prev => {
+                                const next = new Set(prev);
+                                next.delete(msg.id);
+                                return next;
+                              });
+                            }
                           }}
                         />
                       </div>
@@ -453,7 +473,7 @@ export default function Guestbook() {
                             reply={reply}
                             currentUser={user}
                             onReply={(msgId, content, parentId) => handleReply(msgId, content, parentId)}
-                            collapsed={replyingTo !== msg.id}
+                            collapsed={!expandedIds.has(msg.id)}
                           />
                         ))}
                       </div>
