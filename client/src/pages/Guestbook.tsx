@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import api from '../api';
 import { useAuth } from '../contexts/AuthContext';
@@ -160,17 +161,16 @@ function ReplyItem({
 }
 
 export default function Guestbook() {
-  const { user, loginWithGitHub } = useAuth();
+  const navigate = useNavigate();
+  const { user, loginWithGitHub, logout } = useAuth();
   const [heroMessages, setHeroMessages] = useState<HeroMessage[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchHeroMessages();
@@ -202,17 +202,6 @@ export default function Guestbook() {
     fetchMessages();
   }, [fetchMessages]);
 
-  useEffect(() => {
-    if (deletingId === null) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest('.delete-wrapper')) {
-        setDeletingId(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [deletingId]);
-
 
 
   const handlePost = async (content: string) => {
@@ -224,22 +213,9 @@ export default function Guestbook() {
       const { data } = await api.post('/guestbook', { content });
       setMessages(prev => [{ ...data.data, replies: [] }, ...prev]);
       setInputValue('');
-      setToast('留言成功');
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       setToast(err.response?.data?.message || '留言失败');
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      await api.delete(`/guestbook/${id}`);
-      setMessages(prev => prev.filter(m => m.id !== id));
-      setDeletingId(null);
-      setToast('删除成功');
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      setToast(err.response?.data?.message || '删除失败');
     }
   };
 
@@ -330,6 +306,12 @@ export default function Guestbook() {
                   )}
                 </div>
                 <span className="guestbook-form-username">{user.username}</span>
+                <button
+                  className="guestbook-logout-btn"
+                  onClick={() => { logout(); navigate('/'); }}
+                >
+                  退出
+                </button>
               </div>
             ) : (
               <button className="guestbook-login-hint" onClick={loginWithGitHub}>
@@ -428,14 +410,7 @@ export default function Guestbook() {
                       className={`message-action-btn ${replyingTo === msg.id ? 'active' : ''}`}
                       onClick={() => {
                         if (!user) { loginWithGitHub(); return; }
-                        const next = replyingTo === msg.id ? null : msg.id;
-                        setReplyingTo(next);
-                        setExpandedIds(prev => {
-                          const next = new Set(prev);
-                          if (next.has(msg.id)) next.delete(msg.id);
-                          else next.add(msg.id);
-                          return next;
-                        });
+                        setReplyingTo(replyingTo === msg.id ? null : msg.id);
                       }}
                     >
                       <svg className="action-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -443,42 +418,8 @@ export default function Guestbook() {
                       </svg>
                       <span className="action-count">{totalReplies || ''}</span>
                     </button>
-                    {user && user.id === msg.user_id && (
-                      <div className="delete-wrapper">
-                        <button
-                          className="message-action-btn delete"
-                          onClick={() => setDeletingId(deletingId === msg.id ? null : msg.id)}
-                        >
-                          <svg className="action-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            <line x1="10" y1="11" x2="10" y2="17"/>
-                            <line x1="14" y1="11" x2="14" y2="17"/>
-                          </svg>
-                        </button>
-                        {deletingId === msg.id && (
-                          <div className="delete-popover">
-                            <p className="delete-popover-text">确认删除？</p>
-                            <div className="delete-popover-actions">
-                              <button
-                                className="delete-popover-btn cancel"
-                                onClick={() => setDeletingId(null)}
-                              >
-                                取消
-                              </button>
-                              <button
-                                className="delete-popover-btn confirm"
-                                onClick={() => handleDelete(msg.id)}
-                              >
-                                删除
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
-                  <div className={`message-replies ${expandedIds.has(msg.id) ? '' : 'collapsed'}`}>
+                  <div className={`message-replies ${replyingTo === msg.id ? '' : 'collapsed'}`}>
                     {user && replyingTo === msg.id && (
                       <div className="message-reply-form">
                         <input
@@ -512,7 +453,7 @@ export default function Guestbook() {
                             reply={reply}
                             currentUser={user}
                             onReply={(msgId, content, parentId) => handleReply(msgId, content, parentId)}
-                            collapsed={!expandedIds.has(msg.id)}
+                            collapsed={replyingTo !== msg.id}
                           />
                         ))}
                       </div>

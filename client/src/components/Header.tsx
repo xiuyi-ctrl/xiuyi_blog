@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import BackgroundSettings from './BackgroundSettings';
 import pictureIcon from '../assets/pictures/icons/picture_white.svg';
@@ -18,9 +18,8 @@ const navItems = [
 ];
 
 export default function Header() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [showBgSettings, setShowBgSettings] = useState(false);
   const [bgImage, setBgImage] = useState(() => 
     localStorage.getItem('bgImage') || 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png'
@@ -78,11 +77,6 @@ export default function Header() {
     };
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
   return (
     <>
       <div 
@@ -126,9 +120,7 @@ export default function Header() {
               <span className="nav-icon"><img src={settingIcon} alt="设置" className="nav-icon-img" /></span>
             </button>
             
-            {user ? (
-              <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>退出</a>
-            ) : null}
+            {user ? null : null}
           </nav>
         </div>
       </header>
