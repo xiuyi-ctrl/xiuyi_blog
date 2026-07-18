@@ -319,14 +319,14 @@ export default function Guestbook() {
         <div
           className="hero-marquee"
           ref={marqueeRef}
-          onMouseEnter={() => { pausedRef.current = true; }}
-          onMouseLeave={() => { pausedRef.current = false; }}
         >
           {heroMessages.map((msg, i) => (
             <div
               key={msg.id}
               className="hero-card"
               ref={(el) => { cardRefs.current[i] = el; }}
+              onMouseEnter={() => { pausedRef.current = true; }}
+              onMouseLeave={() => { pausedRef.current = false; }}
               style={{
                 position: 'absolute',
                 top: 0,
@@ -365,7 +365,7 @@ export default function Guestbook() {
                 <span className="guestbook-form-username">{user.username}</span>
                 <button
                   className="guestbook-logout-btn"
-                  onClick={() => { logout(); navigate('/'); }}
+                  onClick={() => { logout(); }}
                 >
                   退出
                 </button>
