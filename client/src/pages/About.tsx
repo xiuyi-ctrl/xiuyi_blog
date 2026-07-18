@@ -139,32 +139,26 @@ export default function About() {
         <div className="about-card about-skills-card">
           <h2 className="about-card-title">🛠 技能栈</h2>
           <div className="skills-group">
-            <h3 className="skills-category">
-              <span className="skill-level-dot level-master" /> 精通
-            </h3>
+            <h3 className="skills-category">熟练</h3>
             <div className="skills-tags">
               {['Python', 'Vue', 'MySQL'].map(t => (
-                <span key={t} className="skill-tag tag-master">{t}<span className="skill-dots"><i className="dot-full"/><i className="dot-full"/><i className="dot-full"/></span></span>
+                <span key={t} className="skill-tag tag-master">{t}</span>
               ))}
             </div>
           </div>
           <div className="skills-group">
-            <h3 className="skills-category">
-              <span className="skill-level-dot level-skill" /> 熟练
-            </h3>
+            <h3 className="skills-category">掌握</h3>
             <div className="skills-tags">
               {['Java', 'SpringBoot', 'LangChain', 'Git', 'Vibe Coding'].map(t => (
-                <span key={t} className="skill-tag tag-skill">{t}<span className="skill-dots"><i className="dot-full"/><i className="dot-full"/><i className="dot-empty"/></span></span>
+                <span key={t} className="skill-tag tag-skill">{t}</span>
               ))}
             </div>
           </div>
           <div className="skills-group">
-            <h3 className="skills-category">
-              <span className="skill-level-dot level-learn" /> 了解
-            </h3>
+            <h3 className="skills-category">了解</h3>
             <div className="skills-tags">
               {['React', 'TypeScript', 'LangGraph', 'AI'].map(t => (
-                <span key={t} className="skill-tag tag-learn">{t}<span className="skill-dots"><i className="dot-full"/><i className="dot-empty"/><i className="dot-empty"/></span></span>
+                <span key={t} className="skill-tag tag-learn">{t}</span>
               ))}
             </div>
           </div>

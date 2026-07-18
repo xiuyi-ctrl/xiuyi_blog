@@ -5342,43 +5342,6 @@ body {
   opacity: 0.7;
 }
 
-/* ========== PROFICIENCY DOTS ========== */
-.skill-level-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-  vertical-align: middle;
-}
-
-.level-master { background: #6366f1; }
-.level-skill { background: rgba(99, 102, 241, 0.5); }
-.level-learn { background: rgba(255, 255, 255, 0.25); }
-
-.skill-dots {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  margin-left: 2px;
-}
-
-.skill-dots i {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-}
-
-.dot-full {
-  background: currentColor;
-}
-
-.dot-empty {
-  background: currentColor;
-  opacity: 0.3;
-}
-
 .about-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
