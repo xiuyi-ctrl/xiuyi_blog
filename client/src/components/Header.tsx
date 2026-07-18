@@ -2,9 +2,9 @@ import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import BackgroundSettings from './BackgroundSettings';
-import pictureIcon from '../assets/pictures/icons/picture.svg';
+import pictureIcon from '../assets/pictures/icons/picture_white.svg';
 import settingIcon from '../assets/pictures/icons/setting.svg';
-import userIcon from '../assets/pictures/icons/user.svg';
+import userIcon from '../assets/pictures/icons/user_white.svg';
 
 const navItems = [
   { path: '/', label: '首页', icon: '⌂' },
