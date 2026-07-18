@@ -53,7 +53,7 @@ export default function About() {
           <div className="about-profile-info">
             <h1 className="about-name">Xiuyi</h1>
             <p className="about-bio">
-              拥有丰富的编程经验，热衷于利用AI辅助编程，开发创意产品，解决实际问题，每个项目都是一次学习和成长的机会。
+                一名软件工程在读研究生，拥有丰富的编程经验，热衷学习新技术。
             </p>
           </div>
         </div>
