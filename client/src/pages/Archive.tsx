@@ -117,7 +117,7 @@ export default function Archive() {
               onClick={() => navigate(`/post/${post.id}`)}
             >
               <div className="featured-cover">
-                <img src={post.cover || 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg'} alt={post.title} />
+                <img src={post.cover || '/pictures/post_pictures/1.jpg'} alt={post.title} />
                 <div className="featured-info">
                   <h3 className="featured-title">{post.title}</h3>
                   <div className="featured-meta">

@@ -10,7 +10,7 @@ interface Post {
   created_at: string;
 }
 
-const DEFAULT_COVER = 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg';
+const DEFAULT_COVER = '/pictures/post_pictures/1.jpg';
 const AUTO_PLAY_INTERVAL = 3000;
 
 export default function ArticleShowcase() {

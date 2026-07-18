@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 
 const INITIAL_COUNT = 10;
-const DEFAULT_COVER = 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png';
+const DEFAULT_COVER = '/pictures/post_pictures/secondPage.png';
 
 interface Post {
   id: number;
