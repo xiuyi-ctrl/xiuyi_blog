@@ -83,7 +83,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(18, 20, 30, 0.95);
+  background: rgba(18, 20, 30, 0.35);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
   padding: 1rem var(--side-padding);
@@ -1948,7 +1948,7 @@ body {
 }
 
 .bg-settings-panel {
-  background: rgba(30, 30, 30, 0.95);
+  background: rgba(30, 30, 30, 0.65);
   backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
@@ -2175,9 +2175,9 @@ body {
 .home-search {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-secondary);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border);
   border-radius: 50px;
   padding: 0.6rem 1.2rem;
   margin-bottom: 2rem;
@@ -2187,7 +2187,7 @@ body {
 }
 
 .home-search:focus-within {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(18, 20, 30, 0.85);
   border-color: var(--color-accent);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
