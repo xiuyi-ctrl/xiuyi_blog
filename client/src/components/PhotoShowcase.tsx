@@ -18,7 +18,7 @@ export default function PhotoShowcase() {
     const fetchAlbums = async () => {
       try {
         const { data } = await api.get('/photos');
-        setAlbums(data.slice(0, 5));
+        setAlbums(data.data.slice(0, 5));
       } catch (error) {
         console.error('Failed to fetch photos:', error);
       }
