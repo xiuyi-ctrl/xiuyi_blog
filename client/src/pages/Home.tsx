@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import MusicPlayer from '../components/MusicPlayer';
 import CurrentLyric from '../components/CurrentLyric';
+import ArticleShowcase from '../components/ArticleShowcase';
 import SearchSuggestions, { SearchSuggestionsHandle } from '../components/SearchSuggestions';
 import Toast from '../components/Toast';
 
@@ -161,6 +162,8 @@ export default function Home() {
       <div className="home-lyrics-row">
         <CurrentLyric />
       </div>
+
+      <ArticleShowcase />
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>

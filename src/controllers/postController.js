@@ -2,7 +2,7 @@ const pool = require('../config/database');
 
 const createPost = async (req, res) => {
   try {
-    const { title, content, category, tags, cover } = req.body;
+    const { title, content, summary, category, tags, cover } = req.body;
     const author_id = req.user.id;
 
     if (!title || !content) {
@@ -17,8 +17,8 @@ const createPost = async (req, res) => {
     }
 
     const [result] = await pool.query(
-      'INSERT INTO posts (title, content, cover, category_id, tags, author_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [title, content, cover || null, category || null, JSON.stringify(tags || []), author_id]
+      'INSERT INTO posts (title, content, summary, cover, category_id, tags, author_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [title, content, summary || null, cover || null, category || null, JSON.stringify(tags || []), author_id]
     );
 
     const [post] = await pool.query('SELECT * FROM posts WHERE id = ?', [result.insertId]);
@@ -120,7 +120,7 @@ const getPostById = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, content, category, tags, cover } = req.body;
+    const { title, content, summary, category, tags, cover } = req.body;
     const author_id = req.user.id;
 
     const [existing] = await pool.query('SELECT * FROM posts WHERE id = ?', [id]);
@@ -143,6 +143,10 @@ const updatePost = async (req, res) => {
     if (content !== undefined) {
       fields.push('content = ?');
       values.push(content);
+    }
+    if (summary !== undefined) {
+      fields.push('summary = ?');
+      values.push(summary);
     }
     if (category !== undefined) {
       const [cats] = await pool.query('SELECT id FROM categories WHERE id = ?', [category]);
