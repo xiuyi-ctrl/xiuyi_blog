@@ -21,9 +21,8 @@ import './App.css';
 function App() {
   useEffect(() => {
     if (!sessionStorage.getItem('site_visited')) {
-      api.post('/site-stats/visit').then(() => {
-        sessionStorage.setItem('site_visited', '1');
-      }).catch(() => {});
+      sessionStorage.setItem('site_visited', '1');
+      api.post('/site-stats/visit').catch(() => {});
     }
   }, []);
   return (
