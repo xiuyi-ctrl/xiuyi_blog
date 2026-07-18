@@ -467,8 +467,12 @@ export default function Guestbook() {
                         setReplyingTo(next);
                         setExpandedIds(prev => {
                           const next = new Set(prev);
-                          if (next.has(msg.id)) next.delete(msg.id);
-                          else next.add(msg.id);
+                          if (next.has(msg.id)) {
+                            next.delete(msg.id);
+                          } else {
+                            next.clear();
+                            next.add(msg.id);
+                          }
                           return next;
                         });
                       }}
