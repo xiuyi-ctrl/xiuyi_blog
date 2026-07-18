@@ -59,14 +59,35 @@ function buildReplyTree(replies: Reply[]): Reply[] {
 function ReplyItem({
   reply,
   currentUser,
-  onReply
+  onReply,
+  collapsed
 }: {
   reply: Reply;
   currentUser: { id: number; username: string; avatar: string | null } | null;
   onReply: (messageId: number, content: string, parentId: number) => Promise<boolean>;
+  collapsed?: boolean;
 }) {
   const [showInput, setShowInput] = useState(false);
   const [replyContent, setReplyContent] = useState('');
+
+  useEffect(() => {
+    if (collapsed) {
+      setShowInput(false);
+      setReplyContent('');
+    }
+  }, [collapsed]);
+
+  useEffect(() => {
+    if (!showInput) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('.reply-nested-input')) {
+        setShowInput(false);
+        setReplyContent('');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showInput]);
 
   const handleSubmit = async () => {
     if (!replyContent.trim()) return;
@@ -130,7 +151,7 @@ function ReplyItem({
       {reply.children && reply.children.length > 0 && (
         <div className="reply-children">
           {reply.children.map(child => (
-            <ReplyItem key={child.id} reply={child} currentUser={currentUser} onReply={onReply} />
+            <ReplyItem key={child.id} reply={child} currentUser={currentUser} onReply={onReply} collapsed={collapsed} />
           ))}
         </div>
       )}
@@ -146,6 +167,10 @@ export default function Guestbook() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchHeroMessages();
@@ -177,6 +202,19 @@ export default function Guestbook() {
     fetchMessages();
   }, [fetchMessages]);
 
+  useEffect(() => {
+    if (deletingId === null) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('.delete-wrapper')) {
+        setDeletingId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [deletingId]);
+
+
+
   const handlePost = async (content: string) => {
     if (!user) {
       loginWithGitHub();
@@ -185,6 +223,7 @@ export default function Guestbook() {
     try {
       const { data } = await api.post('/guestbook', { content });
       setMessages(prev => [{ ...data.data, replies: [] }, ...prev]);
+      setInputValue('');
       setToast('留言成功');
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -196,6 +235,7 @@ export default function Guestbook() {
     try {
       await api.delete(`/guestbook/${id}`);
       setMessages(prev => prev.filter(m => m.id !== id));
+      setDeletingId(null);
       setToast('删除成功');
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
@@ -300,12 +340,12 @@ export default function Guestbook() {
             placeholder={user ? '在这里留下你的留言...' : '请先登录后再留言'}
             disabled={!user}
             maxLength={500}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                const target = e.target as HTMLTextAreaElement;
-                if (target.value.trim()) {
-                  handlePost(target.value);
-                  target.value = '';
+                if (inputValue.trim()) {
+                  handlePost(inputValue);
                 }
               }
             }}
@@ -314,12 +354,10 @@ export default function Guestbook() {
             <span className="guestbook-form-hint">Ctrl + Enter 发送</span>
             <button
               className="guestbook-submit-btn"
-              disabled={!user}
+              disabled={!user || !inputValue.trim()}
               onClick={() => {
-                const input = document.querySelector('.guestbook-input') as HTMLTextAreaElement;
-                if (input?.value.trim()) {
-                  handlePost(input.value);
-                  input.value = '';
+                if (inputValue.trim()) {
+                  handlePost(inputValue);
                 }
               }}
             >
@@ -374,51 +412,93 @@ export default function Guestbook() {
                       <span className="action-icon">{msg.liked ? '❤️' : '🤍'}</span>
                       <span className="action-count">{msg.likes || ''}</span>
                     </button>
-                    <button className="message-action-btn">
+                    <button
+                      className={`message-action-btn ${replyingTo === msg.id ? 'active' : ''}`}
+                      onClick={() => {
+                        if (!user) { loginWithGitHub(); return; }
+                        const next = replyingTo === msg.id ? null : msg.id;
+                        setReplyingTo(next);
+                        setExpandedIds(prev => {
+                          const next = new Set(prev);
+                          if (next.has(msg.id)) next.delete(msg.id);
+                          else next.add(msg.id);
+                          return next;
+                        });
+                      }}
+                    >
                       <span className="action-icon">💬</span>
                       <span className="action-count">{totalReplies || ''}</span>
                     </button>
                     {user && user.id === msg.user_id && (
-                      <button
-                        className="message-action-btn delete"
-                        onClick={() => handleDelete(msg.id)}
-                      >
-                        <span className="action-icon">🗑️</span>
-                      </button>
+                      <div className="delete-wrapper">
+                        <button
+                          className="message-action-btn delete"
+                          onClick={() => setDeletingId(deletingId === msg.id ? null : msg.id)}
+                        >
+                          <span className="action-icon">🗑️</span>
+                        </button>
+                        {deletingId === msg.id && (
+                          <div className="delete-popover">
+                            <p className="delete-popover-text">确认删除？</p>
+                            <div className="delete-popover-actions">
+                              <button
+                                className="delete-popover-btn cancel"
+                                onClick={() => setDeletingId(null)}
+                              >
+                                取消
+                              </button>
+                              <button
+                                className="delete-popover-btn confirm"
+                                onClick={() => handleDelete(msg.id)}
+                              >
+                                删除
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-                  {replyTree.length > 0 && (
-                    <div className="message-replies">
-                      {replyTree.map(reply => (
-                        <ReplyItem
-                          key={reply.id}
-                          reply={reply}
-                          currentUser={user}
-                          onReply={(msgId, content, parentId) => handleReply(msgId, content, parentId)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                  {user && (
-                    <div className="message-reply-form">
-                      <input
-                        type="text"
-                        placeholder="写回复..."
-                        className="reply-input"
-                        maxLength={200}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            const target = e.target as HTMLInputElement;
-                            if (target.value.trim()) {
-                              handleReply(msg.id, target.value).then(success => {
-                                if (success) target.value = '';
-                              });
+                  <div className={`message-replies ${expandedIds.has(msg.id) ? '' : 'collapsed'}`}>
+                    {user && replyingTo === msg.id && (
+                      <div className="message-reply-form">
+                        <input
+                          type="text"
+                          placeholder="写回复..."
+                          className="reply-input"
+                          maxLength={200}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              const target = e.target as HTMLInputElement;
+                              if (target.value.trim()) {
+                                handleReply(msg.id, target.value).then(success => {
+                                  if (success) {
+                                    target.value = '';
+                                    setReplyingTo(null);
+                                  }
+                                });
+                              }
                             }
-                          }
-                        }}
-                      />
-                    </div>
-                  )}
+                            if (e.key === 'Escape') setReplyingTo(null);
+                          }}
+                        />
+                      </div>
+                    )}
+                    {replyTree.length > 0 && (
+                      <div className="message-replies-scroll">
+                        {replyTree.map(reply => (
+                          <ReplyItem
+                            key={reply.id}
+                            reply={reply}
+                            currentUser={user}
+                            onReply={(msgId, content, parentId) => handleReply(msgId, content, parentId)}
+                            collapsed={!expandedIds.has(msg.id)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
