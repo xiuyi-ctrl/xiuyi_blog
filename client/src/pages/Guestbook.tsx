@@ -252,6 +252,18 @@ export default function Guestbook() {
     fetchMessages();
   }, [fetchMessages]);
 
+  useEffect(() => {
+    let alive = true;
+    const poll = async () => {
+      try {
+        const { data } = await api.get('/guestbook', { params: { page: 1, pageSize: 1 } });
+        if (alive) setTotalCount(data.pagination.total);
+      } catch {}
+    };
+    const timer = setInterval(poll, 15000);
+    return () => { alive = false; clearInterval(timer); };
+  }, []);
+
 
 
   const handlePost = async (content: string) => {
