@@ -15,5 +15,6 @@ router.use('/archive', require('./archive'));
 router.use('/guestbook', require('./guestbook'));
 router.use('/search', require('./search'));
 router.use('/blog-stats', require('./blogStats'));
+router.use('/site-stats', require('./siteStats'));
 
 module.exports = router;

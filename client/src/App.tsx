@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
 import PageTransition from './components/PageTransition';
@@ -14,9 +15,17 @@ import { AlbumList, AlbumDetail } from './pages/Photos';
 import Archive from './pages/Archive';
 import Guestbook from './pages/Guestbook';
 import About from './pages/About';
+import api from './api';
 import './App.css';
 
 function App() {
+  useEffect(() => {
+    if (!localStorage.getItem('site_visited')) {
+      api.post('/site-stats/visit').then(() => {
+        localStorage.setItem('site_visited', '1');
+      }).catch(() => {});
+    }
+  }, []);
   return (
     <BrowserRouter>
       <AuthProvider>

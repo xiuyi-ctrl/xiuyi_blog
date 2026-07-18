@@ -4,9 +4,10 @@ const pool = require('../config/database');
 
 router.get('/', async (req, res) => {
   try {
-    const [[postRow]] = await pool.query('SELECT COUNT(*) as total, COALESCE(SUM(views), 0) as views FROM posts');
+    const [[postRow]] = await pool.query('SELECT COUNT(*) as total FROM posts');
     const [[projectRow]] = await pool.query('SELECT COUNT(*) as total FROM projects');
     const [[guestbookRow]] = await pool.query('SELECT COUNT(*) as total FROM guestbook');
+    const [[visitRow]] = await pool.query('SELECT visit_count FROM site_stats WHERE id = 1');
 
     const [photoRows] = await pool.query('SELECT image_url FROM photos');
     let photoCount = 0;
@@ -21,7 +22,7 @@ router.get('/', async (req, res) => {
       success: true,
       data: {
         posts: postRow.total,
-        views: postRow.views,
+        views: visitRow.visit_count,
         projects: projectRow.total,
         photos: photoCount,
         messages: guestbookRow.total,
