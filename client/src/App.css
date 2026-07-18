@@ -4433,6 +4433,11 @@ body {
   padding: 20px 0;
 }
 
+@keyframes replyFormIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(8px); }
@@ -4746,17 +4751,20 @@ body {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  max-height: 400px;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+}
+
+.message-replies > * {
+  overflow: hidden;
 }
 
 .message-replies.collapsed {
-  max-height: 0;
+  grid-template-rows: 0fr;
   opacity: 0;
-  margin: 0;
-  padding: 0;
+  margin-top: 0;
+  padding-top: 0;
   border: none;
 }
 

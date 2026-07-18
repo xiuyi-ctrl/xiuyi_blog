@@ -173,6 +173,7 @@ export default function Guestbook() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
@@ -240,6 +241,7 @@ export default function Guestbook() {
       const { data } = await api.get('/guestbook', { params: { page, pageSize: 10 } });
       setMessages(data.messages);
       setTotalPages(data.pagination.totalPages);
+      setTotalCount(data.pagination.total);
     } catch (error) {
       console.error('Failed to fetch messages:', error);
     } finally {
@@ -281,10 +283,7 @@ export default function Guestbook() {
   };
 
   const handleReply = async (messageId: number, content: string, parentId?: number) => {
-    if (!user) {
-      loginWithGitHub();
-      return false;
-    }
+    if (!user) return false;
     try {
       const { data } = await api.post(`/guestbook/${messageId}/reply`, {
         content,
@@ -408,7 +407,7 @@ export default function Guestbook() {
         </div>
 
         <div className="guestbook-list-header">
-          <span className="guestbook-total">共 {messages.length} 条留言</span>
+          <span className="guestbook-total">共 {totalCount} 条留言</span>
         </div>
 
         {loading ? (
