@@ -31,7 +31,7 @@ export default function PhotoShowcase() {
   return (
     <div className="photo-showcase">
       <div className="photo-showcase-header">
-        <span className="photo-showcase-label">FEATURE COLLECTIONS</span>
+        <span className="photo-showcase-label">PHOTO COLLECTION</span>
         <span className="photo-showcase-subtitle">- 折叠卡片</span>
       </div>
       <div className="photo-showcase-panels">

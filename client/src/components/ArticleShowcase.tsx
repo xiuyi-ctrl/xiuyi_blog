@@ -70,7 +70,11 @@ export default function ArticleShowcase() {
 
   return (
     <div className="showcase-container">
-      <div className="showcase-list" onMouseLeave={handleMouseLeave}>
+      <div className="showcase-header">
+        <span className="showcase-label">POST</span>
+      </div>
+      <div className="showcase-body">
+        <div className="showcase-list" onMouseLeave={handleMouseLeave}>
         {posts.map((post, i) => (
           <div
             key={post.id}
@@ -93,11 +97,12 @@ export default function ArticleShowcase() {
         />
         <div className="showcase-overlay" />
         <div className="showcase-card-content">
-          <span className="showcase-label">PERSPECTIVE</span>
+          <span className="showcase-card-label">PERSPECTIVE</span>
           <h2 className="showcase-card-title">{activePost.title}</h2>
           <p className="showcase-card-summary">{activePost.summary || '暂无摘要'}</p>
           <span className="showcase-date">{formatDate(activePost.created_at)}</span>
         </div>
+      </div>
       </div>
     </div>
   );
