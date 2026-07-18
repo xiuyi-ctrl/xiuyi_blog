@@ -1684,11 +1684,13 @@ body {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  position: relative;
 }
 
 .current-lyric-card:hover {
   background: rgba(40, 40, 40, 0.9);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .current-lyric-note {
@@ -2515,11 +2517,13 @@ body {
   width: 680px;
   box-sizing: border-box;
   cursor: pointer;
+  position: relative;
 }
 
 .home-profile-card:hover {
   background: rgba(18, 20, 30, 0.85);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .profile-top {
@@ -3097,11 +3101,13 @@ body {
   box-sizing: border-box;
   height: 100%;
   cursor: pointer;
+  position: relative;
 }
 
 .home-music-card:hover {
   background: rgba(18, 20, 30, 0.85);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 .music-player-wrap {
@@ -3294,12 +3300,14 @@ body {
   font-size: 0.9rem;
   text-align: right;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .home-photo-card:hover {
   background: rgba(18, 20, 30, 0.85);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  z-index: 10;
 }
 
 /* ========== MUSIC PAGE ========== */
