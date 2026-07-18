@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
@@ -11,11 +11,14 @@ interface Post {
 }
 
 const DEFAULT_COVER = 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg';
+const AUTO_PLAY_INTERVAL = 5000;
 
 export default function ArticleShowcase() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -29,6 +32,33 @@ export default function ArticleShowcase() {
     fetchPosts();
   }, []);
 
+  const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setActiveIndex(prev => (prev + 1) % posts.length);
+    }, AUTO_PLAY_INTERVAL);
+  }, [posts.length]);
+
+  useEffect(() => {
+    if (posts.length === 0 || isPaused) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+    startTimer();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [posts.length, isPaused, startTimer]);
+
+  const handleMouseEnter = (index: number) => {
+    setIsPaused(true);
+    setActiveIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    setIsPaused(false);
+  };
+
   if (posts.length === 0) return null;
 
   const activePost = posts[activeIndex];
@@ -40,12 +70,12 @@ export default function ArticleShowcase() {
 
   return (
     <div className="showcase-container">
-      <div className="showcase-list">
+      <div className="showcase-list" onMouseLeave={handleMouseLeave}>
         {posts.map((post, i) => (
           <div
             key={post.id}
             className={`showcase-item ${i === activeIndex ? 'active' : ''}`}
-            onMouseEnter={() => setActiveIndex(i)}
+            onMouseEnter={() => handleMouseEnter(i)}
             onClick={() => navigate(`/post/${post.id}`)}
           >
             <span className="showcase-scene">SCENE {String(i + 1).padStart(2, '0')}</span>
