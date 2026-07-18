@@ -57,6 +57,12 @@ function buildReplyTree(replies: Reply[]): Reply[] {
   return roots;
 }
 
+function ScrollHint() {
+  return (
+    <div className="guestbook-hero-scroll-hint">↓ 向下滚动查看更多 ↓</div>
+  );
+}
+
 function ReplyItem({
   reply,
   currentUser,
@@ -173,14 +179,55 @@ export default function Guestbook() {
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const scrollRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardPositions = useRef<{ x: number; y: number; speed: number }[]>([]);
+  const pausedRef = useRef(false);
 
   useEffect(() => {
     fetchHeroMessages();
   }, []);
 
+  useEffect(() => {
+    if (!heroMessages.length || !marqueeRef.current) return;
+
+    const containerH = marqueeRef.current.offsetHeight;
+    const cardH = cardRefs.current[0]?.offsetHeight || 130;
+    const maxTop = Math.max(0, containerH - cardH);
+
+    let raf: number;
+    const animate = () => {
+      if (!pausedRef.current) {
+        heroMessages.forEach((_, i) => {
+          const pos = cardPositions.current[i];
+          if (!pos) return;
+          pos.x -= pos.speed;
+          if (pos.x < -260) {
+            pos.x = window.innerWidth + Math.random() * 200;
+            pos.y = Math.random() * maxTop;
+          }
+          const el = cardRefs.current[i];
+          if (el) {
+            el.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+          }
+        });
+      }
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [heroMessages]);
+
   const fetchHeroMessages = async () => {
     try {
       const { data } = await api.get('/guestbook/hero');
+      const containerH = marqueeRef.current?.offsetHeight || 380;
+      const maxTop = Math.max(0, containerH - 120);
+      cardPositions.current = data.messages.map(() => ({
+        x: Math.random() * (window.innerWidth + 400) - 200,
+        y: Math.random() * maxTop,
+        speed: 0.6 + Math.random() * 0.6,
+      }));
       setHeroMessages(data.messages);
     } catch (error) {
       console.error('Failed to fetch hero messages:', error);
@@ -261,20 +308,30 @@ export default function Guestbook() {
     <div className="guestbook-container">
       <section className="guestbook-hero">
         <div className="guestbook-hero-inner">
-          <h1 className="guestbook-hero-title">
+          <h1 className="page-title">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-8px', marginRight: 10 }}>
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
-            留言板
+            风过回廊
           </h1>
-          <p className="guestbook-hero-subtitle">留下你的足迹，分享你的想法</p>
+          <p className="page-subtitle">留下你的足迹，分享你的想法</p>
         </div>
-        <div className="guestbook-hero-grid">
-          {heroMessages.map((msg, idx) => (
+        <div
+          className="hero-marquee"
+          ref={marqueeRef}
+          onMouseEnter={() => { pausedRef.current = true; }}
+          onMouseLeave={() => { pausedRef.current = false; }}
+        >
+          {heroMessages.map((msg, i) => (
             <div
               key={msg.id}
               className="hero-card"
-              style={{ transform: `rotate(${(idx % 2 === 0 ? -1 : 1) * (1 + (idx * 1.3) % 3)}deg)` }}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+              }}
             >
               <div className="hero-card-header">
                 <div className="hero-card-avatar">
@@ -290,10 +347,8 @@ export default function Guestbook() {
             </div>
           ))}
         </div>
-        <div className="guestbook-hero-scroll-hint">
-          <span>↓ 向下滚动查看更多 ↓</span>
-        </div>
       </section>
+      <ScrollHint />
 
       <section className="guestbook-content">
         <div className="guestbook-form-wrapper">
