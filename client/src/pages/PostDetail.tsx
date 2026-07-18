@@ -4,7 +4,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api';
-import { emitStatsChanged } from '../lib/statsEvents';
 
 interface Post {
   id: number;
@@ -74,17 +73,6 @@ export default function PostDetail() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleDelete = async () => {
-    if (!confirm('确定要删除这篇文章吗？')) return;
-    try {
-      await api.delete(`/posts/${id}`);
-      emitStatsChanged();
-      navigate('/');
-    } catch (err: any) {
-      alert(err.response?.data?.message || '删除失败');
-    }
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('zh-CN', {
@@ -153,13 +141,6 @@ export default function PostDetail() {
               {post.tags.map((tag, i) => (
                 <span key={i} className="tag">{tag}</span>
               ))}
-            </div>
-          )}
-
-          {user && user.id === post.author_id && (
-            <div className="post-actions">
-              <button onClick={() => navigate(`/write?id=${post.id}`)}>编辑</button>
-              <button onClick={handleDelete} className="danger">删除</button>
             </div>
           )}
 
