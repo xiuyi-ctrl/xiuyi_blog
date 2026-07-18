@@ -11,7 +11,7 @@ interface Post {
 }
 
 const DEFAULT_COVER = 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg';
-const AUTO_PLAY_INTERVAL = 5000;
+const AUTO_PLAY_INTERVAL = 3000;
 
 export default function ArticleShowcase() {
   const [posts, setPosts] = useState<Post[]>([]);
