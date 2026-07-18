@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import api from '../api';
 import { useAuth } from '../contexts/AuthContext';
@@ -167,7 +166,6 @@ function ReplyItem({
 }
 
 export default function Guestbook() {
-  const navigate = useNavigate();
   const { user, loginWithGitHub, logout } = useAuth();
   const [heroMessages, setHeroMessages] = useState<HeroMessage[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
