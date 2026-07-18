@@ -17,21 +17,24 @@ function useCountUp(target: number) {
   const raf = useRef<number>(0);
   const start = useRef<number>(0);
   const from = useRef(0);
+  const current = useRef(0);
 
   const animate = useCallback((ts: number) => {
     if (!start.current) start.current = ts;
     const elapsed = ts - start.current;
     const progress = Math.min(elapsed / DURATION, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    setValue(Math.round(from.current + (target - from.current) * eased));
+    const next = Math.round(from.current + (target - from.current) * eased);
+    current.current = next;
+    setValue(next);
     if (progress < 1) {
       raf.current = requestAnimationFrame(animate);
     }
   }, [target]);
 
   useEffect(() => {
-    if (target === 0) { setValue(0); return; }
-    from.current = value;
+    if (target === 0) { current.current = 0; setValue(0); return; }
+    from.current = current.current;
     start.current = 0;
     raf.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(raf.current);
@@ -51,26 +54,20 @@ export default function About() {
   const animViews = useCountUp(stats.views);
 
   useEffect(() => {
+    let alive = true;
     const fetchStats = async () => {
       try {
-        const [postsRes, projectsRes, photosRes, messagesRes] = await Promise.all([
-          api.get('/posts', { params: { pageSize: 1 } }),
-          api.get('/projects'),
-          api.get('/photos/count'),
-          api.get('/guestbook', { params: { pageSize: 1 } })
-        ]);
-        setStats({
-          posts: postsRes.data.pagination.total,
-          projects: projectsRes.data.projects?.length || 0,
-          views: postsRes.data.posts.reduce((sum: number, p: { views?: number }) => sum + (p.views || 0), 0),
-          photos: photosRes.data.data?.total || 0,
-          messages: messagesRes.data.pagination?.total || 0
-        });
+        const { data } = await api.get('/blog-stats');
+        if (alive && data.success) {
+          setStats(data.data);
+        }
       } catch (error) {
         console.error('Failed to fetch stats:', error);
       }
     };
     fetchStats();
+    const timer = setInterval(fetchStats, 30000);
+    return () => { alive = false; clearInterval(timer); };
   }, []);
 
   const copyToClipboard = (text: string, label: string) => {
