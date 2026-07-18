@@ -443,12 +443,6 @@ export default function Guestbook() {
                                 handleReply(msg.id, target.value).then(success => {
                                   if (success) {
                                     target.value = '';
-                                    setReplyingTo(null);
-                                    setExpandedIds(prev => {
-                                      const next = new Set(prev);
-                                      next.delete(msg.id);
-                                      return next;
-                                    });
                                   }
                                 });
                               }
