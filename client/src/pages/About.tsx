@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api';
 import Toast from '../components/Toast';
+import { onStatsChanged } from '../lib/statsEvents';
 
 interface Stats {
   posts: number;
@@ -66,8 +67,7 @@ export default function About() {
       }
     };
     fetchStats();
-    const timer = setInterval(fetchStats, 30000);
-    return () => { alive = false; clearInterval(timer); };
+    return onStatsChanged(fetchStats);
   }, []);
 
   const copyToClipboard = (text: string, label: string) => {

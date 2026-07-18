@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api';
+import { emitStatsChanged } from '../lib/statsEvents';
 
 interface Post {
   id: number;
@@ -77,6 +78,7 @@ export default function PostDetail() {
     if (!confirm('确定要删除这篇文章吗？')) return;
     try {
       await api.delete(`/posts/${id}`);
+      emitStatsChanged();
       navigate('/');
     } catch (err: any) {
       alert(err.response?.data?.message || '删除失败');

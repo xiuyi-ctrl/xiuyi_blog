@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import api from '../api';
+import { emitStatsChanged } from '../lib/statsEvents';
 
 interface Category {
   id: number;
@@ -85,6 +86,7 @@ export default function Write() {
       } else {
         await api.post('/posts', payload);
       }
+      emitStatsChanged();
       navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || '操作失败');

@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import api from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import Toast from '../components/Toast';
+import { emitStatsChanged } from '../lib/statsEvents';
 
 interface Message {
   id: number;
@@ -263,6 +264,7 @@ export default function Guestbook() {
       const { data } = await api.post('/guestbook', { content });
       setMessages(prev => [{ ...data.data, replies: [] }, ...prev]);
       setTotalCount(prev => prev + 1);
+      emitStatsChanged();
       setInputValue('');
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
