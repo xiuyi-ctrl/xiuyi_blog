@@ -196,6 +196,14 @@ export default function Guestbook() {
     const cardH = cardRefs.current[0]?.offsetHeight || 130;
     const maxTop = Math.max(0, containerH - cardH);
 
+    if (cardPositions.current.length !== heroMessages.length) {
+      cardPositions.current = heroMessages.map(() => ({
+        x: Math.random() * (window.innerWidth + 400) - 200,
+        y: Math.random() * maxTop,
+        speed: 0.6 + Math.random() * 0.6,
+      }));
+    }
+
     let raf: number;
     const animate = () => {
       if (!pausedRef.current) {
@@ -222,13 +230,6 @@ export default function Guestbook() {
   const fetchHeroMessages = async () => {
     try {
       const { data } = await api.get('/guestbook/hero');
-      const containerH = marqueeRef.current?.offsetHeight || 380;
-      const maxTop = Math.max(0, containerH - 120);
-      cardPositions.current = data.messages.map(() => ({
-        x: Math.random() * (window.innerWidth + 400) - 200,
-        y: Math.random() * maxTop,
-        speed: 0.6 + Math.random() * 0.6,
-      }));
       setHeroMessages(data.messages);
     } catch (error) {
       console.error('Failed to fetch hero messages:', error);
