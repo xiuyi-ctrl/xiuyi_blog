@@ -283,7 +283,12 @@ export default function Guestbook() {
     <div className="guestbook-container">
       <section className="guestbook-hero">
         <div className="guestbook-hero-inner">
-          <h1 className="guestbook-hero-title">💬 留言板</h1>
+          <h1 className="guestbook-hero-title">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: '-8px', marginRight: 10 }}>
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            留言板
+          </h1>
           <p className="guestbook-hero-subtitle">留下你的足迹，分享你的想法</p>
         </div>
         <div className="guestbook-hero-grid">
@@ -291,7 +296,7 @@ export default function Guestbook() {
             <div
               key={msg.id}
               className="hero-card"
-              style={{ transform: `rotate(${(idx % 2 === 0 ? -1 : 1) * (1 + Math.random() * 3)}deg)` }}
+              style={{ transform: `rotate(${(idx % 2 === 0 ? -1 : 1) * (1 + (idx * 1.3) % 3)}deg)` }}
             >
               <div className="hero-card-header">
                 <div className="hero-card-avatar">
@@ -378,16 +383,21 @@ export default function Guestbook() {
           </div>
         ) : messages.length === 0 ? (
           <div className="guestbook-empty">
-            <span className="empty-icon">📝</span>
-            <p>还没有留言，快来第一个留言吧</p>
+            <div className="guestbook-empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+              </svg>
+            </div>
+            <p className="guestbook-empty-title">还没有留言</p>
+            <p className="guestbook-empty-desc">登录后分享你的想法，成为第一个留下足迹的人</p>
           </div>
         ) : (
           <div className="guestbook-list">
-            {messages.map(msg => {
+            {messages.map((msg, idx) => {
               const replyTree = buildReplyTree(msg.replies);
               const totalReplies = msg.replies.length;
               return (
-                <div key={msg.id} className="message-card">
+                <div key={msg.id} className="message-card" style={{ animationDelay: `${idx * 0.06}s` }}>
                   <div className="message-header">
                     <div className="message-user">
                       <div className="message-avatar">
@@ -409,7 +419,9 @@ export default function Guestbook() {
                       className={`message-action-btn ${msg.liked ? 'liked' : ''}`}
                       onClick={() => handleLike(msg.id)}
                     >
-                      <span className="action-icon">{msg.liked ? '❤️' : '🤍'}</span>
+                      <svg className="action-icon" width="16" height="16" viewBox="0 0 24 24" fill={msg.liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                      </svg>
                       <span className="action-count">{msg.likes || ''}</span>
                     </button>
                     <button
@@ -426,7 +438,9 @@ export default function Guestbook() {
                         });
                       }}
                     >
-                      <span className="action-icon">💬</span>
+                      <svg className="action-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                      </svg>
                       <span className="action-count">{totalReplies || ''}</span>
                     </button>
                     {user && user.id === msg.user_id && (
@@ -435,7 +449,12 @@ export default function Guestbook() {
                           className="message-action-btn delete"
                           onClick={() => setDeletingId(deletingId === msg.id ? null : msg.id)}
                         >
-                          <span className="action-icon">🗑️</span>
+                          <svg className="action-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <line x1="10" y1="11" x2="10" y2="17"/>
+                            <line x1="14" y1="11" x2="14" y2="17"/>
+                          </svg>
                         </button>
                         {deletingId === msg.id && (
                           <div className="delete-popover">
