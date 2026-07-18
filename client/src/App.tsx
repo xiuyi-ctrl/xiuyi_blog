@@ -20,9 +20,9 @@ import './App.css';
 
 function App() {
   useEffect(() => {
-    if (!localStorage.getItem('site_visited')) {
+    if (!sessionStorage.getItem('site_visited')) {
       api.post('/site-stats/visit').then(() => {
-        localStorage.setItem('site_visited', '1');
+        sessionStorage.setItem('site_visited', '1');
       }).catch(() => {});
     }
   }, []);
