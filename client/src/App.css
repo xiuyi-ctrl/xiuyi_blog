@@ -2,13 +2,12 @@
 
 /* ========== ROOT ========== */
 :root {
-  --color-base: #F7F3EE;
-  --color-secondary: #E8E0D8;
-  --color-text: #3D3A38;
-  --color-accent: #D4A76A;
-  --color-hover: #C17A4B;
-  --color-code-bg: #2D2A28;
-  --color-border: #DCD5CD;
+  --color-base: rgba(18, 20, 30, 0.75);
+  --color-secondary: rgba(18, 20, 30, 0.72);
+  --color-text: rgba(255, 255, 255, 0.95);
+  --color-accent: #6366f1;
+  --color-hover: #8b5cf6;
+  --color-border: rgba(255, 255, 255, 0.06);
   
   --font-display: 'Playfair Display', 'Noto Serif SC', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -39,7 +38,7 @@ html {
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-base);
+  background: none;
   color: var(--color-text);
   line-height: var(--line-height-body);
   font-size: var(--size-body);
@@ -84,7 +83,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(18, 20, 30, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--color-border);
   padding: 1rem var(--side-padding);
@@ -828,7 +827,7 @@ body {
   width: 36px;
   height: 36px;
   border: 1px solid var(--color-border);
-  background: white;
+  background: var(--color-secondary);
   border-radius: 6px;
   cursor: pointer;
   font-family: var(--font-body);
@@ -1382,7 +1381,7 @@ body {
   border-radius: 8px;
   font-size: 0.9rem;
   font-family: var(--font-body);
-  background: white;
+  background: var(--color-secondary);
   color: var(--color-text);
 }
 
@@ -1399,7 +1398,7 @@ body {
   border-radius: 12px;
   overflow: hidden;
   margin: 1.5rem 0;
-  background: white;
+  background: var(--color-secondary);
 }
 
 .editor-pane, .preview-pane {
@@ -1434,7 +1433,7 @@ body {
   font-size: 0.9rem;
   line-height: 1.7;
   color: var(--color-text);
-  background: white;
+  background: transparent;
 }
 
 .preview-content {
@@ -1458,7 +1457,7 @@ body {
 .submit-btn {
   flex: 1;
   padding: 0.875rem;
-  background: var(--color-text);
+  background: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1480,7 +1479,7 @@ body {
 
 .cancel-btn {
   padding: 0.875rem 1.5rem;
-  background: white;
+  background: var(--color-secondary);
   color: var(--color-text);
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -1498,7 +1497,7 @@ body {
 .auth-form {
   max-width: 400px;
   margin: 4rem auto;
-  background: white;
+  background: var(--color-secondary);
   padding: 2.5rem;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -1536,7 +1535,7 @@ body {
 
 .auth-form button {
   padding: 0.875rem;
-  background: var(--color-text);
+  background: var(--color-accent);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1583,7 +1582,7 @@ body {
 
 /* ========== PROFILE ========== */
 .profile {
-  background: white;
+  background: var(--color-secondary);
   padding: 2.5rem;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -1593,6 +1592,7 @@ body {
   font-family: var(--font-display);
   font-size: var(--size-h1);
   margin-bottom: 1.5rem;
+  color: var(--color-text);
 }
 
 .profile-info {
@@ -1897,190 +1897,6 @@ body {
   }
 }
 
-/* ========== DARK MODE ========== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-base: #1a1816;
-    --color-secondary: #2a2826;
-    --color-text: #e8e0d8;
-    --color-accent: #d4a76a;
-    --color-hover: #e4b77a;
-    --color-code-bg: #121110;
-    --color-border: #3a3836;
-  }
-  
-  .header {
-    background: rgba(26, 24, 22, 0.95);
-  }
-  
-  .post-card, .auth-form, .profile {
-    background: var(--color-secondary);
-  }
-  
-  .post-detail {
-    background: rgba(18, 20, 30, 0.85);
-  }
-  
-  .write-meta input, .write-meta select, .auth-form input {
-    background: var(--color-base);
-    color: var(--color-text);
-  }
-  
-  .markdown-editor {
-    background: var(--color-secondary);
-  }
-  
-  .editor-pane textarea, .preview-content {
-    background: var(--color-secondary);
-    color: var(--color-text);
-  }
-  
-  .category-tag {
-    background: transparent;
-    color: var(--color-text);
-  }
-  
-  .category-tag.active {
-    background: #6366f1;
-    border-color: #6366f1;
-    color: #ffffff;
-    opacity: 1;
-  }
-  
-  .post-card {
-    background: rgba(18, 20, 30, 0.75);
-  }
-  
-  .post-card:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-  }
-  
-  .pagination button, .back-btn, .post-actions button {
-    background: var(--color-secondary);
-    color: var(--color-text);
-    border-color: var(--color-border);
-  }
-  
-  .load-more-btn {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.45);
-    color: #818cf8 !important;
-  }
-  
-  .submit-btn {
-    background: var(--color-accent);
-    color: var(--color-base);
-  }
-  
-  .cancel-btn {
-    background: var(--color-secondary);
-    color: var(--color-text);
-  }
-  
-  .auth-form button {
-    background: var(--color-accent);
-    color: var(--color-base);
-  }
-
-  .hero-card,
-  .guestbook-form-wrapper,
-  .message-card,
-  .about-profile-card,
-  .about-card {
-    background: rgba(18, 20, 30, 0.75);
-    border-color: rgba(255, 255, 255, 0.06);
-  }
-
-  .about-contact-item {
-    background: rgba(18, 20, 30, 0.5);
-    border-color: rgba(255, 255, 255, 0.06);
-  }
-
-  .about-contact-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  .about-stat-item {
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .guestbook-input,
-  .reply-input {
-    background: var(--color-base);
-    color: var(--color-text);
-  }
-
-  .guestbook-form-avatar span,
-  .message-avatar span,
-  .reply-avatar span {
-    color: #fff;
-  }
-
-  .message-action-btn {
-    color: var(--color-text);
-  }
-
-  .message-action-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  .page-btn,
-  .page-num {
-    background: var(--color-secondary);
-    color: var(--color-text);
-    border-color: var(--color-border);
-  }
-
-  .search-suggestions {
-    background: rgba(30, 30, 30, 0.98);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 
-      0 16px 48px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  }
-
-  .search-suggestions-header {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
-  }
-
-  .search-suggestion-item:hover,
-  .search-suggestion-item.active {
-    background: rgba(99, 102, 241, 0.15);
-  }
-
-  .search-suggestion-item .suggestion-title {
-    color: var(--color-text);
-  }
-
-  .search-highlight {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(99, 102, 241, 0.2));
-    color: #818cf8;
-  }
-
-  .search-suggestions-footer {
-    border-top-color: rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  .search-hint {
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  .search-hint kbd {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .search-suggestions-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
-  }
-
-  .search-loading-dot {
-    background: #6366f1;
-  }
-}
-
 /* ========== BACKGROUND ========== */
 .blog-background {
   position: fixed;
@@ -2132,16 +1948,16 @@ body {
 }
 
 .bg-settings-panel {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(30, 30, 30, 0.95);
   backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 1.5rem;
   width: 90%;
   max-width: 380px;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   animation: panelSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -2168,7 +1984,7 @@ body {
   width: 28px;
   height: 28px;
   border: none;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 50%;
   cursor: pointer;
   font-size: 1.1rem;
@@ -2199,7 +2015,7 @@ body {
   width: 36px;
   height: 36px;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   cursor: pointer;
   font-size: 1rem;
@@ -2259,9 +2075,9 @@ body {
   gap: 0.75rem;
   margin-bottom: 1.25rem;
   padding: 0.875rem 1rem;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .bg-blur-control label {
@@ -2359,9 +2175,9 @@ body {
 .home-search {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 50px;
   padding: 0.6rem 1.2rem;
   margin-bottom: 2rem;
@@ -2371,9 +2187,9 @@ body {
 }
 
 .home-search:focus-within {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .home-search-icon {
@@ -2416,14 +2232,14 @@ body {
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(30, 30, 30, 0.98);
   backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   box-shadow: 
-    0 16px 48px rgba(0, 0, 0, 0.12),
-    0 0 0 1px rgba(0, 0, 0, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   z-index: 1000;
   overflow: hidden;
   animation: suggestionFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2442,7 +2258,7 @@ body {
 
 .search-suggestions-header {
   padding: 0.75rem 1rem 0.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .search-result-count {
@@ -2507,7 +2323,7 @@ body {
 }
 
 .search-suggestions-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 2px;
 }
 
@@ -2611,8 +2427,8 @@ body {
 
 .search-suggestions-footer {
   padding: 0.5rem 1rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.04);
-  background: rgba(0, 0, 0, 0.01);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .search-hint {
@@ -2631,8 +2447,8 @@ body {
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 4px;
   font-family: var(--font-code);
   font-size: 0.6rem;
@@ -2689,9 +2505,9 @@ body {
 
 /* Profile Card */
 .home-profile-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 1.2rem 1.5rem;
   transition: all 0.3s ease;
@@ -2702,8 +2518,8 @@ body {
 }
 
 .home-profile-card:hover {
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(18, 20, 30, 0.85);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .profile-top {
@@ -3010,9 +2826,9 @@ body {
   position: relative;
   border-radius: 16px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--color-secondary);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   padding: 2rem;
   box-sizing: border-box;
 }
@@ -3085,9 +2901,9 @@ body {
   position: relative;
   border-radius: 16px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--color-secondary);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
 }
 
 .photos-grid {
@@ -3268,9 +3084,9 @@ body {
 
 /* Music Card */
 .home-music-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 1.2rem 1.5rem;
   display: flex;
@@ -3284,8 +3100,8 @@ body {
 }
 
 .home-music-card:hover {
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(18, 20, 30, 0.85);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .music-player-wrap {
@@ -3438,7 +3254,7 @@ body {
   width: 32px;
   height: 32px;
   border: none;
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 50%;
   cursor: pointer;
   color: var(--color-text);
@@ -3450,7 +3266,7 @@ body {
 }
 
 .cmp-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .cmp-play {
@@ -3468,9 +3284,9 @@ body {
 
 /* Photo Card */
 .home-photo-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 1.2rem 1.5rem;
   text-decoration: none;
@@ -3481,9 +3297,9 @@ body {
 }
 
 .home-photo-card:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(18, 20, 30, 0.85);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* ========== MUSIC PAGE ========== */
@@ -4549,9 +4365,9 @@ body {
 }
 
 .hero-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 20px;
   transition: all 0.3s ease;
@@ -4634,9 +4450,9 @@ body {
 }
 
 .guestbook-form-wrapper {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 40px;
@@ -4708,7 +4524,7 @@ body {
   font-family: var(--font-body);
   font-size: 0.95rem;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.3);
   resize: vertical;
   transition: border-color 0.2s ease;
   line-height: 1.6;
@@ -4784,16 +4600,16 @@ body {
 }
 
 .message-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 24px;
   transition: all 0.2s ease;
 }
 
 .message-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .message-header {
@@ -4883,7 +4699,7 @@ body {
 
 .message-action-btn:hover {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .message-action-btn.liked {
@@ -4987,7 +4803,7 @@ body {
   font-family: var(--font-body);
   font-size: 0.85rem;
   color: var(--color-text);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.3);
   transition: border-color 0.2s ease;
 }
 
@@ -5103,7 +4919,7 @@ body {
   height: 36px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   color: var(--color-text);
   cursor: pointer;
   display: flex;
@@ -5144,7 +4960,7 @@ body {
 }
 
 .page-num:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .page-num.active {
@@ -5161,9 +4977,9 @@ body {
 }
 
 .about-profile-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   padding: 32px;
   margin-bottom: 24px;
@@ -5220,7 +5036,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 14px 16px;
@@ -5231,10 +5047,10 @@ body {
 }
 
 .about-contact-item:hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
   border-color: var(--color-accent);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .contact-icon {
@@ -5268,9 +5084,9 @@ body {
 }
 
 .about-card {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-secondary);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--color-border);
   border-radius: 20px;
   padding: 28px;
 }
@@ -5323,7 +5139,7 @@ body {
 .about-stat-item {
   text-align: center;
   padding: 16px 8px;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 12px;
 }
 
