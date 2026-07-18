@@ -269,10 +269,7 @@ export default function Guestbook() {
   };
 
   const handleLike = async (id: number) => {
-    if (!user) {
-      loginWithGitHub();
-      return;
-    }
+    if (!user) return;
     try {
       const { data } = await api.post(`/guestbook/${id}/like`);
       setMessages(prev => prev.map(m =>
@@ -466,7 +463,6 @@ export default function Guestbook() {
                     <button
                       className={`message-action-btn ${replyingTo === msg.id ? 'active' : ''}`}
                       onClick={() => {
-                        if (!user) { loginWithGitHub(); return; }
                         const next = replyingTo === msg.id ? null : msg.id;
                         setReplyingTo(next);
                         setExpandedIds(prev => {
@@ -484,14 +480,15 @@ export default function Guestbook() {
                     </button>
                   </div>
                   <div className={`message-replies ${expandedIds.has(msg.id) ? '' : 'collapsed'}`}>
-                    {user && replyingTo === msg.id && (
+                    {replyingTo === msg.id && (
                       <div className="message-reply-form">
                         <input
                           type="text"
-                          placeholder="写回复..."
+                          placeholder={user ? "写回复..." : "登录后可回复"}
                           className="reply-input"
                           maxLength={200}
                           autoFocus
+                          disabled={!user}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               const target = e.target as HTMLInputElement;

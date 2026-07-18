@@ -4861,6 +4861,11 @@ body {
   opacity: 0.4;
 }
 
+.reply-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .reply-nested {
   padding: 0;
 }
