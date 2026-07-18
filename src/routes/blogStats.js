@@ -7,7 +7,6 @@ router.get('/', async (req, res) => {
     const [[postRow]] = await pool.query('SELECT COUNT(*) as total, COALESCE(SUM(views), 0) as views FROM posts');
     const [[projectRow]] = await pool.query('SELECT COUNT(*) as total FROM projects');
     const [[guestbookRow]] = await pool.query('SELECT COUNT(*) as total FROM guestbook');
-    const [[replyRow]] = await pool.query('SELECT COUNT(*) as total FROM guestbook_replies');
 
     const [photoRows] = await pool.query('SELECT image_url FROM photos');
     let photoCount = 0;
@@ -25,7 +24,7 @@ router.get('/', async (req, res) => {
         views: postRow.views,
         projects: projectRow.total,
         photos: photoCount,
-        messages: guestbookRow.total + replyRow.total,
+        messages: guestbookRow.total,
       }
     });
   } catch (error) {
