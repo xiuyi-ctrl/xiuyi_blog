@@ -4,6 +4,7 @@ import api from '../api';
 import MusicPlayer from '../components/MusicPlayer';
 import CurrentLyric from '../components/CurrentLyric';
 import ArticleShowcase from '../components/ArticleShowcase';
+import PhotoShowcase from '../components/PhotoShowcase';
 import SearchSuggestions, { SearchSuggestionsHandle } from '../components/SearchSuggestions';
 import Toast from '../components/Toast';
 
@@ -164,6 +165,8 @@ export default function Home() {
       </div>
 
       <ArticleShowcase />
+
+      <PhotoShowcase />
 
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
     </div>
