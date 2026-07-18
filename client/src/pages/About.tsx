@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api';
 import Toast from '../components/Toast';
 
@@ -10,9 +10,45 @@ interface Stats {
   messages: number;
 }
 
+const DURATION = 800;
+
+function useCountUp(target: number) {
+  const [value, setValue] = useState(0);
+  const raf = useRef<number>(0);
+  const start = useRef<number>(0);
+  const from = useRef(0);
+
+  const animate = useCallback((ts: number) => {
+    if (!start.current) start.current = ts;
+    const elapsed = ts - start.current;
+    const progress = Math.min(elapsed / DURATION, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    setValue(Math.round(from.current + (target - from.current) * eased));
+    if (progress < 1) {
+      raf.current = requestAnimationFrame(animate);
+    }
+  }, [target]);
+
+  useEffect(() => {
+    if (target === 0) { setValue(0); return; }
+    from.current = value;
+    start.current = 0;
+    raf.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf.current);
+  }, [target]);
+
+  return value;
+}
+
 export default function About() {
   const [stats, setStats] = useState<Stats>({ posts: 0, projects: 0, views: 0, photos: 0, messages: 0 });
   const [toast, setToast] = useState<string | null>(null);
+
+  const animPosts = useCountUp(stats.posts);
+  const animProjects = useCountUp(stats.projects);
+  const animPhotos = useCountUp(stats.photos);
+  const animMessages = useCountUp(stats.messages);
+  const animViews = useCountUp(stats.views);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -70,19 +106,32 @@ export default function About() {
           </button>
 
           <button className="about-contact-item" onClick={() => copyToClipboard('2998526825@qq.com', '邮箱')}>
-            <span className="contact-icon">📧</span>
+            <span className="contact-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="M22 4L12 13L2 4"/>
+              </svg>
+            </span>
             <span className="contact-label">Email</span>
             <span className="contact-value">2998526825@qq.com</span>
           </button>
 
           <button className="about-contact-item" onClick={() => copyToClipboard('2998526825', 'QQ')}>
-            <span className="contact-icon">💬</span>
+            <span className="contact-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </span>
             <span className="contact-label">QQ</span>
             <span className="contact-value">2998526825</span>
           </button>
 
           <button className="about-contact-item" onClick={() => copyToClipboard('fly29985', '微信')}>
-            <span className="contact-icon">💚</span>
+            <span className="contact-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+              </svg>
+            </span>
             <span className="contact-label">WeChat</span>
             <span className="contact-value">fly29985</span>
           </button>
@@ -126,23 +175,23 @@ export default function About() {
           <h2 className="about-card-title">📊 博客数据</h2>
           <div className="about-stats-grid">
             <div className="about-stat-item">
-              <span className="about-stat-number">{stats.posts}</span>
+              <span className="about-stat-number">{animPosts}</span>
               <span className="about-stat-label">篇文章</span>
             </div>
             <div className="about-stat-item">
-              <span className="about-stat-number">{stats.projects}</span>
+              <span className="about-stat-number">{animProjects}</span>
               <span className="about-stat-label">个项目</span>
             </div>
             <div className="about-stat-item">
-              <span className="about-stat-number">{stats.photos}</span>
+              <span className="about-stat-number">{animPhotos}</span>
               <span className="about-stat-label">张照片</span>
             </div>
             <div className="about-stat-item">
-              <span className="about-stat-number">{stats.messages}</span>
+              <span className="about-stat-number">{animMessages}</span>
               <span className="about-stat-label">条留言</span>
             </div>
             <div className="about-stat-item">
-              <span className="about-stat-number">{stats.views}</span>
+              <span className="about-stat-number">{animViews}</span>
               <span className="about-stat-label">次浏览</span>
             </div>
           </div>

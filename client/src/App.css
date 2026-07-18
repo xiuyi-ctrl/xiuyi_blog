@@ -5407,13 +5407,13 @@ body {
 }
 
 .feature-tag {
-  background: rgba(212, 167, 106, 0.12);
-  color: var(--color-accent);
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
-  border: 1px solid rgba(212, 167, 106, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 /* About responsive */
@@ -5453,6 +5453,10 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+  }
+
+  .about-blog-item .blog-item-label {
+    min-width: 0;
   }
 }
 
