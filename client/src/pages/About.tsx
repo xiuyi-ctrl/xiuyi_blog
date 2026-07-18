@@ -139,31 +139,33 @@ export default function About() {
         <div className="about-card about-skills-card">
           <h2 className="about-card-title">🛠 技能栈</h2>
           <div className="skills-group">
-            <h3 className="skills-category">前端</h3>
+            <h3 className="skills-category">
+              <span className="skill-level-dot level-master" /> 精通
+            </h3>
             <div className="skills-tags">
-              <span className="skill-tag">React</span>
-              <span className="skill-tag">TypeScript</span>
-              <span className="skill-tag">Vue</span>
-              <span className="skill-tag">Next.js</span>
-              <span className="skill-tag">Tailwind CSS</span>
+              {['Python', 'Vue', 'MySQL'].map(t => (
+                <span key={t} className="skill-tag tag-master">{t}<span className="skill-dots"><i className="dot-full"/><i className="dot-full"/><i className="dot-full"/></span></span>
+              ))}
             </div>
           </div>
           <div className="skills-group">
-            <h3 className="skills-category">后端</h3>
+            <h3 className="skills-category">
+              <span className="skill-level-dot level-skill" /> 熟练
+            </h3>
             <div className="skills-tags">
-              <span className="skill-tag">Node.js</span>
-              <span className="skill-tag">Express</span>
-              <span className="skill-tag">MySQL</span>
-              <span className="skill-tag">REST API</span>
+              {['Java', 'SpringBoot', 'LangChain', 'Git', 'Vibe Coding'].map(t => (
+                <span key={t} className="skill-tag tag-skill">{t}<span className="skill-dots"><i className="dot-full"/><i className="dot-full"/><i className="dot-empty"/></span></span>
+              ))}
             </div>
           </div>
           <div className="skills-group">
-            <h3 className="skills-category">工具</h3>
+            <h3 className="skills-category">
+              <span className="skill-level-dot level-learn" /> 了解
+            </h3>
             <div className="skills-tags">
-              <span className="skill-tag">Git</span>
-              <span className="skill-tag">Docker</span>
-              <span className="skill-tag">VS Code</span>
-              <span className="skill-tag">AI 辅助编程</span>
+              {['React', 'TypeScript', 'LangGraph', 'AI'].map(t => (
+                <span key={t} className="skill-tag tag-learn">{t}<span className="skill-dots"><i className="dot-full"/><i className="dot-empty"/><i className="dot-empty"/></span></span>
+              ))}
             </div>
           </div>
         </div>
