@@ -252,18 +252,6 @@ export default function Guestbook() {
     fetchMessages();
   }, [fetchMessages]);
 
-  useEffect(() => {
-    let alive = true;
-    const poll = async () => {
-      try {
-        const { data } = await api.get('/guestbook', { params: { page: 1, pageSize: 1 } });
-        if (alive) setTotalCount(data.pagination.total);
-      } catch {}
-    };
-    const timer = setInterval(poll, 15000);
-    return () => { alive = false; clearInterval(timer); };
-  }, []);
-
 
 
   const handlePost = async (content: string) => {
@@ -274,6 +262,7 @@ export default function Guestbook() {
     try {
       const { data } = await api.post('/guestbook', { content });
       setMessages(prev => [{ ...data.data, replies: [] }, ...prev]);
+      setTotalCount(prev => prev + 1);
       setInputValue('');
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
