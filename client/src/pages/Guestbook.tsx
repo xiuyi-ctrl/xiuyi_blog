@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import api from '../api';
@@ -172,6 +172,7 @@ export default function Guestbook() {
   const [inputValue, setInputValue] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const scrollRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
   useEffect(() => {
     fetchHeroMessages();
@@ -443,6 +444,10 @@ export default function Guestbook() {
                                 handleReply(msg.id, target.value).then(success => {
                                   if (success) {
                                     target.value = '';
+                                    requestAnimationFrame(() => {
+                                      const el = scrollRefs.current.get(msg.id);
+                                      if (el) el.scrollTop = el.scrollHeight;
+                                    });
                                   }
                                 });
                               }
@@ -460,7 +465,7 @@ export default function Guestbook() {
                       </div>
                     )}
                     {replyTree.length > 0 && (
-                      <div className="message-replies-scroll">
+                      <div className="message-replies-scroll" ref={el => { if (el) scrollRefs.current.set(msg.id, el); }}>
                         {replyTree.map(reply => (
                           <ReplyItem
                             key={reply.id}

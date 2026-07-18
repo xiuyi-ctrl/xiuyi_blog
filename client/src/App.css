@@ -4779,6 +4779,7 @@ body {
   gap: 12px;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  scroll-behavior: smooth;
 }
 
 .message-replies-scroll::-webkit-scrollbar {
