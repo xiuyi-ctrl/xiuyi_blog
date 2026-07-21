@@ -20,6 +20,10 @@ Thumbs.db
 .vscode/
 *.sw?
 
+# Session / temp files
+*.session.sql
+cssTest.txt
+
 # Build
 dist/
 build/
