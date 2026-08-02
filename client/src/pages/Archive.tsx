@@ -33,6 +33,24 @@ interface Photo {
 
 type ArchiveItem = Post | Project | Photo;
 
+const ArticleIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+    <path d="M6 2h8l4 4v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm7 1.5V7h3.5L13 3.5zM8 10v1.5h8V10H8zm0 3v1.5h8V13H8zm0 3v1.5h5V16H8z" />
+  </svg>
+);
+
+const ProjectIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+    <path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z" />
+  </svg>
+);
+
+const PhotoIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+    <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm2 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm1 4 3 3 3-3 4 4H6l1-4z" />
+  </svg>
+);
+
 interface TimelineGroup {
   key: string;
   year: number;
@@ -70,9 +88,9 @@ export default function Archive() {
   };
 
   const typeIcon = (t: string) => {
-    if (t === 'post') return '📝';
-    if (t === 'project') return '🔧';
-    return '📷';
+    if (t === 'post') return <ArticleIcon />;
+    if (t === 'project') return <ProjectIcon />;
+    return <PhotoIcon />;
   };
 
   const typeLabel = (t: string) => {

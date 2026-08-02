@@ -4658,12 +4658,25 @@ body {
   background: #f59e0b;
 }
 
+.archive-item[data-type="post"] .archive-item-icon {
+  color: #6366f1;
+}
+
+.archive-item[data-type="project"] .archive-item-icon {
+  color: #22c55e;
+}
+
+.archive-item[data-type="photo"] .archive-item-icon {
+  color: #f59e0b;
+}
+
 .archive-item:hover {
   background: rgba(255,255,255,0.04);
 }
 
 .archive-item-icon {
-  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
@@ -5653,6 +5666,9 @@ body {
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .skills-group {
