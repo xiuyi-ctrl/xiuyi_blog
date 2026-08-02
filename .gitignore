@@ -27,3 +27,8 @@ cssTest.txt
 # Build
 dist/
 build/
+*.tsbuildinfo
+
+# Database dump / scripts
+dump.js
+seed.sql
