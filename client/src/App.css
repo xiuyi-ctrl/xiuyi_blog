@@ -2926,6 +2926,13 @@ body {
   width: 1099px;
 }
 
+@media (max-width: 1200px) {
+  .home-grid {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) 400px;
+  }
+}
+
 /* Profile Card */
 .home-profile-card {
   background: var(--color-secondary);
@@ -2935,7 +2942,8 @@ body {
   padding: 1.2rem 1.5rem;
   transition: all 0.3s ease;
   overflow: hidden;
-  width: 680px;
+  width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
