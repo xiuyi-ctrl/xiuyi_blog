@@ -309,7 +309,7 @@ function AlbumDetail() {
       </div>
 
       {items.length > 0 ? (
-        <div className="photos-grid">
+        <div className="photos-masonry">
           {items.map((item, idx) => (
             <div
               key={idx}

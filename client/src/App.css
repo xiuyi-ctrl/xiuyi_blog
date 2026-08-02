@@ -3409,18 +3409,17 @@ body {
   }
 }
 
-.photos-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+.photos-masonry {
+  column-count: 3;
+  column-gap: 1rem;
 }
 
 @media (max-width: 768px) {
-  .photos-grid { grid-template-columns: repeat(2, 1fr); }
+  .photos-masonry { column-count: 2; }
 }
 
 @media (max-width: 480px) {
-  .photos-grid { grid-template-columns: 1fr; }
+  .photos-masonry { column-count: 1; }
 }
 
 .photos-grid-item {
@@ -3431,6 +3430,8 @@ body {
   background: rgba(18, 20, 30, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
+  break-inside: avoid;
+  margin-bottom: 1rem;
 }
 
 .photos-grid-item:hover {
@@ -3440,8 +3441,7 @@ body {
 
 .photos-grid-item img {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+  height: auto;
   display: block;
   transition: transform 0.4s ease;
 }
