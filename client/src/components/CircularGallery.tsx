@@ -33,8 +33,8 @@ function deriveFontFamilyFromUrl(url) {
   return base.replace(/[^a-zA-Z0-9-_ ]/g, '').trim() || 'CircularGalleryFont';
 }
 
-async function loadFontFromStylesheet(url) {
-  const response = await fetch(url);
+async function loadFontFromStylesheet(url, signal) {
+  const response = await fetch(url, { signal });
   if (!response.ok) throw new Error(`Failed to fetch font stylesheet (${response.status})`);
   const cssText = await response.text();
   const faceBlocks = cssText.match(/@font-face\s*{[^}]*}/g) || [];
@@ -72,12 +72,14 @@ async function loadFontFromFile(url) {
   return family;
 }
 
-async function loadCustomFont(fontUrl) {
+async function loadCustomFont(fontUrl, signal) {
   const isStylesheet = fontUrl.includes('fonts.googleapis.com') || /\.css(\?.*)?$/i.test(fontUrl);
-  return isStylesheet ? loadFontFromStylesheet(fontUrl) : loadFontFromFile(fontUrl);
+  return isStylesheet ? loadFontFromStylesheet(fontUrl, signal) : loadFontFromFile(fontUrl);
 }
 
-async function resolveFont(font, fontUrl) {
+async function resolveFont(font, fontUrl, timeoutMs = 5000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   const effectiveUrl = fontUrl || (font === DEFAULT_FONT ? DEFAULT_FONT_URL : null);
   if (!effectiveUrl) {
     if (document.fonts && document.fonts.load) {
@@ -86,10 +88,11 @@ async function resolveFont(font, fontUrl) {
         await document.fonts.ready;
       } catch {}
     }
+    clearTimeout(timer);
     return font;
   }
   try {
-    const family = await loadCustomFont(effectiveUrl);
+    const family = await loadCustomFont(effectiveUrl, controller.signal);
     const sizeMatch = font.match(/^\s*(.*?\d+px)/);
     const prefix = sizeMatch ? sizeMatch[1].trim() : 'bold 30px';
     const resolved = `${prefix} "${family}"`;
@@ -98,8 +101,10 @@ async function resolveFont(font, fontUrl) {
     }
     return resolved;
   } catch (error) {
-    console.error('CircularGallery: unable to load font from', fontUrl, error);
+    console.warn('CircularGallery: unable to load font from', fontUrl, 'using default font:', error.message);
     return font;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
