@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
 import CircularGallery from '../components/CircularGallery';
+import StackedCarousel from '../components/StackedCarousel';
 import Stack from '../components/Stack';
 import SplitText from '../components/SplitText';
 
@@ -26,7 +27,7 @@ function AlbumList() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'gallery' | 'stack'>('gallery');
+  const [viewMode, setViewMode] = useState<'gallery' | 'stack' | 'stacked'>('stacked');
   const [topAlbumIndex, setTopAlbumIndex] = useState(0);
   const navigate = useNavigate();
 
@@ -73,6 +74,15 @@ function AlbumList() {
       {albums.length > 0 && (
         <div className="photos-view-toggle">
           <button
+            className={`photos-toggle-btn ${viewMode === 'stacked' ? 'active' : ''}`}
+            onClick={() => setViewMode('stacked')}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="6" width="14" height="14" rx="2" /><rect x="7" y="2" width="14" height="14" rx="2" /><path d="M3 12h18" opacity="0.5" />
+            </svg>
+            照片墙
+          </button>
+          <button
             className={`photos-toggle-btn ${viewMode === 'gallery' ? 'active' : ''}`}
             onClick={() => setViewMode('gallery')}
           >
@@ -93,7 +103,22 @@ function AlbumList() {
         </div>
       )}
 
-      {viewMode === 'gallery' ? (
+      {viewMode === 'stacked' ? (
+        loading ? (
+          <div className="photos-loading">
+            <div className="loading-dots"><span></span><span></span><span></span></div>
+          </div>
+        ) : error ? (
+          <div className="photos-error">
+            <p>{error}</p>
+            <button className="photos-retry-btn" onClick={fetchAlbums}>重新加载</button>
+          </div>
+        ) : albums.length > 0 ? (
+          <StackedCarousel albums={albums} onAlbumClick={(id) => navigate(`/photos/${id}`)} />
+        ) : (
+          <div className="photos-empty"><p>暂无照片集</p></div>
+        )
+      ) : viewMode === 'gallery' ? (
         <div className="photos-gallery-wrapper">
           {loading ? (
             <div className="photos-loading">
@@ -166,7 +191,7 @@ function AlbumList() {
       )}
 
       <div className="photos-hint">
-        <span>{viewMode === 'gallery' ? '← 拖动或滚轮浏览，点击进入相册 →' : '← 拖拽卡片或等待自动轮播，点击进入相册 →'}</span>
+        <span>{viewMode === 'gallery' ? '← 拖动或滚轮浏览，点击进入相册 →' : viewMode === 'stack' ? '← 拖拽卡片或等待自动轮播，点击进入相册 →' : ''}</span>
       </div>
     </div>
   );
