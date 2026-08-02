@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Header from './components/Header';
 import PageTransition from './components/PageTransition';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -27,25 +28,27 @@ function App() {
   }, []);
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Header />
-        <PageTransition>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/posts" element={<Posts />} />
-            <Route path="/post/:id" element={<PostDetail />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/write" element={<ProtectedRoute><Write /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/music" element={<Music />} />
-            <Route path="/archive" element={<Archive />} />
-            <Route path="/photos" element={<AlbumList />} />
-            <Route path="/photos/:id" element={<AlbumDetail />} />
-            <Route path="/guestbook" element={<Guestbook />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
-        </PageTransition>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Header />
+          <PageTransition>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/posts" element={<Posts />} />
+              <Route path="/post/:id" element={<PostDetail />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/write" element={<ProtectedRoute><Write /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/music" element={<Music />} />
+              <Route path="/archive" element={<Archive />} />
+              <Route path="/photos" element={<AlbumList />} />
+              <Route path="/photos/:id" element={<AlbumDetail />} />
+              <Route path="/guestbook" element={<Guestbook />} />
+              <Route path="/about" element={<About />} />
+            </Routes>
+          </PageTransition>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

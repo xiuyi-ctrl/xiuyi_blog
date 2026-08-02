@@ -7,6 +7,7 @@ import CircularGallery from '../components/CircularGallery';
 import StackedCarousel from '../components/StackedCarousel';
 import Stack from '../components/Stack';
 import SplitText from '../components/SplitText';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Album {
   id: number;
@@ -30,6 +31,7 @@ function AlbumList() {
   const [viewMode, setViewMode] = useState<'gallery' | 'stack' | 'stacked'>('stacked');
   const [topAlbumIndex, setTopAlbumIndex] = useState(0);
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const fetchAlbums = useCallback(async () => {
     try {
@@ -133,7 +135,7 @@ function AlbumList() {
             <CircularGallery
               items={albumItems}
               bend={3}
-              textColor="#ffffff"
+              textColor={theme === 'light' ? 'rgba(24, 28, 48, 0.9)' : '#ffffff'}
               borderRadius={0.05}
               font="bold 30px Figtree"
               fontUrl="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap"

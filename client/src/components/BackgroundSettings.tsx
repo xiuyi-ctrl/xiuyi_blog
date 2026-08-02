@@ -13,6 +13,11 @@ const backgrounds = [
   { id: 1, name: '背景1', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png' },
   { id: 2, name: '背景2', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/bg3.jpg' },
   { id: 3, name: '背景3', url: 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/1.jpg' },
+  { id: 4, name: '小艾1', url: '/pictures/backgrounds/xiaoAi01.jpg' },
+  { id: 5, name: '小艾2', url: '/pictures/backgrounds/xiaoAi02.jpg' },
+  { id: 6, name: '小艾3', url: '/pictures/backgrounds/xiaoAi03.jpg' },
+  { id: 7, name: '小艾4', url: '/pictures/backgrounds/xiaoAi04.jpg' },
+  { id: 8, name: '小艾5', url: '/pictures/backgrounds/xiaoAi05.jpg' },
 ];
 
 export default function BackgroundSettings({

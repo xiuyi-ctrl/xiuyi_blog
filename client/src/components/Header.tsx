@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import BackgroundSettings from './BackgroundSettings';
-import pictureIcon from '../assets/pictures/icons/picture_white.svg';
-import settingIcon from '../assets/pictures/icons/setting_white.svg';
-import userIcon from '../assets/pictures/icons/user_white.svg';
+import pictureDarkIcon from '../assets/pictures/icons/picture_white.svg';
+import pictureLightIcon from '../assets/pictures/icons/picture.svg';
+import settingDarkIcon from '../assets/pictures/icons/setting_white.svg';
+import settingLightIcon from '../assets/pictures/icons/setting.svg';
+import userDarkIcon from '../assets/pictures/icons/user_white.svg';
+import userLightIcon from '../assets/pictures/icons/user.svg';
 
-const navItems = [
+const getNavItems = (pictureIcon: string, userIcon: string) => [
   { path: '/', label: '首页', icon: '⌂' },
   { path: '/posts', label: '文章', icon: '✎' },
   { path: '/projects', label: '项目', icon: '◈' },
@@ -17,16 +21,41 @@ const navItems = [
   { path: '/about', label: '关于', icon: userIcon, isImg: true },
 ];
 
+const LIGHT_BG = '/pictures/backgrounds/xiaoAi05.jpg';
+const DEFAULT_DARK_BG = 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png';
+
+function getStoredBg(theme: 'dark' | 'light'): string {
+  if (theme === 'light') {
+    return localStorage.getItem('bgImage-light') || LIGHT_BG;
+  }
+  return localStorage.getItem('bgImage-dark') || localStorage.getItem('bgImage') || DEFAULT_DARK_BG;
+}
+
 export default function Header() {
   const location = useLocation();
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showBgSettings, setShowBgSettings] = useState(false);
-  const [bgImage, setBgImage] = useState(() => 
-    localStorage.getItem('bgImage') || 'https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/secondPage.png'
-  );
+  const [bgImage, setBgImage] = useState(() => getStoredBg(theme));
   const [bgBlur, setBgBlur] = useState(() => 
     Number(localStorage.getItem('bgBlur')) || 20
   );
+  const navItems = getNavItems(
+    theme === 'light' ? pictureLightIcon : pictureDarkIcon,
+    theme === 'light' ? userLightIcon : userDarkIcon
+  );
+
+  const prevThemeRef = useRef(theme);
+  const bgImageRef = useRef(bgImage);
+  bgImageRef.current = bgImage;
+
+  useEffect(() => {
+    if (prevThemeRef.current === theme) return;
+    const prevBg = bgImageRef.current;
+    localStorage.setItem(prevThemeRef.current === 'light' ? 'bgImage-light' : 'bgImage-dark', prevBg);
+    setBgImage(getStoredBg(theme));
+    prevThemeRef.current = theme;
+  }, [theme]);
 
   const navRef = useRef<HTMLElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -113,11 +142,20 @@ export default function Header() {
             ))}
             
             <button 
+              className="settings-btn theme-toggle-btn"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? '切换到白天模式' : '切换到夜间模式'}
+              aria-label={theme === 'dark' ? '切换到白天模式' : '切换到夜间模式'}
+            >
+              <span className="nav-icon">{theme === 'dark' ? '☀' : '☾'}</span>
+            </button>
+
+            <button 
               className="settings-btn"
               onClick={() => setShowBgSettings(true)}
               title="背景设置"
             >
-              <span className="nav-icon"><img src={settingIcon} alt="设置" className="nav-icon-img" /></span>
+              <span className="nav-icon"><img src={theme === 'light' ? settingLightIcon : settingDarkIcon} alt="设置" className="nav-icon-img" /></span>
             </button>
             
             {user ? null : null}
@@ -130,7 +168,10 @@ export default function Header() {
         onClose={() => setShowBgSettings(false)}
         currentBg={bgImage}
         blur={bgBlur}
-        onBgChange={setBgImage}
+        onBgChange={(url) => {
+          setBgImage(url);
+          localStorage.setItem(theme === 'light' ? 'bgImage-light' : 'bgImage-dark', url);
+        }}
         onBlurChange={setBgBlur}
       />
     </>
