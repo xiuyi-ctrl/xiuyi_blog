@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api';
 import Toast from '../components/Toast';
+import { copyText } from '../utils/clipboard';
 import { onStatsChanged } from '../lib/statsEvents';
 
 interface Stats {
@@ -71,8 +72,8 @@ export default function About() {
   }, []);
 
   const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setToast(`${label}已复制到剪贴板`);
+    copyText(text).then(ok => {
+      setToast(ok ? `${label}已复制到剪贴板` : `${label}复制失败，请手动复制`);
     });
   };
 

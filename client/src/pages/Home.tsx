@@ -7,6 +7,7 @@ import ArticleShowcase from '../components/ArticleShowcase';
 import PhotoShowcase from '../components/PhotoShowcase';
 import SearchSuggestions, { SearchSuggestionsHandle } from '../components/SearchSuggestions';
 import Toast from '../components/Toast';
+import { copyText } from '../utils/clipboard';
 
 interface Stats {
   posts: number;
@@ -41,6 +42,12 @@ export default function Home() {
     if (searchQuery.trim()) {
       window.location.href = `/posts?keyword=${encodeURIComponent(searchQuery)}`;
     }
+  };
+
+  const handleCopy = (text: string, label: string) => {
+    copyText(text).then(ok => {
+      setToast(ok ? `${label}已复制到剪贴板` : `${label}复制失败，请手动复制`);
+    });
   };
 
   return (
@@ -105,9 +112,7 @@ export default function Home() {
                 title="Email"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText('2998526825@qq.com').then(() => {
-                    setToast('邮箱已复制到剪贴板');
-                  });
+                  handleCopy('2998526825@qq.com', '邮箱');
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -119,9 +124,7 @@ export default function Home() {
                 title="QQ"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText('2998526825').then(() => {
-                    setToast('QQ已复制到剪贴板');
-                  });
+                  handleCopy('2998526825', 'QQ');
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -133,9 +136,7 @@ export default function Home() {
                 title="WeChat"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText('fly29985').then(() => {
-                    setToast('微信已复制到剪贴板');
-                  });
+                  handleCopy('fly29985', '微信');
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
