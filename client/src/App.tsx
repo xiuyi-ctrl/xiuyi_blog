@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Header from './components/Header';
+import FloatingActions from './components/FloatingActions';
 import PageTransition from './components/PageTransition';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
@@ -31,6 +32,7 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Header />
+          <FloatingActions />
           <PageTransition>
             <Routes>
               <Route path="/" element={<Home />} />

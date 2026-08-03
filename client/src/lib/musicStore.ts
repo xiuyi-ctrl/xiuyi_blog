@@ -115,7 +115,7 @@ export function subscribe(listener: Listener): () => void {
 
 export async function loadPlaylist() {
   try {
-      const { data } = await api.get('/music/playlist/18149408390');
+      const { data } = await api.get('/music/playlist/18146875685');
       if (data.success && data.songs.length > 0) {
         state.songs = data.songs;
         const saved = loadSavedState();
