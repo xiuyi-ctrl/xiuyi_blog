@@ -217,7 +217,7 @@ export default function Snake() {
             {gameState === 'idle' && <h3>贪吃蛇</h3>}
             {gameState === 'over' && <p>得分：{score}，最高：{best}</p>}
             {gameState === 'idle' && <p>方向键或 WASD 控制移动</p>}
-            <button className="snake-overlay-btn" onClick={startGame}>
+            <button className="snake-overlay-btn" onClick={gameState === 'paused' ? resumeGame : startGame}>
               {gameState === 'over' ? '再来一局' : gameState === 'paused' ? '继续游戏' : '开始游戏'}
             </button>
           </div>

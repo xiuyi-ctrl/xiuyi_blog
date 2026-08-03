@@ -6957,6 +6957,18 @@ body {
   border-color: rgba(16, 185, 129, 0.45);
 }
 
+.memory-match-complete {
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .memory-match-game-over {
   text-align: center;
   padding: 20px 0;

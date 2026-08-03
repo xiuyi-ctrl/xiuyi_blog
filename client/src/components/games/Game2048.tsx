@@ -225,19 +225,19 @@ export default function Game2048() {
     <div className="game-2048-container">
       <div className="game-2048-stats">
         <div className="game-2048-score">
-          <div className="game-2048-score-label">Score</div>
+          <div className="game-2048-score-label">得分</div>
           <div className="game-2048-score-value">{score}</div>
         </div>
         <div className="game-2048-high-score">
-          <div className="game-2048-high-score-label">High Score</div>
+          <div className="game-2048-high-score-label">最高分</div>
           <div className="game-2048-high-score-value">{highScore}</div>
         </div>
         <button
           className="game-2048-reset-btn"
           onClick={resetGame}
-          aria-label="New Game"
+          aria-label="新游戏"
         >
-          New Game
+          新游戏
         </button>
       </div>
 
@@ -266,21 +266,21 @@ export default function Game2048() {
       {gameOver && (
         <div className="game-2048-overlay">
           <div className="game-2048-game-over">
-            <h2>Game Over!</h2>
-            <p>Final Score: {score}</p>
-            <p>{score >= highScore ? 'New High Score!' : ''}</p>
+            <h2>游戏结束！</h2>
+            <p>最终得分：{score}</p>
+            <p>{score >= highScore ? '刷新纪录！' : ''}</p>
             <button
               className="game-2048-play-again-btn"
               onClick={resetGame}
             >
-              Play Again
+              再来一局
             </button>
           </div>
         </div>
       )}
 
       <div className="game-2048-instructions">
-        <p>Use Arrow Keys or WASD to move tiles. Tiles with same number merge when they touch.</p>
+        <p>使用方向键或 WASD 移动方块，相同数字的方块碰撞时会合并。</p>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 type Card = {
   id: number;
@@ -29,6 +29,7 @@ export default function MemoryMatch() {
     const saved = localStorage.getItem('memoryMatch_highScore');
     return saved ? parseInt(saved) : 0;
   });
+  const flippedRef = useRef<number[]>([]);
 
   const resetGame = useCallback((diff: Difficulty) => {
     const { rows, cols } = GRID_SIZES[diff];
@@ -41,6 +42,7 @@ export default function MemoryMatch() {
       cardList.push({ id: i * 2 + 1, value: pairs[i], isFlipped: false, isMatched: false });
     }
     cardList.sort(() => 0.5 - Math.random());
+    flippedRef.current = [];
     setCards(cardList);
     setFlippedCards([]);
     setMoves(0);
@@ -64,47 +66,56 @@ export default function MemoryMatch() {
   }, [difficulty, resetGame]);
 
   const handleCardClick = (cardId: number) => {
-    if (flippedCards.length === 2 || cards.find(c => c.id === cardId)?.isMatched) {
+    const card = cards.find(c => c.id === cardId);
+    if (!card || card.isMatched || card.isFlipped) {
       return;
     }
-    setCards(prevCards => prevCards.map(card =>
-      card.id === cardId ? { ...card, isFlipped: true } : card
+    if (flippedRef.current.length >= 2 || flippedRef.current.includes(cardId)) {
+      return;
+    }
+    flippedRef.current = [...flippedRef.current, cardId];
+    setCards(prevCards => prevCards.map(c =>
+      c.id === cardId ? { ...c, isFlipped: true } : c
     ));
     setFlippedCards(prev => [...prev, cardId]);
   };
 
   useEffect(() => {
-    if (flippedCards.length === 2) {
-      setTimeout(() => {
-        const firstCard = cards.find(c => c.id === flippedCards[0]);
-        const secondCard = cards.find(c => c.id === flippedCards[1]);
-        if (firstCard && secondCard && firstCard.value === secondCard.value) {
-          setCards(prevCards => prevCards.map(card =>
-            (card.id === firstCard.id || card.id === secondCard.id)
-              ? { ...card, isMatched: true }
-              : card
-          ));
-          setMatchedPairs(prev => prev + 1);
-        } else {
-          setCards(prevCards => prevCards.map(card =>
-            (card.id === firstCard?.id || card.id === secondCard?.id)
-              ? { ...card, isFlipped: false }
-              : card
-          ));
-        }
-        setFlippedCards([]);
-        setMoves(prev => prev + 1);
-      }, 1000);
+    if (flippedCards.length !== 2) {
+      return;
     }
+    const timer = setTimeout(() => {
+      const firstCard = cards.find(c => c.id === flippedCards[0]);
+      const secondCard = cards.find(c => c.id === flippedCards[1]);
+      if (firstCard && secondCard && firstCard.value === secondCard.value) {
+        setCards(prevCards => prevCards.map(card =>
+          (card.id === firstCard.id || card.id === secondCard.id)
+            ? { ...card, isMatched: true }
+            : card
+        ));
+        setMatchedPairs(prev => prev + 1);
+      } else {
+        setCards(prevCards => prevCards.map(card =>
+          (card.id === firstCard?.id || card.id === secondCard?.id)
+            ? { ...card, isFlipped: false }
+            : card
+        ));
+      }
+      flippedRef.current = [];
+      setFlippedCards([]);
+      setMoves(prev => prev + 1);
+    }, 1000);
+    return () => clearTimeout(timer);
   }, [flippedCards, cards]);
 
   useEffect(() => {
-    if (matchedPairs === cards.length / 2) {
-      setGameOver(true);
-      if (moves < highScore || highScore === 0) {
-        setHighScore(moves);
-        localStorage.setItem('memoryMatch_highScore', String(moves));
-      }
+    if (cards.length === 0 || matchedPairs !== cards.length / 2) {
+      return;
+    }
+    setGameOver(true);
+    if (moves < highScore || highScore === 0) {
+      setHighScore(moves);
+      localStorage.setItem('memoryMatch_highScore', String(moves));
     }
   }, [matchedPairs, cards, moves, highScore]);
 
@@ -114,57 +125,61 @@ export default function MemoryMatch() {
     <div className="memory-match-container">
       {!gameStarted && (
         <div className="memory-match-start-screen">
-          <h2>Memory Match</h2>
+          <h2>记忆翻牌</h2>
           <div className="memory-match-difficulty-selector">
             <button
               className={`memory-match-difficulty-btn ${difficulty === 'easy' ? 'active' : ''}`}
               onClick={() => changeDifficulty('easy')}
             >
-              Easy ({GRID_SIZES.easy.rows}x{GRID_SIZES.easy.cols})
+              简单（3x4）
             </button>
             <button
               className={`memory-match-difficulty-btn ${difficulty === 'medium' ? 'active' : ''}`}
               onClick={() => changeDifficulty('medium')}
             >
-              Medium ({GRID_SIZES.medium.rows}x{GRID_SIZES.medium.cols})
+              中等（4x4）
             </button>
             <button
               className={`memory-match-difficulty-btn ${difficulty === 'hard' ? 'active' : ''}`}
               onClick={() => changeDifficulty('hard')}
             >
-              Hard ({GRID_SIZES.hard.rows}x{GRID_SIZES.hard.cols})
+              困难（4x5）
             </button>
           </div>
           <button
             className="memory-match-start-btn"
             onClick={startGame}
           >
-            Start Game
+            开始游戏
           </button>
           <div className="memory-match-high-score">
-            Best Moves: {highScore}
+            最少步数：{highScore}
           </div>
         </div>
       )}
 
-      {gameStarted && !gameOver && (
+      {gameStarted && (
         <>
           <div className="memory-match-stats">
             <div className="memory-match-stat">
-              <span className="memory-match-stat-label">Moves</span>
+              <span className="memory-match-stat-label">步数</span>
               <span className="memory-match-stat-value">{moves}</span>
             </div>
             <div className="memory-match-stat">
-              <span className="memory-match-stat-label">Pairs</span>
+              <span className="memory-match-stat-label">配对</span>
               <span className="memory-match-stat-value">{matchedPairs}/{cards.length / 2}</span>
             </div>
             <button
               className="memory-match-reset-btn"
               onClick={() => resetGame(difficulty)}
             >
-              Reset
+              {gameOver ? '再来一局' : '重置'}
             </button>
           </div>
+
+          {gameOver && (
+            <div className="memory-match-complete">全部配对成功！</div>
+          )}
 
           <div
             className="memory-match-grid"
@@ -185,24 +200,6 @@ export default function MemoryMatch() {
           </div>
         </>
       )}
-
-      {gameOver && (
-        <div className="memory-match-game-over">
-          <h2>Game Over!</h2>
-          <p>Moves: {moves}</p>
-          <p>Best: {highScore} moves</p>
-          <button
-            className="memory-match-play-again-btn"
-            onClick={() => resetGame(difficulty)}
-          >
-            Play Again
-          </button>
-        </div>
-      )}
-
-      <div className="memory-match-instructions">
-        <p>Match all pairs by flipping over two cards at a time. Try to minimize your moves!</p>
-      </div>
     </div>
   );
 }
