@@ -7,13 +7,47 @@ import Snake from './games/Snake';
 import Fortune from './games/Fortune';
 import * as music from '../lib/musicStore';
 
-const GAMES: { id: string; name: string }[] = [
-  { id: '2048', name: '2048' },
-  { id: 'memory', name: '记忆翻牌' },
-  { id: 'piano', name: '迷你钢琴' },
-  { id: 'snake', name: '贪吃蛇' },
-  { id: 'fortune', name: '今日运势' },
+const GAMES: { id: string; name: string; theme: string }[] = [
+  { id: '2048', name: '2048', theme: 'g-2048' },
+  { id: 'memory', name: '记忆翻牌', theme: 'g-memory' },
+  { id: 'piano', name: '迷你钢琴', theme: 'g-piano' },
+  { id: 'snake', name: '贪吃蛇', theme: 'g-snake' },
+  { id: 'fortune', name: '今日运势', theme: 'g-fortune' },
 ];
+
+const GAME_ICONS: Record<string, React.ReactNode> = {
+  '2048': <span className="float-game-icon-text">2048</span>,
+  memory: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3.5" y="5" width="12" height="16" rx="2.5" transform="rotate(-12 9.5 13)" />
+      <rect x="8.5" y="3.5" width="12" height="16" rx="2.5" />
+      <path d="M14.5 8.5 L17 12 L14.5 15.5 L12 12 Z" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  piano: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="6.5" width="18" height="11" rx="2" />
+      <line x1="8" y1="6.5" x2="8" y2="17.5" />
+      <line x1="13" y1="6.5" x2="13" y2="17.5" />
+      <path d="M5.5 6.5 h2.5 v4 h-2.5 z" fill="currentColor" stroke="none" />
+      <path d="M10.5 6.5 h2.5 v4 h-2.5 z" fill="currentColor" stroke="none" />
+      <path d="M15.5 6.5 h2.5 v4 h-2.5 z" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  snake: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8.5 17.5 V13 H15 V9 H11" />
+      <circle cx="8.5" cy="17.5" r="1.8" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  fortune: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="10" r="7" />
+      <path d="M7.5 15 H16.5 a4.5 4.5 0 0 1 -9 0 Z" />
+      <path d="M12 6.5 L12.9 9.1 L15.5 10 L12.9 10.9 L12 13.5 L11.1 10.9 L8.5 10 L11.1 9.1 Z" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+};
 
 export default function FloatingActions() {
   const [showBackTop, setShowBackTop] = useState(false);
@@ -228,6 +262,7 @@ export default function FloatingActions() {
                   className="float-game-item"
                   onClick={() => openGame(game.id)}
                 >
+                  <span className={`float-game-icon ${game.theme}`}>{GAME_ICONS[game.id]}</span>
                   <span className="float-game-name">{game.name}</span>
                 </button>
               ))}

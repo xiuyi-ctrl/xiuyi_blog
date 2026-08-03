@@ -6145,7 +6145,7 @@ body {
   border-color: var(--color-accent);
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
 }
 
 .float-btn:active {
@@ -6283,10 +6283,8 @@ body {
   padding: 16px;
   border-radius: 16px;
   background: var(--color-secondary);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--color-border);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12),
               0 0 0 1px rgba(139, 92, 246, 0.12);
   animation: floatPanelIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -6497,7 +6495,7 @@ body {
 
 .float-games-btn.active {
   transform: rotate(45deg) scale(1.05);
-  box-shadow: 0 10px 28px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 5px 14px rgba(16, 185, 129, 0.3);
 }
 
 .float-games-panel {
@@ -6508,10 +6506,8 @@ body {
   padding: 14px;
   border-radius: 16px;
   background: var(--color-secondary);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--color-border);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2),
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12),
               0 0 0 1px rgba(139, 92, 246, 0.12);
   animation: floatPanelIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -6533,9 +6529,10 @@ body {
 
 .float-game-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 9px 4px;
+  gap: 6px;
+  padding: 10px 4px;
   border-radius: 10px;
   background: var(--color-header);
   border: 1px solid var(--color-border);
@@ -6546,11 +6543,65 @@ body {
   transition: all 0.2s;
 }
 
+.float-game-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s;
+}
+
+.float-game-icon svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.float-game-icon-text {
+  font-family: var(--font-code);
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.float-game-name {
+  white-space: nowrap;
+}
+
+.float-game-icon.g-2048 {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+}
+
+.float-game-icon.g-memory {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+}
+
+.float-game-icon.g-piano {
+  background: linear-gradient(135deg, #ec4899, #f43f5e);
+}
+
+.float-game-icon.g-snake {
+  background: linear-gradient(135deg, #10b981, #22c55e);
+}
+
+.float-game-icon.g-fortune {
+  background: linear-gradient(135deg, #f97316, #dc2626);
+}
+
 .float-game-item:hover {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: #fff;
   transform: translateY(-1px);
+}
+
+.float-game-item:hover .float-game-icon {
+  transform: scale(1.1);
 }
 
 /* ========== GAME MODAL ========== */
