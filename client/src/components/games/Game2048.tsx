@@ -33,8 +33,9 @@ function addRandomTile(grid: Tile[][]): boolean {
   return true;
 }
 
-function slideAndMerge(line: Tile[]): Tile[] {
+function slideAndMerge(line: Tile[]): { result: Tile[]; score: number } {
   const result: Tile[] = [];
+  let score = 0;
   let skipNext = false;
   for (let i = 0; i < line.length; i++) {
     if (skipNext) {
@@ -49,7 +50,9 @@ function slideAndMerge(line: Tile[]): Tile[] {
       const next = line[i + 1];
       if (!next) continue;
       if (current.value === next.value) {
-        result.push({ value: current.value * 2, id: Date.now() + Math.random() });
+        const merged = current.value * 2;
+        result.push({ value: merged, id: Date.now() + Math.random() });
+        score += merged;
         skipNext = true;
         continue;
       }
@@ -59,7 +62,7 @@ function slideAndMerge(line: Tile[]): Tile[] {
   while (result.length < GRID_SIZE) {
     result.push(null as unknown as Tile);
   }
-  return result;
+  return { result, score };
 }
 
 function transposeGrid(grid: Tile[][]): Tile[][] {
@@ -75,40 +78,37 @@ function transposeGrid(grid: Tile[][]): Tile[][] {
 function moveTiles(grid: Tile[][], direction: Direction): { newGrid: Tile[][]; moved: boolean; score: number } {
   let moved = false;
   let score = 0;
-  const originalGrid = JSON.parse(JSON.stringify(grid)) as Tile[][];
-  
+
   if (direction === 'left') {
     for (let row = 0; row < GRID_SIZE; row++) {
       const originalRow = grid[row].slice();
       const rowTiles = grid[row].filter((tile): tile is Tile => tile !== null);
-      const newRow = slideAndMerge(rowTiles);
+      const { result: newRow, score: mergedScore } = slideAndMerge(rowTiles);
       if (JSON.stringify(originalRow) !== JSON.stringify(newRow)) {
         moved = true;
+        score += mergedScore;
         for (let col = 0; col < GRID_SIZE; col++) {
           grid[row][col] = newRow[col];
-          if (newRow[col] && originalGrid[row][col] && newRow[col].value !== originalGrid[row][col].value) {
-            score += newRow[col].value;
-          }
         }
       }
     }
+    if (moved) addRandomTile(grid);
   } else if (direction === 'right') {
     for (let row = 0; row < GRID_SIZE; row++) {
       const originalRow = grid[row].slice();
       const reversedRow = originalRow.slice().reverse();
       const rowTiles = reversedRow.filter((tile): tile is Tile => tile !== null);
-      const newRow = slideAndMerge(rowTiles);
+      const { result: newRow, score: mergedScore } = slideAndMerge(rowTiles);
       const newReversed = newRow.reverse();
       if (JSON.stringify(originalRow) !== JSON.stringify(newReversed)) {
         moved = true;
+        score += mergedScore;
         for (let col = 0; col < GRID_SIZE; col++) {
           grid[row][col] = newReversed[col];
-          if (newReversed[col] && originalGrid[row][col] && newReversed[col].value !== originalGrid[row][col].value) {
-            score += newReversed[col].value;
-          }
         }
       }
     }
+    if (moved) addRandomTile(grid);
   } else if (direction === 'up') {
     const transposed = transposeGrid(grid);
     const movedTransposed = moveTiles(transposed, 'left');
@@ -124,11 +124,7 @@ function moveTiles(grid: Tile[][], direction: Direction): { newGrid: Tile[][]; m
     Object.assign(grid, newGrid);
     score = movedTransposed.score;
   }
-  
-  if (moved) {
-    addRandomTile(grid);
-  }
-  
+
   return { newGrid: grid, moved, score };
 }
 
@@ -190,10 +186,10 @@ export default function Game2048() {
       }
       let direction: Direction | null = null;
       switch (e.key) {
-        case 'ArrowUp': direction = 'up'; break;
-        case 'ArrowDown': direction = 'down'; break;
-        case 'ArrowLeft': direction = 'left'; break;
-        case 'ArrowRight': direction = 'right'; break;
+        case 'ArrowUp': case 'w': case 'W': direction = 'up'; break;
+        case 'ArrowDown': case 's': case 'S': direction = 'down'; break;
+        case 'ArrowLeft': case 'a': case 'A': direction = 'left'; break;
+        case 'ArrowRight': case 'd': case 'D': direction = 'right'; break;
       }
       if (direction) {
         e.preventDefault();
