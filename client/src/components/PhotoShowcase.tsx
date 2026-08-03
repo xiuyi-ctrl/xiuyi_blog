@@ -68,16 +68,6 @@ export default function PhotoShowcase() {
           ))}
         </div>
       </div>
-      <div className="photo-showcase-dots">
-        {albums.map((album, i) => (
-          <button
-            key={album.id}
-            className={`photo-showcase-dot${i === activeIndex ? ' active' : ''}`}
-            onClick={() => setActiveIndex(i)}
-            aria-label={`切换到 ${album.title}`}
-          />
-        ))}
-      </div>
     </div>
   );
 }
