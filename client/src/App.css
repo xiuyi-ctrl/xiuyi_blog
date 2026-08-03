@@ -2121,6 +2121,34 @@ body {
   color: #818cf8;
 }
 
+.photo-showcase-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.photo-showcase-dot {
+  width: 8px;
+  height: 8px;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  background: var(--color-border);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.photo-showcase-dot:hover {
+  background: var(--color-text-secondary);
+}
+
+.photo-showcase-dot.active {
+  width: 24px;
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+
 @media (max-width: 1200px) {
   .photo-showcase-wrapper {
     width: 100%;

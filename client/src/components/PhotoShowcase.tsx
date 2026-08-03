@@ -9,9 +9,12 @@ interface Album {
   cover: string;
 }
 
+const AUTO_PLAY_INTERVAL = 4000;
+
 export default function PhotoShowcase() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,6 +29,14 @@ export default function PhotoShowcase() {
     fetchAlbums();
   }, []);
 
+  useEffect(() => {
+    if (isHovered || albums.length === 0) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % albums.length);
+    }, AUTO_PLAY_INTERVAL);
+    return () => clearInterval(timer);
+  }, [isHovered, albums.length]);
+
   if (albums.length === 0) return null;
 
   return (
@@ -34,7 +45,11 @@ export default function PhotoShowcase() {
         <span className="photo-showcase-label">PHOTO COLLECTION</span>
       </div>
       <div className="photo-showcase">
-        <div className="photo-showcase-panels">
+        <div
+          className="photo-showcase-panels"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           {albums.map((album, i) => (
             <div
               key={album.id}
@@ -52,6 +67,16 @@ export default function PhotoShowcase() {
             </div>
           ))}
         </div>
+      </div>
+      <div className="photo-showcase-dots">
+        {albums.map((album, i) => (
+          <button
+            key={album.id}
+            className={`photo-showcase-dot${i === activeIndex ? ' active' : ''}`}
+            onClick={() => setActiveIndex(i)}
+            aria-label={`切换到 ${album.title}`}
+          />
+        ))}
       </div>
     </div>
   );
