@@ -9,6 +9,7 @@ import Match3 from './games/Match3';
 import Blackjack from './games/Blackjack';
 import WatermelonMerge from './games/WatermelonMerge';
 import * as music from '../lib/musicStore';
+import { petStore } from '../lib/petStore';
 
 const GAMES: { id: string; name: string; theme: string }[] = [
   { id: '2048', name: '2048', theme: 'g-2048' },
@@ -81,6 +82,7 @@ export default function FloatingActions() {
   const [showPanel, setShowPanel] = useState(false);
   const [showGamesPanel, setShowGamesPanel] = useState(false);
   const [activeGame, setActiveGame] = useState<string | null>(null);
+  const [petHidden, setPetHidden] = useState(petStore.isHidden());
   const [isPlaying, setIsPlaying] = useState(music.getState().isPlaying);
   const [volume, setVolume] = useState(music.getState().volume);
   const [progress, setProgress] = useState(0);
@@ -125,6 +127,12 @@ export default function FloatingActions() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showPanel, showGamesPanel]);
 
+  useEffect(() => {
+    const sync = () => setPetHidden(petStore.isHidden());
+    sync();
+    return petStore.subscribe(sync);
+  }, []);
+
   const handleBackTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -148,6 +156,11 @@ export default function FloatingActions() {
 
   const openGame = (gameId: string) => {
     setActiveGame(gameId);
+    setShowGamesPanel(false);
+  };
+
+  const showPet = () => {
+    petStore.wake();
     setShowGamesPanel(false);
   };
 
@@ -299,6 +312,25 @@ export default function FloatingActions() {
                   <span className="float-game-name">{game.name}</span>
                 </button>
               ))}
+              {petHidden && (
+                <button
+                  className="float-game-item"
+                  onClick={showPet}
+                  title="显示宠物"
+                >
+                  <span className="float-game-icon g-pet">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="8" cy="11" r="2" fill="currentColor" stroke="none" />
+                      <circle cx="16" cy="11" r="2" fill="currentColor" stroke="none" />
+                      <circle cx="12" cy="13.5" r="2.6" fill="currentColor" stroke="none" />
+                      <path d="M4.5 8.5 Q3 4.5 6 3.8 Q7.5 6 6.5 8.5" fill="currentColor" stroke="none" />
+                      <path d="M19.5 8.5 Q21 4.5 18 3.8 Q16.5 6 17.5 8.5" fill="currentColor" stroke="none" />
+                      <path d="M4 13 Q1.5 18 5.5 20.5 Q12 23.5 18.5 20.5 Q22.5 18 20 13" fill="currentColor" stroke="none" opacity="0.85" />
+                    </svg>
+                  </span>
+                  <span className="float-game-name">显示宠物</span>
+                </button>
+              )}
             </div>
           </div>
         )}

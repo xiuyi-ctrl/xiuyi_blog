@@ -6633,6 +6633,10 @@ body {
   background: linear-gradient(135deg, #10b981, #22c55e);
 }
 
+.float-game-icon.g-pet {
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+}
+
 .float-game-icon.g-fortune {
   background: linear-gradient(135deg, #f97316, #dc2626);
 }

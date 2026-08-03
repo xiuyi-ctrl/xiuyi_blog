@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Header from './components/Header';
 import FloatingActions from './components/FloatingActions';
+import VirtualPet from './components/VirtualPet';
 import PageTransition from './components/PageTransition';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
@@ -33,6 +34,7 @@ function App() {
         <AuthProvider>
           <Header />
           <FloatingActions />
+          <VirtualPet />
           <PageTransition>
             <Routes>
               <Route path="/" element={<Home />} />

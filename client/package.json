@@ -14,6 +14,7 @@
     "aplayer": "^1.10.1",
     "axios": "^1.18.1",
     "gsap": "^3.15.0",
+    "l2d-widget": "^0.1.1",
     "motion": "^12.42.2",
     "ogl": "^1.0.11",
     "react": "^18.3.1",
@@ -31,6 +32,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
+    "l2d": "^2.1.1",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.7.0",
     "vite": "^5.4.8"
