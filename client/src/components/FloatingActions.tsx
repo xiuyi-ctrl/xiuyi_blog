@@ -5,6 +5,9 @@ import MemoryMatch from './games/MemoryMatch';
 import MiniPiano from './games/MiniPiano';
 import Snake from './games/Snake';
 import Fortune from './games/Fortune';
+import Match3 from './games/Match3';
+import Blackjack from './games/Blackjack';
+import WatermelonMerge from './games/WatermelonMerge';
 import * as music from '../lib/musicStore';
 
 const GAMES: { id: string; name: string; theme: string }[] = [
@@ -13,6 +16,9 @@ const GAMES: { id: string; name: string; theme: string }[] = [
   { id: 'piano', name: '迷你钢琴', theme: 'g-piano' },
   { id: 'snake', name: '贪吃蛇', theme: 'g-snake' },
   { id: 'fortune', name: '今日运势', theme: 'g-fortune' },
+  { id: 'match3', name: '消消乐', theme: 'g-match3' },
+  { id: 'blackjack', name: '21点', theme: 'g-blackjack' },
+  { id: 'watermelon', name: '合成大西瓜', theme: 'g-watermelon' },
 ];
 
 const GAME_ICONS: Record<string, React.ReactNode> = {
@@ -45,6 +51,27 @@ const GAME_ICONS: Record<string, React.ReactNode> = {
       <circle cx="12" cy="10" r="7" />
       <path d="M7.5 15 H16.5 a4.5 4.5 0 0 1 -9 0 Z" />
       <path d="M12 6.5 L12.9 9.1 L15.5 10 L12.9 10.9 L12 13.5 L11.1 10.9 L8.5 10 L11.1 9.1 Z" fill="currentColor" stroke="none" />
+    </svg>
+  ),
+  match3: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="4" width="7" height="7" rx="2" />
+      <rect x="13" y="4" width="7" height="7" rx="2" />
+      <rect x="4" y="13" width="7" height="7" rx="2" />
+      <rect x="13" y="13" width="7" height="7" rx="2" />
+    </svg>
+  ),
+  blackjack: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3.5" y="5" width="17" height="14" rx="2.5" />
+      <path d="M12 8.2 L15 12.2 A3.8 3.8 0 1 1 9 12.2 Z" />
+      <path d="M12 14.4 V17" />
+    </svg>
+  ),
+  watermelon: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 4 a8 8 0 0 1 8 8 h-16 a8 8 0 0 1 8 -8 Z" />
+      <path d="M7.5 9.5 L9 11 M12 7.5 L12 9.5 M16.5 9.5 L15 11" strokeWidth="1.4" />
     </svg>
   ),
 };
@@ -142,6 +169,12 @@ export default function FloatingActions() {
         return <Snake />;
       case 'fortune':
         return <Fortune />;
+      case 'match3':
+        return <Match3 />;
+      case 'blackjack':
+        return <Blackjack />;
+      case 'watermelon':
+        return <WatermelonMerge />;
       default:
         return null;
     }

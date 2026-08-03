@@ -6502,13 +6502,14 @@ body {
   position: absolute;
   bottom: calc(100% + 14px);
   right: 0;
-  width: 200px;
+  width: 220px;
   padding: 14px;
   border-radius: 16px;
   background: var(--color-secondary);
   border: 1px solid var(--color-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12),
               0 0 0 1px rgba(139, 92, 246, 0.12);
+  overflow: hidden;
   animation: floatPanelIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -6571,6 +6572,9 @@ body {
 
 .float-game-name {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .float-game-icon.g-2048 {
@@ -6591,6 +6595,18 @@ body {
 
 .float-game-icon.g-fortune {
   background: linear-gradient(135deg, #f97316, #dc2626);
+}
+
+.float-game-icon.g-match3 {
+  background: linear-gradient(135deg, #f59e0b, #ec4899);
+}
+
+.float-game-icon.g-blackjack {
+  background: linear-gradient(135deg, #334155, #dc2626);
+}
+
+.float-game-icon.g-watermelon {
+  background: linear-gradient(135deg, #22c55e, #ef4444);
 }
 
 .float-game-item:hover {
@@ -7118,7 +7134,7 @@ body {
 
 .mini-piano-keyboard {
   position: relative;
-  height: 170px;
+  height: min(170px, calc(100vh - 350px));
   border-radius: 14px;
   padding: 10px 8px 12px;
   background: var(--color-overlay-strong);
@@ -7547,6 +7563,565 @@ body {
   cursor: not-allowed;
 }
 
+/* ========== MATCH 3 ========== */
+
+.match3-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.match3-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.match3-stat {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--color-header);
+  border: 1px solid var(--color-border);
+}
+
+.match3-stat-label {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.match3-stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-code);
+}
+
+.match3-reset-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #f59e0b, #ec4899);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.match3-reset-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.4);
+}
+
+.match3-board-wrap {
+  position: relative;
+  width: min(100%, 360px, calc(100vh - 290px));
+}
+
+.match3-board {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--color-overlay-strong);
+  border: 1px solid var(--color-border);
+  container-type: inline-size;
+}
+
+.match3-row {
+  display: flex;
+  gap: 4px;
+}
+
+.match3-cell {
+  flex: 1;
+  aspect-ratio: 1;
+  min-width: 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.match3-cell:hover {
+  transform: scale(1.06);
+}
+
+.match3-cell.selected {
+  box-shadow: 0 0 0 2px var(--color-accent);
+  transform: scale(1.08);
+}
+
+.match3-cell.empty {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.match3-cell.clearing {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.match3-gem {
+  display: inline-block;
+  font-size: calc(8cqw - 3px);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.match3-cell.clearing .match3-gem {
+  animation: match3ClearGem 0.28s ease-out forwards;
+}
+
+@keyframes match3ClearGem {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.35) rotate(8deg);
+  }
+  100% {
+    transform: scale(0) rotate(-12deg);
+    opacity: 0;
+  }
+}
+
+.match3-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 12, 20, 0.65);
+  backdrop-filter: blur(4px);
+  border-radius: 14px;
+}
+
+.match3-overlay-card {
+  text-align: center;
+  color: #fff;
+}
+
+.match3-overlay-card h3 {
+  font-size: 1.4rem;
+  margin: 0 0 8px;
+}
+
+.match3-overlay-card p {
+  margin: 4px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.match3-overlay-btn {
+  margin-top: 12px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f59e0b, #ec4899);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.match3-overlay-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.4);
+}
+
+.match3-combo {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  z-index: 2;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.92), rgba(236, 72, 153, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  animation: match3ComboIn 0.25s ease;
+}
+
+@keyframes match3ComboIn {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ========== BLACKJACK ========== */
+
+.blackjack-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.blackjack-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.blackjack-stat {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--color-header);
+  border: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.blackjack-stat-label {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.blackjack-stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-code);
+}
+
+.blackjack-round-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #334155, #dc2626);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.blackjack-round-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+}
+
+.blackjack-round-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.blackjack-area {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--color-overlay-strong);
+  border: 1px solid var(--color-border);
+  min-height: 96px;
+}
+
+.blackjack-area-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.blackjack-result {
+  text-align: center;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.35);
+  animation: blackjackResultIn 0.3s ease;
+}
+
+.blackjack-result.win {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.35);
+}
+
+.blackjack-result.blackjack {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);
+}
+
+.blackjack-result.lose {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
+}
+
+.blackjack-result.push {
+  background: linear-gradient(135deg, #64748b, #475569);
+  box-shadow: 0 6px 18px rgba(100, 116, 139, 0.35);
+}
+
+@keyframes blackjackResultIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.blackjack-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 62px;
+}
+
+.blackjack-card {
+  width: 44px;
+  height: 62px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #1e293b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.blackjack-card.red {
+  color: #dc2626;
+}
+
+.blackjack-card.face-down {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.blackjack-card-back {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.blackjack-card-rank {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.blackjack-card-suit {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.blackjack-total {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-code);
+}
+
+.blackjack-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.blackjack-action-btn {
+  flex: 1;
+  max-width: 160px;
+  padding: 10px 0;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.blackjack-action-btn.stand {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.blackjack-action-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
+}
+
+.blackjack-action-btn.stand:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.4);
+}
+
+.blackjack-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.blackjack-instructions {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.blackjack-instructions p {
+  margin: 0;
+}
+
+/* ========== WATERMELON MERGE ========== */
+
+.suika-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.suika-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.suika-stat {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--color-header);
+  border: 1px solid var(--color-border);
+}
+
+.suika-stat-label {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+}
+
+.suika-stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-code);
+}
+
+.suika-reset-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e, #ef4444);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.suika-reset-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+}
+
+.suika-board-wrap {
+  position: relative;
+  width: min(100%, 400px, calc((100vh - 300px) * 0.6774));
+}
+
+.suika-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 420 / 620;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 20%, #1c2740, #0d1526);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.suika-next {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(10, 14, 24, 0.72);
+  border: 1px solid var(--color-border);
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+}
+
+.suika-next-emoji {
+  font-size: 1.1rem;
+  vertical-align: middle;
+}
+
+.suika-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 12, 20, 0.65);
+  backdrop-filter: blur(4px);
+  border-radius: 14px;
+}
+
+.suika-overlay-card {
+  text-align: center;
+  color: #fff;
+}
+
+.suika-overlay-card h3 {
+  font-size: 1.4rem;
+  margin: 0 0 8px;
+}
+
+.suika-overlay-card p {
+  margin: 4px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.suika-overlay-btn {
+  margin-top: 12px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #22c55e, #ef4444);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.suika-overlay-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+}
+
+.suika-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+}
+
+.suika-legend-item {
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
 @media (max-width: 480px) {
   .game-modal {
     max-width: none;
@@ -7557,7 +8132,13 @@ body {
   }
 
   .float-games-panel {
-    width: 180px;
+    width: 200px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .float-games-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .snake-board {
