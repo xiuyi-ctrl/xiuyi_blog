@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { flushSync } from 'react-dom';
 
 export type Theme = 'light' | 'dark';
 
@@ -26,17 +25,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const toggleTheme = () => {
+    const root = document.documentElement;
     const apply = () => {
-      flushSync(() => setTheme(prev => (prev === 'light' ? 'dark' : 'light')));
+      setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
     };
     if ('startViewTransition' in document) {
       document.startViewTransition(apply);
       return;
     }
-    const root = document.documentElement;
-    root.classList.add('theme-transition');
+    root.classList.add('theme-transition', 'no-blur-transition');
     apply();
-    window.setTimeout(() => root.classList.remove('theme-transition'), 400);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        root.classList.remove('theme-transition', 'no-blur-transition');
+      });
+    });
   };
 
   return (
