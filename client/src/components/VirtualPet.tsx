@@ -9,9 +9,9 @@ import {
 import { petStore } from '../lib/petStore';
 
 const STORE_HIDDEN_KEY = 'pet_hidden';
-const MODEL_BLACK = '/live2d/hijiki/model.json';
-const MODEL_WHITE = '/live2d/tororo/model.json';
+const MODEL_BYC = '/live2d/byc/model.json';
 const MODEL_THIRD = '/live2d/ninifashengri/model.json';
+const MODEL_KIRO = '/live2d/kiro/model.json';
 
 const clamp = (value: number, lo: number, hi: number) =>
   Math.min(Math.max(value, lo), hi);
@@ -49,9 +49,9 @@ export default function VirtualPet() {
       transitionType: 'fade',
       transitionDuration: 800,
       model: [
-        { path: MODEL_BLACK, tips },
-        { path: MODEL_WHITE, tips },
+        { path: MODEL_BYC, tips },
         { path: MODEL_THIRD, tips },
+        { path: MODEL_KIRO, tips },
       ],
       menus: {
         items: [
@@ -68,12 +68,12 @@ export default function VirtualPet() {
             label: '摸头',
             onClick: (w) => {
               const motions = w.l2d.getMotions();
-              const touch = Object.keys(motions).filter((g) =>
-                g.toLowerCase().includes('touch'),
+              const interact = Object.keys(motions).filter((g) =>
+                /touch|tap|flick|shake|pat|pet|head|face|breast|belly|leg/.test(g.toLowerCase()),
               );
               const groups =
-                touch.length > 0
-                  ? touch
+                interact.length > 0
+                  ? interact
                   : Object.keys(motions).filter((g) => g !== 'idle');
               const pool = groups.length > 0 ? groups : Object.keys(motions);
               if (pool.length > 0) {
