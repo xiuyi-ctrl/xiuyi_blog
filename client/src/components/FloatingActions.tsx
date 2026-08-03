@@ -1,9 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
+import GameModal from './games/GameModal';
+import Game2048 from './games/Game2048';
+import MemoryMatch from './games/MemoryMatch';
+import MiniPiano from './games/MiniPiano';
+import Snake from './games/Snake';
+import Fortune from './games/Fortune';
 import * as music from '../lib/musicStore';
+
+const GAMES: { id: string; name: string }[] = [
+  { id: '2048', name: '2048' },
+  { id: 'memory', name: '记忆翻牌' },
+  { id: 'piano', name: '迷你钢琴' },
+  { id: 'snake', name: '贪吃蛇' },
+  { id: 'fortune', name: '今日运势' },
+];
 
 export default function FloatingActions() {
   const [showBackTop, setShowBackTop] = useState(false);
   const [showPanel, setShowPanel] = useState(false);
+  const [showGamesPanel, setShowGamesPanel] = useState(false);
+  const [activeGame, setActiveGame] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(music.getState().isPlaying);
   const [volume, setVolume] = useState(music.getState().volume);
   const [progress, setProgress] = useState(0);
@@ -37,15 +53,16 @@ export default function FloatingActions() {
   }, []);
 
   useEffect(() => {
-    if (!showPanel) return;
+    if (!showPanel && !showGamesPanel) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowPanel(false);
+        setShowGamesPanel(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showPanel]);
+  }, [showPanel, showGamesPanel]);
 
   const handleBackTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -61,6 +78,39 @@ export default function FloatingActions() {
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     music.seek(percent * duration);
+  };
+
+  const toggleGamesPanel = () => {
+    setShowGamesPanel(v => !v);
+    setShowPanel(false);
+  };
+
+  const openGame = (gameId: string) => {
+    setActiveGame(gameId);
+    setShowGamesPanel(false);
+  };
+
+  const closeGame = () => {
+    setActiveGame(null);
+  };
+
+  const activeGameName = GAMES.find(g => g.id === activeGame)?.name ?? '';
+
+  const renderGame = () => {
+    switch (activeGame) {
+      case '2048':
+        return <Game2048 />;
+      case 'memory':
+        return <MemoryMatch />;
+      case 'piano':
+        return <MiniPiano />;
+      case 'snake':
+        return <Snake />;
+      case 'fortune':
+        return <Fortune />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -167,6 +217,36 @@ export default function FloatingActions() {
         </button>
       </div>
 
+      <div className="float-games-wrap">
+        {showGamesPanel && (
+          <div className="float-games-panel">
+            <div className="float-games-title">小游戏</div>
+            <div className="float-games-grid">
+              {GAMES.map((game) => (
+                <button
+                  key={game.id}
+                  className="float-game-item"
+                  onClick={() => openGame(game.id)}
+                >
+                  <span className="float-game-name">{game.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button
+          className={`float-btn float-games-btn${showGamesPanel ? ' active' : ''}`}
+          onClick={toggleGamesPanel}
+          title="小游戏"
+          aria-label="小游戏"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7.5 13.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm4.5 4.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm4.5-4.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4.5-4.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM21 2H3C1.35 2 0 3.35 0 5v14c0 1.65 1.35 3 3 3h18c1.65 0 3-1.35 3-3V5c0-1.65-1.35-3-3-3zm0 17H3V5h18v14z"/>
+          </svg>
+        </button>
+      </div>
+
       <button
         className={`float-btn float-backtop${showBackTop ? ' show' : ''}`}
         onClick={handleBackTop}
@@ -177,6 +257,14 @@ export default function FloatingActions() {
           <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
         </svg>
       </button>
+
+      <GameModal
+        isOpen={activeGame !== null}
+        onClose={closeGame}
+        title={activeGameName}
+      >
+        {renderGame()}
+      </GameModal>
     </div>
   );
 }
