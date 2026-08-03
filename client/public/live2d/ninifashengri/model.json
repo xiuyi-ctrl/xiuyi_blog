@@ -1,0 +1,31 @@
+{
+  "type": "Live2D Model Setting",
+  "name": "ninifashengri",
+  "model": "Lead_00.moc",
+  "textures": [
+    "textures/texture_00.png",
+    "textures/texture_01.png"
+  ],
+  "motions": {
+    "idle": [
+      {
+        "file": "motions/idle.mtn"
+      }
+    ],
+    "stay": [
+      {
+        "file": "motions/stay_01.mtn"
+      }
+    ],
+    "touch_01_1": [
+      {
+        "file": "motions/touch_01_1.mtn"
+      }
+    ],
+    "touch_99": [
+      {
+        "file": "motions/touch_99.mtn"
+      }
+    ]
+  }
+}

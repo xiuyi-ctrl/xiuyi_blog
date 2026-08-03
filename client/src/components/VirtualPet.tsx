@@ -11,6 +11,7 @@ import { petStore } from '../lib/petStore';
 const STORE_HIDDEN_KEY = 'pet_hidden';
 const MODEL_BLACK = '/live2d/hijiki/model.json';
 const MODEL_WHITE = '/live2d/tororo/model.json';
+const MODEL_THIRD = '/live2d/ninifashengri/model.json';
 
 const clamp = (value: number, lo: number, hi: number) =>
   Math.min(Math.max(value, lo), hi);
@@ -50,6 +51,7 @@ export default function VirtualPet() {
       model: [
         { path: MODEL_BLACK, tips },
         { path: MODEL_WHITE, tips },
+        { path: MODEL_THIRD, tips },
       ],
       menus: {
         items: [
@@ -57,7 +59,7 @@ export default function VirtualPet() {
             icon: 'mdi:shuffle-variant',
             label: '切换模型',
             onClick: (w) => {
-              switchIndex = (switchIndex + 1) % 2;
+              switchIndex = (switchIndex + 1) % 3;
               w.switchModel(switchIndex);
             },
           },
@@ -66,7 +68,13 @@ export default function VirtualPet() {
             label: '摸头',
             onClick: (w) => {
               const motions = w.l2d.getMotions();
-              const groups = Object.keys(motions).filter((g) => g !== 'idle');
+              const touch = Object.keys(motions).filter((g) =>
+                g.toLowerCase().includes('touch'),
+              );
+              const groups =
+                touch.length > 0
+                  ? touch
+                  : Object.keys(motions).filter((g) => g !== 'idle');
               const pool = groups.length > 0 ? groups : Object.keys(motions);
               if (pool.length > 0) {
                 w.l2d.playMotion(pool[Math.floor(Math.random() * pool.length)]);
