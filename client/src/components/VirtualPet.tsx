@@ -15,6 +15,10 @@ const MODEL_KIRO = '/live2d/kiro/model.json';
 const MODEL_L1 = '/live2d/l_234400412/model.json';
 const MODEL_L2 = '/live2d/l_234500311/model.json';
 const MODEL_COUNT = 5;
+const MODEL_NAMES = ['BYC', 'ninifashengri', 'Kiro', 'l_234400412', 'l_234500311'];
+const MODEL_BASE_SCALE = [1, 1.2, 1, 1, 1];
+const SCALE_MIN = 0.5;
+const SCALE_MAX = 2;
 
 const clamp = (value: number, lo: number, hi: number) =>
   Math.min(Math.max(value, lo), hi);
@@ -35,6 +39,7 @@ export default function VirtualPet() {
     const rightOffset = isMobile ? 70 : 96;
     const size = isMobile ? 260 : 300;
     let switchIndex = 0;
+    let scaleFactor = 1;
 
     const tips = {
       welcomeMessage: [
@@ -51,6 +56,22 @@ export default function VirtualPet() {
         minValue: 0.4,
         maxValue: 1,
       },
+    };
+
+    const applyScale = (w: Widget) => {
+      w.l2d.setScale(
+        clamp(MODEL_BASE_SCALE[switchIndex] * scaleFactor, SCALE_MIN, SCALE_MAX),
+      );
+    };
+
+    const switchTo = async (w: Widget, index: number) => {
+      switchIndex = index;
+      await w.switchModel(index);
+      applyScale(w);
+      const motions = w.l2d.getMotions();
+      if (motions['login']) {
+        w.l2d.playMotion('login');
+      }
     };
 
     const widget = createWidget({
@@ -71,13 +92,31 @@ export default function VirtualPet() {
           {
             icon: 'mdi:shuffle-variant',
             label: '切换模型',
-            onClick: async (w) => {
-              switchIndex = (switchIndex + 1) % MODEL_COUNT;
-              await w.switchModel(switchIndex);
-              const motions = w.l2d.getMotions();
-              if (motions['login']) {
-                w.l2d.playMotion('login');
-              }
+            onClick: (w) => {
+              switchTo(w, (switchIndex + 1) % MODEL_COUNT);
+            },
+          },
+          {
+            icon: 'mdi:view-grid',
+            label: '选择模型',
+            onClick: (w) => {
+              showModelPicker(w);
+            },
+          },
+          {
+            icon: 'mdi:magnify-plus',
+            label: '放大',
+            onClick: (w) => {
+              scaleFactor = clamp(scaleFactor + 0.1, SCALE_MIN, SCALE_MAX);
+              applyScale(w);
+            },
+          },
+          {
+            icon: 'mdi:magnify-minus',
+            label: '缩小',
+            onClick: (w) => {
+              scaleFactor = clamp(scaleFactor - 0.1, SCALE_MIN, SCALE_MAX);
+              applyScale(w);
             },
           },
           {
@@ -136,6 +175,74 @@ export default function VirtualPet() {
         statusBar.style.right = `${right}px`;
         statusBar.style.bottom = `${bottom + size / 2}px`;
       }
+    };
+
+    let pickerEl: HTMLElement | null = null;
+    let pickerDocHandler: ((e: PointerEvent) => void) | null = null;
+    const hideModelPicker = () => {
+      pickerEl?.remove();
+      pickerEl = null;
+      if (pickerDocHandler) {
+        window.removeEventListener('pointerdown', pickerDocHandler, true);
+        pickerDocHandler = null;
+      }
+    };
+    const showModelPicker = (w: Widget) => {
+      if (pickerEl) {
+        hideModelPicker();
+        return;
+      }
+      const el = document.createElement('div');
+      Object.assign(el.style, {
+        position: 'fixed',
+        right: `${rightOffset + size + 16}px`,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        background: 'rgba(99,102,241,0.95)',
+        borderRadius: '10px',
+        padding: '6px',
+        zIndex: '81',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+      });
+      MODEL_NAMES.forEach((name, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = name;
+        Object.assign(btn.style, {
+          border: 'none',
+          borderRadius: '6px',
+          padding: '6px 12px',
+          cursor: 'pointer',
+          background:
+            i === switchIndex ? 'rgba(255,255,255,0.25)' : 'transparent',
+          color: 'rgba(255,255,255,0.9)',
+          fontSize: '13px',
+          textAlign: 'left',
+          whiteSpace: 'nowrap',
+        });
+        btn.addEventListener('mouseenter', () => {
+          btn.style.background = 'rgba(255,255,255,0.2)';
+        });
+        btn.addEventListener('mouseleave', () => {
+          btn.style.background =
+            i === switchIndex ? 'rgba(255,255,255,0.25)' : 'transparent';
+        });
+        btn.addEventListener('click', () => {
+          hideModelPicker();
+          switchTo(w, i);
+        });
+        el.appendChild(btn);
+      });
+      pickerEl = el;
+      document.body.appendChild(el);
+      const onDocPointerDown = (e: PointerEvent) => {
+        if (el.contains(e.target as Node)) return;
+        hideModelPicker();
+      };
+      pickerDocHandler = onDocPointerDown;
+      window.addEventListener('pointerdown', onDocPointerDown, true);
     };
 
     petStore.setController({
@@ -243,6 +350,7 @@ export default function VirtualPet() {
 
     return () => {
       window.removeEventListener('live2d:tapbody', onTapBody);
+      hideModelPicker();
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerEnd);
