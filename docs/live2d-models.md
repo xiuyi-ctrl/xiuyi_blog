@@ -11,6 +11,10 @@
 - 身体会随鼠标在页面移动而轻微转动（视口追踪）
 - 加载前显示加载动画，入场/退场为 fade 过渡（800ms）
 
+### 统一气泡 + 5s 显示保护
+- **关闭库内置气泡**（各模型 `tips: false`），全部文案由 `VirtualPet.tsx` 自建**单个复用气泡**显示：欢迎语、循环提示、隐藏/唤醒/重置位置等即时提示共用同一个气泡元素
+- **5s 显示保护**：气泡显示后 5s 内忽略任何新的气泡请求，避免内容未显示完整就被新气泡覆盖（打字动画被截断）
+
 ### 点击行为（鼠标点击模型本体）
 - 点击命中模型上的 **hit area** 区域时，触发对应区域的 `tap_*` / `flick_head` / `shake` 动作（由库分发 `live2d:tapbody` 事件，按命中区域名称播放）
 - hit area 区域：head（头部）、face（脸）、breast（胸）、belly（腹）、leg（腿）
@@ -22,7 +26,7 @@
 菜单项 `摸头` 点击逻辑（`VirtualPet.tsx`）：
 1. 获取模型所有动作组
 2. 优先筛选交互类动作组，正则匹配：`touch|tap|flick|shake|pat|pet|head|face|breast|belly|leg`
-3. 若命中则从这些交互组中随机播放一个；否则退化为非 idle 组随机播放
+3. 若命中则从这些交互组中随机播放一个；否则退化为非 idle 组随机播放（不含 `login`）
 4. 若仍无匹配则从全部动作组随机播放
 
 ### 拖拽行为
@@ -46,9 +50,12 @@
 - 点击面板外区域或再次点击"选择模型"可关闭面板
 
 ### 隐藏/唤醒
-- 菜单"隐藏"：模型入睡，显示休息状态条，写入 `localStorage[pet_hidden]=1`
-- 小游戏面板"显示宠物"按钮：唤醒模型，写入 `localStorage[pet_hidden]=0`
+- 菜单"隐藏"：先气泡显示"那我先睡啦，点旁边的休息条就能叫醒我～"，约 0.9s 后模型入睡，显示休息状态条，写入 `localStorage[pet_hidden]=1`，同时**停止提示循环**（睡眠期间不再弹气泡）
+- 小游戏面板"显示宠物"按钮：唤醒模型，写入 `localStorage[pet_hidden]=0`，气泡显示"想我了吗？我回来啦～"并**重启提示循环**
 - 刷新页面后若 `pet_hidden=1` 则保持隐藏状态
+
+### 重置位置（菜单"重置位置"按钮）
+- 菜单项"重置位置"：将模型拖拽后复位于初始右下角（`right: 96/70px, bottom: 0`），气泡显示"已经把我放回原来的位置啦～"
 
 ---
 
@@ -225,7 +232,7 @@
 
 ## 相关代码文件
 
-- `client/src/components/VirtualPet.tsx`：widget 创建、菜单、摸头/切换/隐藏逻辑、拖拽
+- `client/src/components/VirtualPet.tsx`：widget 创建、菜单、摸头/切换/隐藏逻辑、拖拽、统一气泡（欢迎语/循环/即时提示 + 5s 显示保护）
 - `client/src/lib/petMessages.ts`：欢迎语、idle/click/pat 提示文案
 - `client/src/lib/petStore.ts`：隐藏状态与唤醒控制器
 - `client/src/components/FloatingActions.tsx`：小游戏面板"显示宠物"唤醒入口

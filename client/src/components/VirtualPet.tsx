@@ -5,6 +5,9 @@ import {
   PET_IDLE_TIPS,
   PET_CLICK_TIPS,
   PET_PAT_TIPS,
+  PET_HIDE_TIPS,
+  PET_SUMMON_TIPS,
+  PET_RESET_TIPS,
 } from '../lib/petMessages';
 import { petStore } from '../lib/petStore';
 
@@ -54,11 +57,15 @@ export default function VirtualPet() {
       welcomeMessage: [
         timeBasedGreeting(),
         '欢迎来到秀一的博客～',
-        '我是猫猫，请多指教喵～',
       ],
       messages: [...PET_IDLE_TIPS, ...PET_CLICK_TIPS, ...PET_PAT_TIPS],
       duration: 4000,
       interval: 8000,
+      style: {
+        whiteSpace: 'normal',
+        maxWidth: '280px',
+        wordBreak: 'break-word',
+      },
       typing: {
         param: 'PARAM_MOUTH_OPEN_Y',
         speed: 160,
@@ -75,6 +82,113 @@ export default function VirtualPet() {
       rootEl.style.height = `${px}px`;
       w.l2d.resize();
       w.l2d.setScale(MODEL_BASE_SCALE[switchIndex]);
+    };
+
+    const TIP_PROTECT_MS = 5000;
+    let tipEl: HTMLElement | null = null;
+    let tipSpan: HTMLSpanElement | null = null;
+    let tipHideTimer: number | null = null;
+    let tipTypeTimer: number | null = null;
+    let lastTipAt = 0;
+    let tipMsgIndex = 0;
+    let tipLoopTimer: number | null = null;
+
+    const ensureTipEl = (w: Widget) => {
+      if (tipEl && tipEl.isConnected) return tipEl;
+      const rootEl = w.l2d.getCanvas().parentElement;
+      if (!rootEl) return null;
+      const el = document.createElement('div');
+      Object.assign(el.style, {
+        position: 'absolute',
+        bottom: 'calc(100% + 14px)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: '#6366f1',
+        borderRadius: '8px',
+        padding: '8px 14px',
+        color: 'rgba(255,255,255,0.95)',
+        fontSize: '13px',
+        lineHeight: '1.5',
+        maxWidth: '280px',
+        textAlign: 'center',
+        wordBreak: 'break-word',
+        whiteSpace: 'normal',
+        pointerEvents: 'none',
+        zIndex: '3',
+        opacity: '0',
+      });
+      const span = document.createElement('span');
+      el.appendChild(span);
+      rootEl.appendChild(el);
+      tipEl = el;
+      tipSpan = span;
+      return el;
+    };
+
+    const hideTip = (w: Widget) => {
+      if (!tipEl) return;
+      const el = tipEl;
+      tipEl = null;
+      tipSpan = null;
+      el.style.transition = 'opacity 0.3s ease';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 350);
+      if (tipTypeTimer) {
+        window.clearTimeout(tipTypeTimer);
+        tipTypeTimer = null;
+      }
+      w.l2d.setParams?.({ [tips.typing.param]: 0 });
+    };
+
+    const showTip = (w: Widget, text: string) => {
+      const now = Date.now();
+      if (now - lastTipAt < TIP_PROTECT_MS) return;
+      lastTipAt = now;
+      const el = ensureTipEl(w);
+      if (!el || !tipSpan) return;
+      if (tipHideTimer) window.clearTimeout(tipHideTimer);
+      if (tipTypeTimer) window.clearTimeout(tipTypeTimer);
+      tipSpan.textContent = '';
+      el.style.transition = 'none';
+      el.style.animation = 'none';
+      void el.offsetHeight;
+      el.style.animation = 'l2dw-tips-in 0.35s ease-out forwards';
+      el.style.opacity = '1';
+      const chars = [...text];
+      let i = 0;
+      const typeStep = () => {
+        if (i >= chars.length) {
+          tipTypeTimer = null;
+          w.l2d.setParams?.({ [tips.typing.param]: 0 });
+          return;
+        }
+        tipSpan!.textContent = chars.slice(0, i + 1).join('');
+        w.l2d.setParams?.({
+          [tips.typing.param]:
+            tips.typing.minValue +
+            Math.random() * (tips.typing.maxValue - tips.typing.minValue),
+        });
+        if (tipTypeTimer) window.clearTimeout(tipTypeTimer);
+        tipTypeTimer = window.setTimeout(typeStep, tips.typing.speed);
+        i++;
+      };
+      tipTypeTimer = window.setTimeout(typeStep, tips.typing.speed);
+      tipHideTimer = window.setTimeout(() => hideTip(w), tips.duration);
+    };
+
+    const startTipLoop = (w: Widget) => {
+      if (tipLoopTimer) window.clearInterval(tipLoopTimer);
+      tipLoopTimer = window.setInterval(() => {
+        showTip(w, tips.messages[tipMsgIndex % tips.messages.length]);
+        tipMsgIndex++;
+      }, tips.interval);
+    };
+
+    const stopTipLoop = () => {
+      if (tipLoopTimer) {
+        window.clearInterval(tipLoopTimer);
+        tipLoopTimer = null;
+      }
     };
 
     const switchTo = async (w: Widget, index: number) => {
@@ -94,12 +208,12 @@ export default function VirtualPet() {
       transitionType: 'fade',
       transitionDuration: 800,
       model: [
-        { path: MODEL_BYC, offset: [0, 0.6], tips },
-        { path: MODEL_THIRD, scale: 1.2, tips },
-        { path: MODEL_KIRO, tips },
-        { path: MODEL_L1, tips },
-        { path: MODEL_L2, tips },
-        { path: MODEL_L4, tips },
+        { path: MODEL_BYC, offset: [0, 0.6], tips: false },
+        { path: MODEL_THIRD, scale: 1.2, tips: false },
+        { path: MODEL_KIRO, tips: false },
+        { path: MODEL_L1, tips: false },
+        { path: MODEL_L2, tips: false },
+        { path: MODEL_L4, tips: false },
       ],
       menus: {
         items: [
@@ -135,7 +249,9 @@ export default function VirtualPet() {
               const groups =
                 interact.length > 0
                   ? interact
-                  : Object.keys(motions).filter((g) => g !== 'idle');
+                  : Object.keys(motions).filter(
+                      (g) => g !== 'idle' && g !== 'login',
+                    );
               const pool = groups.length > 0 ? groups : Object.keys(motions);
               if (pool.length > 0) {
                 w.l2d.playMotion(pool[Math.floor(Math.random() * pool.length)]);
@@ -146,13 +262,25 @@ export default function VirtualPet() {
             icon: 'mdi:bed',
             label: '隐藏',
             onClick: (w) => {
-              w.sleep();
-              try {
-                localStorage.setItem(STORE_HIDDEN_KEY, '1');
-              } catch {
-                /* ignore */
-              }
-              petStore.setHidden(true);
+              showTip(w, PET_HIDE_TIPS[0]);
+              setTimeout(() => {
+                w.sleep();
+                stopTipLoop();
+                try {
+                  localStorage.setItem(STORE_HIDDEN_KEY, '1');
+                } catch {
+                  /* ignore */
+                }
+                petStore.setHidden(true);
+              }, 900);
+            },
+          },
+          {
+            icon: 'mdi:backup-restore',
+            label: '重置位置',
+            onClick: (w) => {
+              applyPos(rightOffset, 0);
+              showTip(w, PET_RESET_TIPS[0]);
             },
           },
         ],
@@ -339,6 +467,10 @@ export default function VirtualPet() {
           /* ignore */
         }
         petStore.setHidden(false);
+        setTimeout(() => {
+          showTip(widget, PET_SUMMON_TIPS[0]);
+          startTipLoop(widget);
+        }, 900);
       },
     });
 
@@ -434,12 +566,26 @@ export default function VirtualPet() {
     if (hiddenAtMount) {
       widget.l2d.on('loaded', () => widget.sleep());
       petStore.setHidden(true);
+    } else {
+      widget.l2d.on('loaded', () => {
+        showTip(
+          widget,
+          tips.welcomeMessage[
+            Math.floor(Math.random() * tips.welcomeMessage.length)
+          ],
+        );
+        startTipLoop(widget);
+      });
     }
 
     return () => {
       window.removeEventListener('live2d:tapbody', onTapBody);
       hideModelPicker();
       hideScaleSlider();
+      stopTipLoop();
+      hideTip(widget);
+      if (tipHideTimer) window.clearTimeout(tipHideTimer);
+      if (tipTypeTimer) window.clearTimeout(tipTypeTimer);
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerEnd);

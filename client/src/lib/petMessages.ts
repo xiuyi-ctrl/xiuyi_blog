@@ -30,7 +30,6 @@ export const PET_CLICK_TIPS = [
 ];
 
 export const PET_PAT_TIPS = [
-  '喵～好舒服，再多摸摸～',
   '被摸头了，有点害羞呢…',
   '嗯嗯，乖～',
 ];
@@ -40,9 +39,6 @@ export const PET_HIDE_TIPS = ['那我先睡啦，点旁边的休息条就能叫�
 export const PET_SUMMON_TIPS = ['想我了吗？我回来啦～'];
 
 export const PET_RESET_TIPS = ['已经把我放回原来的位置啦～'];
-
-export const PET_ABOUT_TIPS =
-  '我是 l2d-widget 官方猫猫模型，欢迎来秀一的博客玩～';
 
 export function randomOf(arr: string[]): string {
   return arr[Math.floor(Math.random() * arr.length)];
