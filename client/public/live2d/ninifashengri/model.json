@@ -17,6 +17,36 @@
         "file": "motions/stay_01.mtn"
       }
     ],
+    "flick_head": [
+      {
+        "file": "motions/touch_01_1.mtn"
+      }
+    ],
+    "tap_face": [
+      {
+        "file": "motions/touch_01_1.mtn"
+      }
+    ],
+    "tap_breast": [
+      {
+        "file": "motions/touch_99.mtn"
+      }
+    ],
+    "tap_belly": [
+      {
+        "file": "motions/touch_99.mtn"
+      }
+    ],
+    "tap_leg": [
+      {
+        "file": "motions/touch_99.mtn"
+      }
+    ],
+    "shake": [
+      {
+        "file": "motions/touch_01_1.mtn"
+      }
+    ],
     "touch_01_1": [
       {
         "file": "motions/touch_01_1.mtn"
@@ -27,5 +57,12 @@
         "file": "motions/touch_99.mtn"
       }
     ]
-  }
+  },
+  "hit_areas": [
+    { "name": "head", "id": "B_FACE_07" },
+    { "name": "face", "id": "B_FACE_083" },
+    { "name": "breast", "id": "B_BODY_123" },
+    { "name": "belly", "id": "B_BODY_153" },
+    { "name": "leg", "id": "B_BODY_243" }
+  ]
 }

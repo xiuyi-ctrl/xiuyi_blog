@@ -16,6 +16,14 @@ const MODEL_KIRO = '/live2d/kiro/model.json';
 const clamp = (value: number, lo: number, hi: number) =>
   Math.min(Math.max(value, lo), hi);
 
+const areaToMotion: Record<string, string> = {
+  head: 'flick_head',
+  face: 'tap_face',
+  breast: 'tap_breast',
+  belly: 'tap_belly',
+  leg: 'tap_leg',
+};
+
 export default function VirtualPet() {
   const widgetRef = useRef<Widget | null>(null);
 
@@ -49,8 +57,8 @@ export default function VirtualPet() {
       transitionType: 'fade',
       transitionDuration: 800,
       model: [
-        { path: MODEL_BYC, tips },
-        { path: MODEL_THIRD, tips },
+        { path: MODEL_BYC, offset: [0, 0.6], tips },
+        { path: MODEL_THIRD, scale: 1.2, tips },
         { path: MODEL_KIRO, tips },
       ],
       menus: {
@@ -189,6 +197,24 @@ export default function VirtualPet() {
     canvas.addEventListener('pointerup', onPointerEnd);
     canvas.addEventListener('pointercancel', onPointerEnd);
 
+    const playTapMotion = (areaName: string) => {
+      const motions = widget.l2d.getMotions();
+      let group = areaToMotion[areaName] ?? 'shake';
+      if (switchIndex === 0 && areaName === 'face') {
+        group = 'shake';
+      }
+      if (motions[group]) {
+        widget.l2d.playMotion(group);
+      }
+    };
+
+    const onTapBody = (e: Event) => {
+      const detail = (e as CustomEvent<{ canvas: HTMLCanvasElement; areaName: string }>).detail;
+      if (!detail || detail.canvas !== canvas) return;
+      playTapMotion(detail.areaName);
+    };
+    window.addEventListener('live2d:tapbody', onTapBody);
+
     let hiddenAtMount = false;
     try {
       hiddenAtMount = localStorage.getItem(STORE_HIDDEN_KEY) === '1';
@@ -201,6 +227,7 @@ export default function VirtualPet() {
     }
 
     return () => {
+      window.removeEventListener('live2d:tapbody', onTapBody);
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerEnd);

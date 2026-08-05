@@ -6,51 +6,50 @@
 	],
 	"motions":{
 		"shake":[
-			{"file":"motions/confused.mtn","sound":"sound/D_Sak_Live2D001.wav","text":155079,"sound_delay":-1}
+			{"file":"motions/confused.mtn"}
 		],
 		"flick_head":[
-			{"file":"motions/happy.mtn","sound":"sound/D_Sak_Live2D002.wav","text":155080,"sound_delay":-1}
+			{"file":"motions/happy.mtn"}
 		],
 		"tap_face":[
-			{"file":"motions/happy.mtn","sound":"sound/D_Sak_Live2D002.wav","text":155080,"sound_delay":-1}
+			{"file":"motions/happy.mtn"}
 		],
 		"tap_breast":[
-			{"file":"motions/happy.mtn","sound":"sound/D_Sak_Live2D002.wav","text":155080,"sound_delay":-1}
+			{"file":"motions/happy.mtn"}
 		],
 		"tap_belly":[
-			{"file":"motions/happy.mtn","sound":"sound/D_Sak_Live2D002.wav","text":155080,"sound_delay":-1}
+			{"file":"motions/happy.mtn"}
 		],
 		"tap_leg":[
-			{"file":"motions/happy.mtn","sound":"sound/D_Sak_Live2D002.wav","text":155080,"sound_delay":-1}
+			{"file":"motions/happy.mtn"}
 		],
 		"mail":[
-			{"file":"motions/soft.mtn","sound":"sound/D_Sak_Live2D003.wav","text":155081,"sound_delay":-1}
+			{"file":"motions/soft.mtn"}
 		],
 		"morning":[
-			{"file":"motions/smart.mtn","sound":"sound/D_Sak_Live2D004.wav","text":155082,"sound_delay":-1},
-			{"file":"motions/soft.mtn","sound":"sound/D_Sak_Live2D011.wav","text":155089,"sound_delay":-1}
+			{"file":"motions/smart.mtn"},
+			{"file":"motions/soft.mtn"}
 		],
 		"idle":[
 			{"file":"motions/idle.mtn"},
-			{"file":"motions/laugh.mtn","sound":"sound/D_Sak_Live2D005.wav","text":155083,"sound_delay":-1},
-			{"file":"motions/laugh.mtn","sound":"sound/D_Sak_Live2D007.wav","text":155085,"sound_delay":-1},
-			{"file":"motions/joke.mtn","sound":"sound/D_Sak_Live2D008.wav","text":155086,"sound_delay":-1}
+			{"file":"motions/laugh.mtn"},
+			{"file":"motions/laugh.mtn"},
+			{"file":"motions/joke.mtn"}
 		],
 		"activity":[
-			{"file":"motions/soft.mtn","sound":"sound/D_Sak_Live2D006.wav","text":155084,"sound_delay":-1}
-
+			{"file":"motions/soft.mtn"}
 		],
 		"born":[
-			{"file":"motions/soft.mtn","sound":"sound/D_Sak_Live2D009.wav","text":155087,"sound_delay":-1}
+			{"file":"motions/soft.mtn"}
 		],
 		"friend":[
-			{"file":"motions/soft.mtn","sound":"sound/D_Sak_Live2D010.wav","text":155088,"sound_delay":-1}
+			{"file":"motions/soft.mtn"}
 		],
 		"afternoon":[
-			{"file":"motions/soft.mtn","sound":"sound/D_Sak_Live2D012.wav","text":155090,"sound_delay":-1}
+			{"file":"motions/soft.mtn"}
 		],
 		"evening":[
-			{"file":"motions/soft.mtn","sound":"sound/D_Sak_Live2D013.wav","text":155091,"sound_delay":-1}
+			{"file":"motions/soft.mtn"}
 		]
 	},
 	"physics":"physics.json",

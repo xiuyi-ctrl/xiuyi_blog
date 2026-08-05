@@ -6,36 +6,36 @@
 	],
 	"motions":{
 		"flick_head":[
-			{"file":"motions/1.mtn","sound":"Ev_Cv_Partner_1279_002","text":155183,"sound_delay":0}
+			{"file":"motions/1.mtn","text":155183}
 		],
 		"tap_face":[
-			{"file":"motions/2.mtn","sound":"Ev_Cv_Partner_1279_003","text":155184,"sound_delay":0}
+			{"file":"motions/2.mtn","text":155184}
 		],
 		"tap_breast":[
-			{"file":"motions/2.mtn","sound":"Ev_Cv_Partner_1279_003","text":155184,"sound_delay":0}
+			{"file":"motions/2.mtn","text":155184}
 		],
 		"tap_leg":[
-			{"file":"motions/1.mtn","sound":"Ev_Cv_Partner_1279_002","text":155183,"sound_delay":0}
+			{"file":"motions/1.mtn","text":155183}
 		],
 		"tap_belly":[
-			{"file":"motions/1.mtn","sound":"Ev_Cv_Partner_1279_002","text":155183,"sound_delay":0}
+			{"file":"motions/1.mtn","text":155183}
 		],
 		"mail":[
 			{"file":"motions/idle.mtn"}
 		],
 		"idle":[
-			{"file":"motions/3.mtn","sound":"Ev_Cv_Partner_1279_008","text":155185,"sound_delay":0},
-			{"file":"motions/4.mtn","sound":"Ev_Cv_Partner_1279_009","text":155186,"sound_delay":0},
+			{"file":"motions/3.mtn","text":155185},
+			{"file":"motions/4.mtn","text":155186},
 			{"file":"motions/idle.mtn"}
 		],
 		"shake":[
-			{"file":"motions/5.mtn","sound":"Ev_Cv_Partner_1279_001","text":155187,"sound_delay":0}
+			{"file":"motions/5.mtn","text":155187}
 		],
 		"activity":[
 			{"file":"motions/idle.mtn"}
 		],
 		"born":[
-			{"file":"motions/3.mtn","sound":"Ev_Cv_Partner_1279_008","text":155185,"sound_delay":0}
+			{"file":"motions/3.mtn","text":155185}
 		],
 		"friend":[
 			{"file":"motions/idle.mtn"}
