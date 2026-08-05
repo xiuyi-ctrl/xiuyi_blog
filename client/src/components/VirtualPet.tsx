@@ -14,19 +14,17 @@ const MODEL_THIRD = '/live2d/ninifashengri/model.json';
 const MODEL_KIRO = '/live2d/kiro/model.json';
 const MODEL_L1 = '/live2d/l_234400412/model.json';
 const MODEL_L2 = '/live2d/l_234500311/model.json';
-const MODEL_L3 = '/live2d/l_154500211/model.json';
 const MODEL_L4 = '/live2d/l_234200211/model.json';
-const MODEL_COUNT = 7;
+const MODEL_COUNT = 6;
 const MODEL_NAMES = [
   'BYC',
   'ninifashengri',
   'Kiro',
   'l_234400412',
   'l_234500311',
-  'l_154500211',
   'l_234200211',
 ];
-const MODEL_BASE_SCALE = [1, 1.2, 1, 1, 1, 1, 1];
+const MODEL_BASE_SCALE = [1, 1.2, 1, 1, 1, 1];
 const SCALE_MIN = 0.5;
 const SCALE_MAX = 2;
 const SCALE_LEVELS = [0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -101,7 +99,6 @@ export default function VirtualPet() {
         { path: MODEL_KIRO, tips },
         { path: MODEL_L1, tips },
         { path: MODEL_L2, tips },
-        { path: MODEL_L3, tips },
         { path: MODEL_L4, tips },
       ],
       menus: {
