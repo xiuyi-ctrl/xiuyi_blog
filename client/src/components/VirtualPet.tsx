@@ -108,19 +108,10 @@ export default function VirtualPet() {
             },
           },
           {
-            icon: 'mdi:magnify-plus',
-            label: '放大',
+            icon: 'mdi:resize',
+            label: '缩放',
             onClick: (w) => {
-              scaleFactor = clamp(scaleFactor + 0.1, SCALE_MIN, SCALE_MAX);
-              applyCanvasSize(w);
-            },
-          },
-          {
-            icon: 'mdi:magnify-minus',
-            label: '缩小',
-            onClick: (w) => {
-              scaleFactor = clamp(scaleFactor - 0.1, SCALE_MIN, SCALE_MAX);
-              applyCanvasSize(w);
+              showScaleSlider(w);
             },
           },
           {
@@ -196,6 +187,7 @@ export default function VirtualPet() {
         hideModelPicker();
         return;
       }
+      hideScaleSlider();
       const el = document.createElement('div');
       Object.assign(el.style, {
         position: 'fixed',
@@ -246,6 +238,68 @@ export default function VirtualPet() {
         hideModelPicker();
       };
       pickerDocHandler = onDocPointerDown;
+      window.addEventListener('pointerdown', onDocPointerDown, true);
+    };
+
+    let sliderEl: HTMLElement | null = null;
+    let sliderDocHandler: ((e: PointerEvent) => void) | null = null;
+    const hideScaleSlider = () => {
+      sliderEl?.remove();
+      sliderEl = null;
+      if (sliderDocHandler) {
+        window.removeEventListener('pointerdown', sliderDocHandler, true);
+        sliderDocHandler = null;
+      }
+    };
+    const showScaleSlider = (w: Widget) => {
+      if (sliderEl) {
+        hideScaleSlider();
+        return;
+      }
+      hideModelPicker();
+      const el = document.createElement('div');
+      Object.assign(el.style, {
+        position: 'fixed',
+        right: `${rightOffset + (root?.offsetWidth ?? size) + 16}px`,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        background: 'rgba(99,102,241,0.95)',
+        borderRadius: '10px',
+        padding: '10px 12px',
+        zIndex: '81',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+      });
+      const label = document.createElement('span');
+      label.textContent = `缩放：${scaleFactor.toFixed(2)}x`;
+      Object.assign(label.style, {
+        color: 'rgba(255,255,255,0.9)',
+        fontSize: '12px',
+        whiteSpace: 'nowrap',
+      });
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.min = `${SCALE_MIN}`;
+      input.max = `${SCALE_MAX}`;
+      input.step = '0.05';
+      input.value = `${scaleFactor}`;
+      Object.assign(input.style, { width: '140px', cursor: 'pointer' });
+      input.addEventListener('input', () => {
+        scaleFactor = parseFloat(input.value);
+        label.textContent = `缩放：${scaleFactor.toFixed(2)}x`;
+        applyCanvasSize(w);
+      });
+      el.appendChild(label);
+      el.appendChild(input);
+      sliderEl = el;
+      document.body.appendChild(el);
+      const onDocPointerDown = (e: PointerEvent) => {
+        if (el.contains(e.target as Node)) return;
+        hideScaleSlider();
+      };
+      sliderDocHandler = onDocPointerDown;
       window.addEventListener('pointerdown', onDocPointerDown, true);
     };
 
@@ -361,6 +415,7 @@ export default function VirtualPet() {
     return () => {
       window.removeEventListener('live2d:tapbody', onTapBody);
       hideModelPicker();
+      hideScaleSlider();
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerEnd);
