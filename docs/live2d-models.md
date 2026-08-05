@@ -129,6 +129,22 @@
 
 ---
 
+## 新增模型总览（l_234400412 / l_234500311）
+
+两个模型来自同一素材包（`D:\BaiduNetdiskDownload\models`），结构与行为完全一致：
+
+| 项目 | 说明 |
+|---|---|
+| 类型 | Cubism 2（model.moc），本地托管 |
+| 纹理 | l_234400412：3 张（texture_00~02）；l_234500311：2 张（texture_00~01） |
+| 动作组 | `idle`（1 动作 idle.mtn）、`idle_click`（11 动作 002~012.mtn）、`login`（020.mtn，切换到该模型时触发） |
+| 点击 | 无 hit_areas（moc 为 ArtMesh/PARTS 无语义命名），任意位置点击触发 `idle_click` 随机动作 |
+| 音效/layout | 无音效、无 layout、无特效配置 |
+| 原 JSON 问题 | 含尾随逗号与无效字段（`trigger`/`cv_id`），已清理为合法 JSON |
+| 体积 | l_234400412：11.37MB；l_234500311：9.23MB |
+
+---
+
 ## 4. l_234400412 模型（l_234400412/model.json）
 
 - **文件**：`client/public/live2d/l_234400412/model.json`（model.moc）
@@ -140,7 +156,7 @@
 ### 默认行为
 - idle 动作组仅 1 个动作：`idle.mtn`
 - idle_click 动作组：11 个动作（002.mtn ~ 012.mtn）
-- login 动作组：`020.mtn`（登录触发，本实现不主动播放）
+- login 动作组：`020.mtn`（切换到该模型时触发）
 
 ### 点击行为
 任意位置点击随机播放 `idle_click` 组动作（`onPointerEnd` 兜底，见 VirtualPet.tsx），带文字提示但无音效。
@@ -161,7 +177,7 @@
 ### 默认行为
 - idle 动作组仅 1 个动作：`idle.mtn`
 - idle_click 动作组：11 个动作（002.mtn ~ 012.mtn）
-- login 动作组：`020.mtn`（登录触发，本实现不主动播放）
+- login 动作组：`020.mtn`（切换到该模型时触发）
 
 ### 点击行为
 任意位置点击随机播放 `idle_click` 组动作（`onPointerEnd` 兜底，见 VirtualPet.tsx），带文字提示但无音效。

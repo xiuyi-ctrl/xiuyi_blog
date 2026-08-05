@@ -71,9 +71,13 @@ export default function VirtualPet() {
           {
             icon: 'mdi:shuffle-variant',
             label: '切换模型',
-            onClick: (w) => {
+            onClick: async (w) => {
               switchIndex = (switchIndex + 1) % MODEL_COUNT;
-              w.switchModel(switchIndex);
+              await w.switchModel(switchIndex);
+              const motions = w.l2d.getMotions();
+              if (motions['login']) {
+                w.l2d.playMotion('login');
+              }
             },
           },
           {
