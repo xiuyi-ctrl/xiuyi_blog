@@ -58,16 +58,20 @@ export default function VirtualPet() {
       },
     };
 
-    const applyScale = (w: Widget) => {
-      w.l2d.setScale(
-        clamp(MODEL_BASE_SCALE[switchIndex] * scaleFactor, SCALE_MIN, SCALE_MAX),
-      );
+    const applyCanvasSize = (w: Widget) => {
+      const rootEl = w.l2d.getCanvas().parentElement;
+      if (!rootEl) return;
+      const px = Math.round(size * scaleFactor);
+      rootEl.style.width = `${px}px`;
+      rootEl.style.height = `${px}px`;
+      w.l2d.resize();
+      w.l2d.setScale(MODEL_BASE_SCALE[switchIndex]);
     };
 
     const switchTo = async (w: Widget, index: number) => {
       switchIndex = index;
       await w.switchModel(index);
-      applyScale(w);
+      applyCanvasSize(w);
       const motions = w.l2d.getMotions();
       if (motions['login']) {
         w.l2d.playMotion('login');
@@ -108,7 +112,7 @@ export default function VirtualPet() {
             label: '放大',
             onClick: (w) => {
               scaleFactor = clamp(scaleFactor + 0.1, SCALE_MIN, SCALE_MAX);
-              applyScale(w);
+              applyCanvasSize(w);
             },
           },
           {
@@ -116,7 +120,7 @@ export default function VirtualPet() {
             label: '缩小',
             onClick: (w) => {
               scaleFactor = clamp(scaleFactor - 0.1, SCALE_MIN, SCALE_MAX);
-              applyScale(w);
+              applyCanvasSize(w);
             },
           },
           {
@@ -173,7 +177,7 @@ export default function VirtualPet() {
       }
       if (statusBar) {
         statusBar.style.right = `${right}px`;
-        statusBar.style.bottom = `${bottom + size / 2}px`;
+        statusBar.style.bottom = `${bottom + (root?.offsetHeight ?? size) / 2}px`;
       }
     };
 
@@ -195,7 +199,7 @@ export default function VirtualPet() {
       const el = document.createElement('div');
       Object.assign(el.style, {
         position: 'fixed',
-        right: `${rightOffset + size + 16}px`,
+        right: `${rightOffset + (root?.offsetWidth ?? size) + 16}px`,
         top: '50%',
         transform: 'translateY(-50%)',
         background: 'rgba(99,102,241,0.95)',
@@ -287,8 +291,14 @@ export default function VirtualPet() {
       const dy = e.clientY - start.y;
       if (!dragging && Math.hypot(dx, dy) < 4) return;
       dragging = true;
-      const maxRight = Math.max(0, window.innerWidth - size + 12);
-      const maxBottom = Math.max(0, window.innerHeight - size + 12);
+      const maxRight = Math.max(
+        0,
+        window.innerWidth - (root?.offsetWidth ?? size) + 12,
+      );
+      const maxBottom = Math.max(
+        0,
+        window.innerHeight - (root?.offsetHeight ?? size) + 12,
+      );
       const right = clamp(start.right - dx, 0, maxRight);
       const bottom = clamp(start.bottom - dy, 0, maxBottom);
       applyPos(right, bottom);
