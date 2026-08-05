@@ -19,6 +19,7 @@ const MODEL_NAMES = ['BYC', 'ninifashengri', 'Kiro', 'l_234400412', 'l_234500311
 const MODEL_BASE_SCALE = [1, 1.2, 1, 1, 1];
 const SCALE_MIN = 0.5;
 const SCALE_MAX = 2;
+const SCALE_LEVELS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 const clamp = (value: number, lo: number, hi: number) =>
   Math.min(Math.max(value, lo), hi);
@@ -191,7 +192,7 @@ export default function VirtualPet() {
       const el = document.createElement('div');
       Object.assign(el.style, {
         position: 'fixed',
-        left: '0',
+        right: `${rightOffset}px`,
         top: '50%',
         transform: 'translateY(-50%)',
         background: 'rgba(99,102,241,0.95)',
@@ -260,7 +261,7 @@ export default function VirtualPet() {
       const el = document.createElement('div');
       Object.assign(el.style, {
         position: 'fixed',
-        left: '0',
+        right: `${rightOffset}px`,
         top: '50%',
         transform: 'translateY(-50%)',
         background: 'rgba(99,102,241,0.95)',
@@ -283,16 +284,30 @@ export default function VirtualPet() {
       input.type = 'range';
       input.min = `${SCALE_MIN}`;
       input.max = `${SCALE_MAX}`;
-      input.step = '0.05';
+      input.step = '0.25';
       input.value = `${scaleFactor}`;
+      const datalist = document.createElement('datalist');
+      datalist.id = 'pet-scale-levels';
+      SCALE_LEVELS.forEach((v) => {
+        const opt = document.createElement('option');
+        opt.value = `${v}`;
+        datalist.appendChild(opt);
+      });
       Object.assign(input.style, { width: '140px', cursor: 'pointer' });
+      input.setAttribute('list', 'pet-scale-levels');
       input.addEventListener('input', () => {
-        scaleFactor = parseFloat(input.value);
-        label.textContent = `缩放：${scaleFactor.toFixed(2)}x`;
+        const raw = parseFloat(input.value);
+        scaleFactor = SCALE_LEVELS.reduce(
+          (best, v) => (Math.abs(v - raw) < Math.abs(best - raw) ? v : best),
+          SCALE_LEVELS[0],
+        );
+        input.value = `${scaleFactor}`;
+        label.textContent = `缩放：${scaleFactor}x`;
         applyCanvasSize(w);
       });
       el.appendChild(label);
       el.appendChild(input);
+      el.appendChild(datalist);
       sliderEl = el;
       document.body.appendChild(el);
       const onDocPointerDown = (e: PointerEvent) => {
