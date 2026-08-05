@@ -208,6 +208,8 @@
 - **特效配置**：无（默认）
 - **纹理**：textures/texture_00.png、texture_01.png
 - **无 layout、无音效、无 hit_areas**（moc drawable 为 ArtMesh/PARTS 无语义化命名，无法提取部位区域）
+- **内置装饰部件**：`beijing`（背景）、`san`（伞）、`R_denglong`/`L_denglong`（红灯笼）
+- **白遮修复**：全部 13 个动作文件（`020.mtn` login、`idle.mtn`、`002.mtn`~`012.mtn` idle_click）原含 `VISIBLE:beijing=1`，登场或点击时显示整块白色背景遮盖；已全部改为 `VISIBLE:beijing=0` 强制隐藏背景，保留伞/灯笼装饰
 - **原始 model.json 含尾随逗号与无效字段**（`trigger`、`cv_id`），已清理为合法 JSON
 
 ### 默认行为
