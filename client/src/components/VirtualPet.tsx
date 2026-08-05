@@ -12,6 +12,9 @@ const STORE_HIDDEN_KEY = 'pet_hidden';
 const MODEL_BYC = '/live2d/byc/model.json';
 const MODEL_THIRD = '/live2d/ninifashengri/model.json';
 const MODEL_KIRO = '/live2d/kiro/model.json';
+const MODEL_L1 = '/live2d/l_234400412/model.json';
+const MODEL_L2 = '/live2d/l_234500311/model.json';
+const MODEL_COUNT = 5;
 
 const clamp = (value: number, lo: number, hi: number) =>
   Math.min(Math.max(value, lo), hi);
@@ -60,6 +63,8 @@ export default function VirtualPet() {
         { path: MODEL_BYC, offset: [0, 0.6], tips },
         { path: MODEL_THIRD, scale: 1.2, tips },
         { path: MODEL_KIRO, tips },
+        { path: MODEL_L1, tips },
+        { path: MODEL_L2, tips },
       ],
       menus: {
         items: [
@@ -67,7 +72,7 @@ export default function VirtualPet() {
             icon: 'mdi:shuffle-variant',
             label: '切换模型',
             onClick: (w) => {
-              switchIndex = (switchIndex + 1) % 3;
+              switchIndex = (switchIndex + 1) % MODEL_COUNT;
               w.switchModel(switchIndex);
             },
           },
@@ -187,6 +192,12 @@ export default function VirtualPet() {
           window.removeEventListener('click', suppress, true);
         };
         window.addEventListener('click', suppress, true);
+      } else {
+        const motions = widget.l2d.getMotions();
+        const clickGroup = motions['idle_click'];
+        if (clickGroup && clickGroup.length > 0) {
+          widget.l2d.playMotion('idle_click');
+        }
       }
       start = null;
       dragging = false;

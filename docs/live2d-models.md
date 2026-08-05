@@ -1,6 +1,6 @@
 # Live2D 看板娘模型行为说明
 
-本博客右下角 Live2D 看板娘由 `l2d-widget` 库驱动，共包含 3 个 Cubism 2 模型，支持模型切换、点击互动、摸头、隐藏/唤醒、拖拽。
+本博客右下角 Live2D 看板娘由 `l2d-widget` 库驱动，共包含 5 个 Cubism 2 模型，支持模型切换、点击互动、摸头、隐藏/唤醒、拖拽。
 
 ## 通用行为（所有模型共用）
 
@@ -16,6 +16,7 @@
 - hit area 区域：head（头部）、face（脸）、breast（胸）、belly（腹）、leg（腿）
 - 点击命中区域时附带随机文字提示（"嘿嘿，干嘛戳我～"等）
 - 特殊映射：仅 BYC 模型的 face 区域点击触发 `shake`（摇头），其余模型 face 仍为 `tap_face`
+- **无 hit area 的模型**（l_234400412 / l_234500311）：任意位置点击均触发 `idle_click` 动作组（随机播放其中 1 个动作），实现见 `onPointerEnd` 兜底逻辑
 
 ### 摸头行为（菜单"摸头"按钮）
 菜单项 `摸头` 点击逻辑（`VirtualPet.tsx`）：
@@ -125,6 +126,48 @@
 
 ### 摸头行为
 匹配交互正则命中的动作组：`shake`、`flick_head`、`tap_face`、`tap_breast`、`tap_belly`、`tap_leg`，随机播放其一。
+
+---
+
+## 4. l_234400412 模型（l_234400412/model.json）
+
+- **文件**：`client/public/live2d/l_234400412/model.json`（model.moc）
+- **特效配置**：无（默认）
+- **纹理**：textures/texture_00.png、texture_01.png、texture_02.png
+- **无 layout、无音效、无 hit_areas**（moc drawable 为 ArtMesh/PARTS 无语义化命名，无法提取部位区域）
+- **原始 model.json 含尾随逗号与无效字段**（`trigger`、`cv_id`），已清理为合法 JSON
+
+### 默认行为
+- idle 动作组仅 1 个动作：`idle.mtn`
+- idle_click 动作组：11 个动作（002.mtn ~ 012.mtn）
+- login 动作组：`020.mtn`（登录触发，本实现不主动播放）
+
+### 点击行为
+任意位置点击随机播放 `idle_click` 组动作（`onPointerEnd` 兜底，见 VirtualPet.tsx），带文字提示但无音效。
+
+### 摸头行为
+交互正则匹配命中的动作组：`idle_click`（含 click 关键字），随机播放其一。
+
+---
+
+## 5. l_234500311 模型（l_234500311/model.json）
+
+- **文件**：`client/public/live2d/l_234500311/model.json`（model.moc）
+- **特效配置**：无（默认）
+- **纹理**：textures/texture_00.png、texture_01.png
+- **无 layout、无音效、无 hit_areas**（moc drawable 为 ArtMesh/PARTS 无语义化命名，无法提取部位区域）
+- **原始 model.json 含尾随逗号与无效字段**（`trigger`、`cv_id`），已清理为合法 JSON
+
+### 默认行为
+- idle 动作组仅 1 个动作：`idle.mtn`
+- idle_click 动作组：11 个动作（002.mtn ~ 012.mtn）
+- login 动作组：`020.mtn`（登录触发，本实现不主动播放）
+
+### 点击行为
+任意位置点击随机播放 `idle_click` 组动作（`onPointerEnd` 兜底，见 VirtualPet.tsx），带文字提示但无音效。
+
+### 摸头行为
+交互正则匹配命中的动作组：`idle_click`（含 click 关键字），随机播放其一。
 
 ---
 
