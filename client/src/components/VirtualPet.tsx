@@ -191,7 +191,7 @@ export default function VirtualPet() {
       const el = document.createElement('div');
       Object.assign(el.style, {
         position: 'fixed',
-        right: `${rightOffset + (root?.offsetWidth ?? size) + 16}px`,
+        left: '0',
         top: '50%',
         transform: 'translateY(-50%)',
         background: 'rgba(99,102,241,0.95)',
@@ -260,7 +260,7 @@ export default function VirtualPet() {
       const el = document.createElement('div');
       Object.assign(el.style, {
         position: 'fixed',
-        right: `${rightOffset + (root?.offsetWidth ?? size) + 16}px`,
+        left: '0',
         top: '50%',
         transform: 'translateY(-50%)',
         background: 'rgba(99,102,241,0.95)',
