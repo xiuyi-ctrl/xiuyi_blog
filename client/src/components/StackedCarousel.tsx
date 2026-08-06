@@ -20,7 +20,9 @@ export default function StackedCarousel({ albums, onAlbumClick }: StackedCarouse
       {albums.map((album, index) => {
         const urls = Object.values(album.image_url || {});
         const photoCount = urls.length;
-        const layers = [album.cover, ...urls].slice(0, 3);
+        const layers = album.cover
+          ? [...urls.slice(0, 2), album.cover]
+          : urls.slice(0, 3);
 
         return (
           <div

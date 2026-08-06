@@ -124,7 +124,7 @@ export default function PostDetail() {
 
         <article className="post-detail">
           {post.cover && (
-            <img src={post.cover} alt={post.title} className="post-detail-cover" />
+            <img src={post.cover} alt={post.title} className="post-detail-cover" fetchPriority="high" decoding="async" />
           )}
 
           <h1>{post.title}</h1>

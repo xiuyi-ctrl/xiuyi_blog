@@ -82,7 +82,7 @@ export default function About() {
       <div className="about-profile-card">
         <div className="about-profile-top">
           <div className="about-avatar">
-            <img src="https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/yileina.png" alt="avatar" />
+            <img src="https://raw.githubusercontent.com/xiuyi-ctrl/picgo_images/main/images/yileina.png" alt="avatar" fetchPriority="high" decoding="async" />
           </div>
           <div className="about-profile-info">
             <h1 className="about-name">Xiuyi</h1>

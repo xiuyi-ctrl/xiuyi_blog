@@ -3,11 +3,9 @@ import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api';
-import CircularGallery from '../components/CircularGallery';
 import StackedCarousel from '../components/StackedCarousel';
 import Stack from '../components/Stack';
 import SplitText from '../components/SplitText';
-import { useTheme } from '../contexts/ThemeContext';
 
 interface Album {
   id: number;
@@ -28,10 +26,9 @@ function AlbumList() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'gallery' | 'stack' | 'stacked'>('stacked');
+  const [viewMode, setViewMode] = useState<'stack' | 'stacked'>('stacked');
   const [topAlbumIndex, setTopAlbumIndex] = useState(0);
   const navigate = useNavigate();
-  const { theme } = useTheme();
 
   const fetchAlbums = useCallback(async () => {
     try {
@@ -53,13 +50,9 @@ function AlbumList() {
 
   const albumItems: GalleryItem[] = useMemo(() => albums.map(a => ({ id: a.id, image: a.cover, text: a.title })), [albums]);
 
-  const handleAlbumClick = useCallback((item: GalleryItem) => {
+  const handleStackClick = useCallback((item: GalleryItem) => {
     navigate(`/photos/${item.id}`);
   }, [navigate]);
-
-  const handleStackClick = useCallback((item: GalleryItem) => {
-    handleAlbumClick(item);
-  }, [handleAlbumClick]);
 
   return (
     <div className="photos-page">
@@ -83,15 +76,6 @@ function AlbumList() {
               <rect x="3" y="6" width="14" height="14" rx="2" /><rect x="7" y="2" width="14" height="14" rx="2" /><path d="M3 12h18" opacity="0.5" />
             </svg>
             照片墙
-          </button>
-          <button
-            className={`photos-toggle-btn ${viewMode === 'gallery' ? 'active' : ''}`}
-            onClick={() => setViewMode('gallery')}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            旋转画廊
           </button>
           <button
             className={`photos-toggle-btn ${viewMode === 'stack' ? 'active' : ''}`}
@@ -120,33 +104,6 @@ function AlbumList() {
         ) : (
           <div className="photos-empty"><p>暂无照片集</p></div>
         )
-      ) : viewMode === 'gallery' ? (
-        <div className="photos-gallery-wrapper">
-          {loading ? (
-            <div className="photos-loading">
-              <div className="loading-dots"><span></span><span></span><span></span></div>
-            </div>
-          ) : error ? (
-            <div className="photos-error">
-              <p>{error}</p>
-              <button className="photos-retry-btn" onClick={fetchAlbums}>重新加载</button>
-            </div>
-          ) : albumItems.length > 0 ? (
-            <CircularGallery
-              items={albumItems}
-              bend={3}
-              textColor={theme === 'light' ? 'rgba(24, 28, 48, 0.9)' : '#ffffff'}
-              borderRadius={0.05}
-              font="bold 30px Figtree"
-              fontUrl="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap"
-              scrollSpeed={2}
-              scrollEase={0.05}
-              onItemClick={handleAlbumClick}
-            />
-          ) : (
-            <div className="photos-empty"><p>暂无照片集</p></div>
-          )}
-        </div>
       ) : (
         <div className="photos-stack-layout">
           <div className="stack-album-name" key={topAlbumIndex}>
@@ -173,7 +130,7 @@ function AlbumList() {
               <Stack
                 cards={albumItems.map((item, i) => (
                   <div key={i} className="stack-card" onClick={() => handleStackClick(item)}>
-                    <img src={item.image} alt={item.text} className="stack-card-image" />
+                    <img src={item.image} alt={item.text} className="stack-card-image" loading="lazy" decoding="async" />
                     <span className="stack-card-label">{item.text}</span>
                   </div>
                 ))}
@@ -193,7 +150,7 @@ function AlbumList() {
       )}
 
       <div className="photos-hint">
-        <span>{viewMode === 'gallery' ? '← 拖动或滚轮浏览，点击进入相册 →' : viewMode === 'stack' ? '← 拖拽卡片或等待自动轮播，点击进入相册 →' : ''}</span>
+        <span>{viewMode === 'stack' ? '← 拖拽卡片或等待自动轮播，点击进入相册 →' : ''}</span>
       </div>
     </div>
   );
@@ -318,7 +275,7 @@ function AlbumDetail() {
               className="photos-grid-item"
               onClick={() => setLightbox({ items, index: idx })}
             >
-              <img src={item.image} alt={item.text} />
+              <img src={item.image} alt={item.text} loading="lazy" decoding="async" />
               <span className="photos-grid-label">{item.text}</span>
             </div>
           ))}

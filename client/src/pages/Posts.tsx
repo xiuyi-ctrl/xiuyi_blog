@@ -263,6 +263,8 @@ export default function Posts() {
                         src={getCoverSrc(post)}
                         alt={post.title}
                         className="post-cover"
+                        loading="lazy"
+                        decoding="async"
                         onError={() => handleCoverError(post.id)}
                       />
                     </div>

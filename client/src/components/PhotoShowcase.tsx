@@ -57,7 +57,7 @@ export default function PhotoShowcase() {
               onMouseEnter={() => setActiveIndex(i)}
               onClick={() => navigate(`/photos/${album.id}`)}
             >
-              <img className="panel-cover" src={album.cover} alt={album.title} />
+              <img className="panel-cover" src={album.cover} alt={album.title} loading="lazy" decoding="async" />
               <div className="panel-overlay">
                 <span className="panel-number">{String(i + 1).padStart(2, '0')}</span>
                 <h3 className="panel-title">{album.title}</h3>

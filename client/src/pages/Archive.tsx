@@ -135,7 +135,7 @@ export default function Archive() {
               onClick={() => navigate(`/post/${post.id}`)}
             >
               <div className="featured-cover">
-                <img src={post.cover || '/pictures/post_pictures/1.jpg'} alt={post.title} />
+                <img src={post.cover || '/pictures/post_pictures/1.jpg'} alt={post.title} loading="lazy" decoding="async" />
                 <div className="featured-info">
                   <h3 className="featured-title">{post.title}</h3>
                   <div className="featured-meta">
@@ -185,7 +185,7 @@ export default function Archive() {
                     <div className="timeline-card-content">
                       {cover && (
                         <div className="timeline-card-cover">
-                          <img src={cover} alt={item.title} />
+                          <img src={cover} alt={item.title} loading="lazy" decoding="async" />
                         </div>
                       )}
                       <div className="timeline-card-body">

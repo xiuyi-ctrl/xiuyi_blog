@@ -95,6 +95,8 @@ export default function ArticleShowcase() {
           className="showcase-cover"
           src={activePost.cover || DEFAULT_COVER}
           alt={activePost.title}
+          loading="lazy"
+          decoding="async"
         />
         <div className="showcase-overlay" />
         <div className="showcase-card-content">
