@@ -56,7 +56,7 @@ export default function VirtualPet() {
     const tips = {
       welcomeMessage: [
         timeBasedGreeting(),
-        '欢迎来到秀一的博客～',
+        '欢迎来到咻咿的博客～',
       ],
       messages: [...PET_IDLE_TIPS, ...PET_CLICK_TIPS, ...PET_PAT_TIPS],
       duration: 4000,

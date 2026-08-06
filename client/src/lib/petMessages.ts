@@ -13,7 +13,7 @@ export function timeBasedGreeting(): string {
 }
 
 export const PET_IDLE_TIPS = [
-  '欢迎来到秀一的博客～',
+  '欢迎来到咻咿的博客～',
   '要不要看看最新的文章呢？',
   '累了吗？休息一下，我陪着你～',
   '这里的音乐超好听，去听听吧！',
